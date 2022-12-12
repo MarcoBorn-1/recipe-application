@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/home/screens/main_page.dart';
 import 'package:frontend/recipe/screens/recipe_page.dart';
+import 'package:frontend/search/screens/search_option_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 Future<void> main() async {
@@ -63,7 +64,7 @@ class _MyBottomNavigatorState extends State<MyBottomNavigator> {
   List<Widget> _buildScreens() {
       return [
         const MyHomePage(),
-        const RecipeScreen(title: "Lasagne", recipeId: 4, isExternal: true),
+        SearchOptionScreen(),
         const WidgetTree(),
       ];
   }
