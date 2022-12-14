@@ -2,25 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:frontend/recipe/screens/recipe_page.dart';
 
 class RecipeContainer extends StatelessWidget {
+  RecipeContainer(
+      this.recipeIdTemp, this.recipeName, this.timeToMake, this.calories,
+      {super.key});
   final String recipeIdTemp;
   final String recipeName;
   final String timeToMake;
   final String calories;
-  RecipeContainer(
-      this.recipeIdTemp, this.recipeName, this.timeToMake, this.calories,
-      {super.key});
 
   late int recipeId = int.tryParse(recipeIdTemp) ?? -1;
   @override
   Widget build(BuildContext context) {
+    String imageURL;
+    if (recipeName == "Pizza") {
+      imageURL = "assets/images/pizza.jpg";
+    } else if (recipeName == "Spaghetti") {
+      imageURL = "assets/images/spaghetti.jpg";
+    } else {
+      imageURL = "assets/images/lasagne.jpg";
+    }
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => RecipeScreen(title: recipeName, recipeId: 1, isExternal: true,)));
+            context,
+            MaterialPageRoute(
+              builder: (context) => RecipeScreen(
+                    recipeImg: imageURL,
+                    title: recipeName,
+                    recipeId: 1,
+                    isExternal: true,
+                  )
+            )
+          );
         },
         child: Container(
           decoration: BoxDecoration(
@@ -32,9 +48,9 @@ class RecipeContainer extends StatelessWidget {
             Expanded(
                 flex: 4,
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: Image.asset(
-                    "assets/images/dish.jpg",
+                    imageURL,
                   ),
                 )),
             Expanded(
