@@ -6,7 +6,7 @@ class SearchWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(30),
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
       child: TextField(
     textAlign: TextAlign.left,
     style: const TextStyle(fontSize: 30),

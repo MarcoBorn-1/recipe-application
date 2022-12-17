@@ -1,30 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:recase/recase.dart';
 
-class NutrientWidget extends StatelessWidget {
-  const NutrientWidget(this.nutrients, {super.key});
-  final Map<String, Map<String, dynamic>> nutrients;
-  final String nutrientTitle = "Nutrients";
+class RecipeInformationWidget extends StatelessWidget {
+  const RecipeInformationWidget(this.informationMap, this.title, {super.key});
+  final Map<String, Map<String, dynamic>> informationMap;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Text(
-          nutrientTitle,
+          title,
           style: const TextStyle(color: Colors.white, fontSize: 24),
         ),
         Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 25, top: 10),
           child: Container(
             decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 48, 47, 47),
-                borderRadius: BorderRadius.circular(10)),
+              color: const Color.fromARGB(255, 48, 47, 47),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: Colors.deepPurple,
+                width: 0.8,
+              )
+            ),
             width: double.infinity,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               child: Column(
-                children: nutrients.entries.map((entry) {
+                children: informationMap.entries.map((entry) {
                   var value = entry.value['amount'].toString() + " " +
                       entry.value['measurement'];
 

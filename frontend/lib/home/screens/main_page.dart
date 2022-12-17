@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/home/widgets/recipes_show.dart';
+import 'package:frontend/home/widgets/recipe_container.dart';
 import 'package:frontend/home/widgets/search_widget.dart';
 
 import '../../auth/widgets/auth.dart';
@@ -50,18 +50,19 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFF242424),
       body: ListView.builder(
-          scrollDirection: Axis.vertical,
-          shrinkWrap: true,
-          padding: const EdgeInsets.all(8),
-          itemCount: itemList.length + 1,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              return const SearchWidget();
-            }
-            index -= 1;
-            return RecipeContainer(itemList[index][0], itemList[index][1],
-                itemList[index][2], itemList[index][3]);
-          }),
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        padding: const EdgeInsets.all(8),
+        itemCount: itemList.length + 1,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return const SearchWidget();
+          }
+          index -= 1;
+          return RecipeContainer(itemList[index][0], itemList[index][1],
+              itemList[index][2], itemList[index][3]);
+        }
+      ),
     );
   }
 }

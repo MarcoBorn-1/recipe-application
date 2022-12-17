@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/recipe/widgets/nutrient_widget.dart';
+import 'package:frontend/recipe/widgets/recipe_info_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_header_widget.dart';
+import 'package:frontend/recipe/widgets/recipe_steps_widget.dart';
 
 class RecipeScreen extends StatefulWidget {
   const RecipeScreen(
@@ -47,7 +48,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
   };
   List<String> instructions = [
     "Once pasta is cooked, drain and leave to cool for a minute",
-    "Place small skillet on medium fire, drizzle olive oil, add in red pepper and stir-fry for 1-2 minutes. Put aside. Toss pasta shells, red pepper, tuna, parsley, garlic, chillies and lemon juice. Season with ground black pepper to taste, spoon into serving bowls."
+    "Place small skillet on medium fire, drizzle olive oil, add in red pepper and stir-fry for 1-2 minutes. ",
+    "Put aside. ",
+    "Toss pasta shells, red pepper, tuna, parsley, garlic, chillies and lemon juice.",
+    "Season with ground black pepper to taste, spoon into serving bowls."
   ];
   int reviewAmount = 2;
   Map<String, Map<String, String>> reviewsPreview = {
@@ -76,7 +80,9 @@ class _RecipeScreenState extends State<RecipeScreen> {
     List<Widget> widgetList = [
       RecipeHeaderWidget(
           widget.title, widget.recipeImg, ratingAvg, timeToPrepareMin),
-      NutrientWidget(nutritionValues),
+      RecipeInformationWidget(nutritionValues, "Nutrients"),
+      RecipeInformationWidget(ingredients, "Ingredients"),
+      RecipeStepsWidget(instructions)
     ];
 
     return Scaffold(
