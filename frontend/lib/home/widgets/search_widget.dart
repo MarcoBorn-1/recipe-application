@@ -8,6 +8,7 @@ class SearchWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
       child: TextField(
+        enabled: false,
     textAlign: TextAlign.left,
     style: const TextStyle(fontSize: 30),
     keyboardType: TextInputType.text,

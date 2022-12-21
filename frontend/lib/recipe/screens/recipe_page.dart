@@ -54,16 +54,18 @@ class _RecipeScreenState extends State<RecipeScreen> {
     "Season with ground black pepper to taste, spoon into serving bowls."
   ];
   int reviewAmount = 2;
-  Map<String, Map<String, String>> reviewsPreview = {
+  Map<String, Map<String, dynamic>> reviewsPreview = {
     'userID1': {
       'username': 'Andrzej Drwal',
       'review': 'Świetny przepis!',
-      'image_url': 'imgURL'
+      'image_url': 'imgURL',
+      'rating': 4
     },
     'userID2': {
       'username': 'Joanna Radna',
       'review': 'super!!! pozdrawiam cieplutko!',
-      'image_url': 'imgURL'
+      'image_url': 'imgURL',
+      'rating': 5
     }
   };
 

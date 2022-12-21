@@ -7,6 +7,25 @@ class RecipeReviewsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ;
+    return Column(
+      children: [
+        const Text(
+          "Reviews",
+          style: TextStyle(
+            color:Colors.white,
+            fontSize: 24,
+          ),
+        ),
+        ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(8),
+          itemCount: reviewList.length,
+          itemBuilder: (BuildContext context, int index) {
+            return RecipeStepContainer(index, recipeSteps[index]);
+          }
+        )
+      ]
+    );
   }
 }

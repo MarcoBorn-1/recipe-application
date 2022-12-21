@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/search/screens/search_dish_name.dart';
 import 'package:frontend/search/widgets/search_option_container.dart';
 
 class SearchOptionScreen extends StatelessWidget {
@@ -29,7 +30,14 @@ class SearchOptionScreen extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: () => {},
+              onTap: () => {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SearchDishName()
+                  )
+                )
+              },
               child: SearchOptionContainer(titleList[0], descList[0])
             ),
             GestureDetector(

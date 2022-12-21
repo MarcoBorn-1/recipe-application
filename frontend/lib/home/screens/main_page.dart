@@ -49,19 +49,22 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF242424),
-      body: ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        padding: const EdgeInsets.all(8),
-        itemCount: itemList.length + 1,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return const SearchWidget();
-          }
-          index -= 1;
-          return RecipeContainer(itemList[index][0], itemList[index][1],
-              itemList[index][2], itemList[index][3]);
-        }
+      body: Column(
+        children: [
+          const SearchWidget(),
+          Expanded(
+            child: ListView.builder(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(8),
+              itemCount: itemList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return RecipeContainer(itemList[index][0], itemList[index][1],
+                    itemList[index][2], itemList[index][3]);
+              }
+            ),
+          ),
+        ],
       ),
     );
   }
