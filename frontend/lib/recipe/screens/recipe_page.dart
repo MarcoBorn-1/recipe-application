@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/recipe/widgets/recipe_info_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_header_widget.dart';
+import 'package:frontend/recipe/widgets/recipe_reviews_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_steps_widget.dart';
 
 class RecipeScreen extends StatefulWidget {
@@ -54,20 +55,29 @@ class _RecipeScreenState extends State<RecipeScreen> {
     "Season with ground black pepper to taste, spoon into serving bowls."
   ];
   int reviewAmount = 2;
-  Map<String, Map<String, dynamic>> reviewsPreview = {
-    'userID1': {
+  List<Map<String, dynamic>> reviewsPreview = [
+    {
+      'user_id': 'userID1',
       'username': 'Andrzej Drwal',
       'review': 'Świetny przepis!',
       'image_url': 'imgURL',
       'rating': 4
     },
-    'userID2': {
+    {
+      'user_id': 'userID2',
       'username': 'Joanna Radna',
       'review': 'super!!! pozdrawiam cieplutko!',
       'image_url': 'imgURL',
       'rating': 5
+    },
+    {
+      'user_id': 'userID3',
+      'username': 'Jarl Cohnson',
+      'review': 'takie srednie te zarelko',
+      'image_url': 'imgURL',
+      'rating': 5
     }
-  };
+  ];
 
   Widget favorite = const Padding(
       padding: EdgeInsets.only(right: 20),
@@ -84,7 +94,8 @@ class _RecipeScreenState extends State<RecipeScreen> {
           widget.title, widget.recipeImg, ratingAvg, timeToPrepareMin),
       RecipeInformationWidget(nutritionValues, "Nutrients"),
       RecipeInformationWidget(ingredients, "Ingredients"),
-      RecipeStepsWidget(instructions)
+      RecipeStepsWidget(instructions),
+      RecipeReviewsWidget(2, reviewsPreview)
     ];
 
     return Scaffold(
