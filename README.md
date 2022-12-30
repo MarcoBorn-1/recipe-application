@@ -1,7 +1,7 @@
 # Recipe Application
 
 An application for mobile devices, which allows users to search for recipes using the meal's name, or the names of the ingredients they wish to use.
-Application is written in Flutter and Spring.
+Application is written in Flutter, Spring and Firebase. The external recipe API is provided by Spoonacular.
 
 # Features
 
