@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Review {
-    int rating;
-    String userUID;
-    String comment;
+public class Nutrient {
+    String name;
+    double amount;
+    String unit;
 }
