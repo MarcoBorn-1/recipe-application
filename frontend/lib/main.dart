@@ -110,6 +110,7 @@ class _MyBottomNavigatorState extends State<MyBottomNavigator> {
           colorBehindNavBar: const MaterialColor(0xFF221722, color),
         ),
         popAllScreensOnTapOfSelectedTab: true,
+        popAllScreensOnTapAnyTabs: true,
         popActionScreens: PopActionScreensType.all,
         itemAnimationProperties: const ItemAnimationProperties( // Navigation Bar's items animation properties.
           duration: Duration(milliseconds: 200),

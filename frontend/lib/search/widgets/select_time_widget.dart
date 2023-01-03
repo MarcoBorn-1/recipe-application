@@ -1,50 +1,124 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/widgets/custom_container.dart';
 
 class SelectTimeWidget extends StatelessWidget {
   const SelectTimeWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text(
-          "Time", 
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white, 
-            fontSize: 32,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 15),
+            child: Text(
+              "Time", 
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white, 
+                fontSize: 32,
+              ),
+            ),
           ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              children: const  [
-                Padding(
-                  padding: EdgeInsets.only(bottom: 20.0),
-                  child: Icon(
-                    CupertinoIcons.timer, 
-                    color: Colors.white,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 10.0),
-                  child: Text(
-                    "< 15 mins", 
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                flex: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomContainer(
+                    child: Column(
+                      children: const  [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 20.0),
+                          child: Icon(
+                            CupertinoIcons.flame, 
+                            size: 40,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10.0),
+                          child: Text(
+                            "Under 15 minutes", 
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-            Column(),
-            Column(),
-          ],
-          )
-      ],
+              ),
+              Expanded(
+                flex: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomContainer(
+                    child: Column(
+                      children: const  [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 20.0),
+                          child: Icon(
+                            CupertinoIcons.time, 
+                            size: 40,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10.0),
+                          child: Text(
+                            "Under 30 minutes", 
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomContainer(
+                    child: Column(
+                      children: const  [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 20.0),
+                          child: Icon(
+                            CupertinoIcons.hourglass, 
+                            size: 40,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10.0),
+                          child: Text(
+                            "Under 60 minutes", 
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            )
+        ],
+      ),
     );
   }
 }

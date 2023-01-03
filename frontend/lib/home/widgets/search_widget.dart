@@ -27,8 +27,8 @@ class SearchWidget extends StatelessWidget {
         fillColor: Colors.white,
         prefixIcon: Container(
           padding: const EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 10),
-          width: 65,
-          height: 65,
+          width: 55,
+          height: 55,
           child: Image.asset('assets/icons/search1.png'),
                         
     ),

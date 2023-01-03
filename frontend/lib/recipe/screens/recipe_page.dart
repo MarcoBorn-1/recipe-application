@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/recipe/widgets/recipe_info_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_header_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_reviews_widget.dart';
@@ -95,7 +96,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
       RecipeInformationWidget(nutritionValues, "Nutrients"),
       RecipeInformationWidget(ingredients, "Ingredients"),
       RecipeStepsWidget(instructions),
-      RecipeReviewsWidget(2, reviewsPreview)
+      RecipeReviewsWidget(2, reviewsPreview),
     ];
 
     return Scaffold(
