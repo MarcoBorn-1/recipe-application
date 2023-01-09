@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Nutrient {
-    String name;
-    double amount;
-    String unit;
+    private String name;
+    private double amount;
+    private String unit;
 }

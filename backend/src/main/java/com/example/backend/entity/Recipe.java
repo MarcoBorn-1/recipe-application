@@ -9,48 +9,67 @@ import java.util.Map;
 @Getter
 @Setter
 public class Recipe {
-    int id;
-    boolean isExternal;
+    private int id;
+    private boolean isExternal;
+    private String title;
 
-    ArrayList<Ingredient> ingredients = new ArrayList<>();
-    ArrayList<Nutrient> nutrients = new ArrayList<>();
-    ArrayList<String> steps;
+    private ArrayList<Ingredient> ingredients = new ArrayList<>();
+    private ArrayList<String> steps;
 
-    double readyInMinutes;
+    private Double readyInMinutes;
 
-    String author;
-    String dateAdded;
+    private String author;
+    private String dateAdded;
+    private String imageURL;
 
     // Review information
 
-    ArrayList<Review> reviews = new ArrayList<>();
+    private ArrayList<Review> reviews = new ArrayList<>();
 
-    int amountOfReviews;
-    double averageReviewScore;
+    private int amountOfReviews;
+    private Double averageReviewScore;
 
-    public void addRecipeInfo(RecipeDTO recipeDTO) {
+    private Double calories;
+    private Double proteins;
+    private Double carbohydrates;
+    private Double fats;
+
+    public void addInternalRecipeInfo(InternalRecipeDTO internalRecipeDTO) {
         isExternal = false;
-        author = recipeDTO.author;
-        dateAdded = recipeDTO.dateAdded;
-        id = recipeDTO.id;
-        readyInMinutes = recipeDTO.readyInMinutes;
-        steps = recipeDTO.steps;
+        author = internalRecipeDTO.getAuthor();
+        dateAdded = internalRecipeDTO.getDateAdded();
+        id = internalRecipeDTO.getId();
+        readyInMinutes = internalRecipeDTO.getReadyInMinutes();
+        steps = internalRecipeDTO.getSteps();
+        calories = ((Number) internalRecipeDTO.getCalories()).doubleValue();
+        proteins = ((Number) internalRecipeDTO.getProteins()).doubleValue();
+        carbohydrates = ((Number) internalRecipeDTO.getCarbohydrates()).doubleValue();
+        fats = ((Number) internalRecipeDTO.getFats()).doubleValue();
 
-        for (Map.Entry<String, Map<String, Object>> entry : recipeDTO.ingredients.entrySet()) {
+        Map<String, Map<String, Object>> map = internalRecipeDTO.getIngredients_map();
+
+        for (Map.Entry<String, Map<String, Object>> entry : map.entrySet()) {
             Ingredient ingredient = new Ingredient();
-            //ingredient.id = (int) entry.getValue().get("id");
-            ingredient.name = entry.getKey();
-            ingredient.amount = Double.parseDouble(entry.getValue().get("amount").toString());
-            ingredient.unit = (String) entry.getValue().get("unit");
+            ingredient.setName(entry.getKey());
+            ingredient.setId(((Number) entry.getValue().get("id")).intValue());
+            ingredient.setAmount(((Number) entry.getValue().get("amount")).doubleValue());
+            ingredient.setUnit((String) entry.getValue().get("unit"));
             ingredients.add(ingredient);
         }
+    }
 
-        for (Map.Entry<String, Map<String, Object>> entry : recipeDTO.nutrients.entrySet()) {
-            Nutrient nutrient = new Nutrient();
-            nutrient.name = entry.getKey();
-            nutrient.amount = Double.parseDouble(entry.getValue().get("amount").toString());
-            nutrient.unit = (String) entry.getValue().get("unit");
-            nutrients.add(nutrient);
-        }
+    public void addExternalRecipeInfo(ExternalRecipeDTO externalRecipeDTO) {
+        isExternal = true;
+        author = null;
+        dateAdded = null;
+        id = externalRecipeDTO.getId();
+        readyInMinutes = externalRecipeDTO.getReadyInMinutes();
+        steps = externalRecipeDTO.getSteps();
+        calories = externalRecipeDTO.getCalories();
+        proteins = externalRecipeDTO.getProteins();
+        carbohydrates = externalRecipeDTO.getCarbohydrates();
+        fats = externalRecipeDTO.getFats();
+        ingredients = externalRecipeDTO.getIngredients();
+        imageURL = externalRecipeDTO.getImageURL();
     }
 }

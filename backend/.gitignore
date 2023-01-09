@@ -33,3 +33,4 @@ build/
 .vscode/
 
 /src/main/java/resources/firebaseSecretKey.json
+/src/main/java/com/example/backend/config/Constants.java

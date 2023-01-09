@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Review {
-    int rating;
-    String userUID;
-    String comment;
+    private int rating;
+    private String userUID;
+    private String comment;
 }
