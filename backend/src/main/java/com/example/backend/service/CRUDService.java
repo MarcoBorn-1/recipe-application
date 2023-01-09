@@ -3,10 +3,12 @@ package com.example.backend.service;
 import com.example.backend.entity.ExternalRecipeDTO;
 import com.example.backend.entity.Recipe;
 import com.example.backend.entity.InternalRecipeDTO;
+import com.example.backend.entity.RecipePreview;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -37,10 +40,9 @@ public class CRUDService {
             return null;
 
         }
-        Recipe recipe = new Recipe();
         InternalRecipeDTO internalRecipeDTO = document.toObject(InternalRecipeDTO.class);
         if (internalRecipeDTO == null) return null;
-        recipe.addInternalRecipeInfo(internalRecipeDTO);
+        Recipe recipe = new Recipe(internalRecipeDTO);
 
         // Reviews
         CollectionReference reviewsCollection = dbFirestore.collection("reviews").document("internal_reviews").collection("1");
@@ -67,9 +69,30 @@ public class CRUDService {
         String json = IOUtils.toString(url, StandardCharsets.UTF_8);
         JSONObject jsonObject = new JSONObject(json);
         ExternalRecipeDTO externalRecipe = new ExternalRecipeDTO(jsonObject);
-        Recipe recipe = new Recipe();
-        recipe.addExternalRecipeInfo(externalRecipe);
-        return recipe;
+        return new Recipe(externalRecipe);
+    }
+
+    public List<RecipePreview> getRandomRecipes(int amount) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("https://api.spoonacular.com/recipes/complexSearch?");
+        urlBuilder.append("number=").append(amount);
+        urlBuilder.append("&addRecipeNutrition=").append(true);
+        urlBuilder.append("&addRecipeInformation=").append(true);
+        urlBuilder.append("&apiKey=").append(SPOONACULAR_API_KEY);
+        URL url = new URL(urlBuilder.toString());
+        String json = IOUtils.toString(url, StandardCharsets.UTF_8);
+        JSONObject jsonObject = new JSONObject(json);
+        JSONArray jsonArray = jsonObject.getJSONArray("results");
+
+        List<RecipePreview> list = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            ExternalRecipeDTO externalRecipeDTO = new ExternalRecipeDTO(jsonArray.getJSONObject(i));
+            Recipe recipe = new Recipe(externalRecipeDTO);
+            RecipePreview recipePreview = new RecipePreview(recipe);
+            list.add(recipePreview);
+        }
+
+        return list;
     }
 
     public String updateRecipe(Recipe crud) {

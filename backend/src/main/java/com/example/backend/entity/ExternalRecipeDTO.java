@@ -14,9 +14,14 @@ public class ExternalRecipeDTO {
         JSONObject nutrition_info = jsonObject.getJSONObject("nutrition");
         JSONArray nutrient_info = nutrition_info.getJSONArray("nutrients");
         JSONArray ingredient_info = nutrition_info.getJSONArray("ingredients");
-        JSONArray steps_info = jsonObject.getJSONArray("analyzedInstructions").getJSONObject(0).getJSONArray("steps");
+
+        JSONArray instruction_info = jsonObject.getJSONArray("analyzedInstructions");
+        JSONArray steps_info;
+        if (instruction_info.isEmpty()) steps_info = null;
+        else steps_info = jsonObject.getJSONArray("analyzedInstructions").getJSONObject(0).getJSONArray("steps");
 
         id = jsonObject.getInt("id");
+        title = jsonObject.getString("title");
 
         calories = nutrient_info.getJSONObject(0).getDouble("amount");
         proteins = nutrient_info.getJSONObject(9).getDouble("amount");
@@ -29,8 +34,13 @@ public class ExternalRecipeDTO {
             ingredients.add(ingredient);
         }
 
-        for (int i = 0; i < steps_info.length(); i++) {
-            steps.add(steps_info.getJSONObject(i).getString("step"));
+        if (steps_info != null) {
+            for (int i = 0; i < steps_info.length(); i++) {
+                steps.add(steps_info.getJSONObject(i).getString("step"));
+            }
+        }
+        else {
+            steps = null;
         }
 
         readyInMinutes = jsonObject.getDouble("readyInMinutes");

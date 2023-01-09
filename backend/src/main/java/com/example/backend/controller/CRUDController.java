@@ -1,11 +1,13 @@
 package com.example.backend.controller;
 
 import com.example.backend.entity.Recipe;
+import com.example.backend.entity.RecipePreview;
 import com.example.backend.service.CRUDService;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -15,10 +17,6 @@ public class CRUDController {
         this.crudService = crudService;
     }
 
-    @GetMapping("/test")
-    public void test() {
-
-    }
 
     @PostMapping("/create")
     public String createRecipe(@RequestBody Recipe recipe) throws InterruptedException, ExecutionException {
@@ -34,6 +32,11 @@ public class CRUDController {
     public Recipe getInternalRecipe(@RequestParam String id) throws InterruptedException, ExecutionException {
         System.out.println("test");
         return crudService.getInternalRecipe(id);
+    }
+
+    @GetMapping("/get_random_recipes")
+    public List<RecipePreview> getRandomRecipes(@RequestParam int amount) throws IOException {
+        return crudService.getRandomRecipes(amount);
     }
 
     @PutMapping("/put")
