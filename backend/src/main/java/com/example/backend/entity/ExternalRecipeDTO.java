@@ -40,7 +40,7 @@ public class ExternalRecipeDTO {
             }
         }
         else {
-            steps = null;
+            steps = new ArrayList<>();
         }
 
         readyInMinutes = jsonObject.getDouble("readyInMinutes");

@@ -13,7 +13,7 @@ import java.util.Map;
 public class Recipe {
 
     public Recipe(InternalRecipeDTO internalRecipeDTO) {
-        isExternal = false;
+        external = false;
         author = internalRecipeDTO.getAuthor();
         dateAdded = internalRecipeDTO.getDateAdded();
         id = internalRecipeDTO.getId();
@@ -37,9 +37,9 @@ public class Recipe {
     }
 
     public Recipe(ExternalRecipeDTO externalRecipeDTO) {
-        isExternal = true;
-        author = null;
-        dateAdded = null;
+        external = true;
+        author = "";
+        dateAdded = "";
         id = externalRecipeDTO.getId();
         title = externalRecipeDTO.getTitle();
         readyInMinutes = externalRecipeDTO.getReadyInMinutes();
@@ -52,7 +52,7 @@ public class Recipe {
         imageURL = externalRecipeDTO.getImageURL();
     }
     private int id;
-    private boolean isExternal;
+    private boolean external;
     private String title;
 
     private ArrayList<Ingredient> ingredients = new ArrayList<>();
@@ -68,8 +68,8 @@ public class Recipe {
 
     private ArrayList<Review> reviews = new ArrayList<>();
 
-    private int amountOfReviews;
-    private Double averageReviewScore;
+    private int amountOfReviews = 0;
+    private Double averageReviewScore = (double) 0;
 
     private Double calories;
     private Double proteins;

@@ -9,4 +9,5 @@ public class Review {
     private int rating;
     private String userUID;
     private String comment;
+    private String userImageURL;
 }

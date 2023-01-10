@@ -12,10 +12,12 @@ public class RecipePreview {
         imageURL = recipe.getImageURL();
         readyInMinutes = recipe.getReadyInMinutes();
         calories = recipe.getCalories();
+        isExternal = recipe.isExternal();
     }
     private int id;
     private String title;
     private String imageURL;
     private Double readyInMinutes;
     private Double calories;
+    private boolean isExternal;
 }
