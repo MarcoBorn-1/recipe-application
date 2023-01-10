@@ -3,24 +3,15 @@ import 'package:frontend/recipe/screens/recipe_page.dart';
 
 class RecipeContainer extends StatelessWidget {
   RecipeContainer(
-      this.recipeIdTemp, this.recipeName, this.timeToMake, this.calories,
+      this.recipeId, this.recipeName, this.timeToMake, this.calories, this.imageURL,
       {super.key});
-  final String recipeIdTemp;
+  final int recipeId;
   final String recipeName;
-  final String timeToMake;
-  final String calories;
-
-  late int recipeId = int.tryParse(recipeIdTemp) ?? -1;
+  final double timeToMake;
+  final double calories;
+  final String imageURL;
   @override
   Widget build(BuildContext context) {
-    String imageURL;
-    if (recipeName == "Pizza") {
-      imageURL = "assets/images/pizza.jpg";
-    } else if (recipeName == "Spaghetti") {
-      imageURL = "assets/images/spaghetti.jpg";
-    } else {
-      imageURL = "assets/images/lasagne.jpg";
-    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
@@ -32,7 +23,7 @@ class RecipeContainer extends StatelessWidget {
               builder: (context) => RecipeScreen(
                     recipeImg: imageURL,
                     title: recipeName,
-                    recipeId: 1,
+                    recipeId: recipeId,
                     isExternal: true,
                   )
             )
@@ -43,13 +34,13 @@ class RecipeContainer extends StatelessWidget {
               color: const Color.fromARGB(255, 48, 47, 47),
               borderRadius: BorderRadius.circular(10)),
           width: double.infinity,
-          height: 180,
+          height: 200,
           child: Row(children: [
             Expanded(
                 flex: 4,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Image.asset(
+                  child: Image.network(
                     imageURL,
                   ),
                 )),
@@ -69,7 +60,7 @@ class RecipeContainer extends StatelessWidget {
                         softWrap: true,
                         style: const TextStyle(
                           color: Color.fromARGB(255, 255, 255, 255),
-                          fontSize: 24,
+                          fontSize: 20,
                           fontFamily: "Inter",
                         ),
                       ),
@@ -82,7 +73,7 @@ class RecipeContainer extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 5),
                             child: Text(
-                              timeToMake,
+                              timeToMake.toStringAsFixed(0) + " minutes",
                               style: const TextStyle(
                                 color: Colors.white70,
                                 fontStyle: FontStyle.italic,
@@ -101,7 +92,7 @@ class RecipeContainer extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 5),
                             child: Text(
-                              calories,
+                              calories.round().toString() + " calories",
                               style: const TextStyle(
                                   color: Colors.white70,
                                   fontStyle: FontStyle.italic),

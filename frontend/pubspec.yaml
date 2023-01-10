@@ -41,6 +41,7 @@ dependencies:
   persistent_bottom_nav_bar: ^5.0.2
   flutter_rating_bar: ^4.0.1
   recase: ^4.1.0
+  http: ^0.13.5
   
 dev_dependencies:
   flutter_test:

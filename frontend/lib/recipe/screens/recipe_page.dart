@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
+import 'package:frontend/recipe/models/recipe.dart';
 import 'package:frontend/recipe/widgets/recipe_info_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_header_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_reviews_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_steps_widget.dart';
+import 'package:http/http.dart' as http;
 
 class RecipeScreen extends StatefulWidget {
   const RecipeScreen(
@@ -13,8 +17,8 @@ class RecipeScreen extends StatefulWidget {
       required this.isExternal,
       required this.recipeImg});
 
-  final String title;
   final int recipeId;
+  final String title;
   final bool isExternal;
   final String recipeImg;
 
@@ -23,9 +27,12 @@ class RecipeScreen extends StatefulWidget {
 }
 
 class _RecipeScreenState extends State<RecipeScreen> {
-  bool isFavorite = false;
+  bool loadedData = false;
+  late Recipe recipe;
 
+  bool isFavorite = false;
   final double ratingAvg = 4;
+  final int amountOfReviews = 1;
   final int timeToPrepareMin = 30;
   Map<String, Map<String, dynamic>> nutritionValues = {
     'calories': {'amount': 690, 'measurement': ''},
@@ -55,7 +62,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
     "Toss pasta shells, red pepper, tuna, parsley, garlic, chillies and lemon juice.",
     "Season with ground black pepper to taste, spoon into serving bowls."
   ];
-  int reviewAmount = 2;
   List<Map<String, dynamic>> reviewsPreview = [
     {
       'user_id': 'userID1',
@@ -90,9 +96,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    loadData();
     List<Widget> widgetList = [
-      RecipeHeaderWidget(
-          widget.title, widget.recipeImg, ratingAvg, timeToPrepareMin),
+      RecipeHeaderWidget(widget.title, widget.recipeImg, ratingAvg,
+          timeToPrepareMin, widget.isExternal, amountOfReviews),
       RecipeInformationWidget(nutritionValues, "Nutrients"),
       RecipeInformationWidget(ingredients, "Ingredients"),
       RecipeStepsWidget(instructions),
@@ -126,5 +133,26 @@ class _RecipeScreenState extends State<RecipeScreen> {
         },
       ),
     );
+  }
+
+  Future<Recipe> loadData() async {
+    print(recipe.amountOfReviews);
+    print(recipe.steps);
+    if (loadedData == true) return recipe;
+    final response =
+        await http.get(Uri.parse('http://10.0.2.2:8080/get_external?id=20'));
+    print("Loaded data from endpoint.");
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,r
+      // then parse the JSON.
+      print(response.body);
+      recipe = Recipe.fromJson(json.decode(response.body));
+      loadedData = true;
+      return recipe;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load data');
+    }
   }
 }
