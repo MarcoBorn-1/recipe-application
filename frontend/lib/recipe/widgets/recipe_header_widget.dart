@@ -12,7 +12,7 @@ class RecipeHeaderWidget extends StatelessWidget {
   final String imageURL;
   final double avgRating;
   final int amountOfReviews;
-  final int timeToPrepare;
+  final double timeToPrepare;
   final bool isExternal;
 
   @override
@@ -71,7 +71,7 @@ class RecipeHeaderWidget extends StatelessWidget {
                     color: Colors.white,
                   ),
                   Text(
-                    " " + timeToPrepare.toString() + " minutes",
+                    " " + timeToPrepare.toStringAsFixed(0) + " minutes",
                     style: TextStyle(color: Colors.white),
                   )
                 ],

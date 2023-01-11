@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:recase/recase.dart';
 
+// Currently unused - leaving for now.
+
 class RecipeInformationWidget extends StatelessWidget {
   const RecipeInformationWidget(this.informationMap, this.title, {super.key});
   final Map<String, Map<String, dynamic>> informationMap;

@@ -5,6 +5,8 @@ import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/recipe/models/recipe.dart';
 import 'package:frontend/recipe/widgets/recipe_info_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_header_widget.dart';
+import 'package:frontend/recipe/widgets/recipe_ingredients_widget.dart';
+import 'package:frontend/recipe/widgets/recipe_nutrients_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_reviews_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_steps_widget.dart';
 import 'package:http/http.dart' as http;
@@ -96,16 +98,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    loadData();
-    List<Widget> widgetList = [
-      RecipeHeaderWidget(widget.title, widget.recipeImg, ratingAvg,
-          timeToPrepareMin, widget.isExternal, amountOfReviews),
-      RecipeInformationWidget(nutritionValues, "Nutrients"),
-      RecipeInformationWidget(ingredients, "Ingredients"),
-      RecipeStepsWidget(instructions),
-      RecipeReviewsWidget(2, reviewsPreview),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -126,21 +118,50 @@ class _RecipeScreenState extends State<RecipeScreen> {
         ],
       ),
       backgroundColor: const Color(0xFF242424),
-      body: ListView.builder(
-        itemCount: widgetList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return widgetList[index];
+      body: FutureBuilder<Recipe>(
+        future: loadData(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+          } else if (snapshot.hasData) {
+            recipe = snapshot.data!;
+            loadedData = true;
+            List<Widget> widgetList = [
+              RecipeHeaderWidget(recipe.title, recipe.imageURL, recipe.averageReviewScore,
+                  recipe.readyInMinutes, recipe.isExternal, recipe.amountOfReviews),
+              RecipeNutrientsWidget(
+                calories: recipe.calories, 
+                proteins: recipe.proteins, 
+                carbohydrates: recipe.carbohydrates, 
+                fats: recipe.fats
+              ),
+              RecipeIngredientsWidget(recipe.ingredients, recipe.servings),
+              RecipeStepsWidget(recipe.steps),
+              RecipeReviewsWidget(2, reviewsPreview),
+            ];
+            return ListView.builder(
+              itemCount: widgetList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return widgetList[index];
+              },
+            );
+          } else {
+            return const Center(
+                child: CircularProgressIndicator(color: Colors.white));
+          }
         },
       ),
     );
   }
 
   Future<Recipe> loadData() async {
-    print(recipe.amountOfReviews);
-    print(recipe.steps);
-    if (loadedData == true) return recipe;
-    final response =
-        await http.get(Uri.parse('http://10.0.2.2:8080/get_external?id=20'));
+    if (loadedData == true) {
+      print(recipe.amountOfReviews);
+      print(recipe.steps);
+      return recipe;
+    }
+    final response = await http.get(Uri.parse(
+        'http://10.0.2.2:8080/get_external?id=' + widget.recipeId.toString()));
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,r

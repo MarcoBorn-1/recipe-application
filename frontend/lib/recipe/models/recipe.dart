@@ -12,6 +12,7 @@ class Recipe {
       required this.ingredients,
       required this.steps,
       required this.readyInMinutes,
+      required this.servings,
       required this.author,
       required this.dateAdded,
       required this.imageURL,
@@ -32,6 +33,7 @@ class Recipe {
   final String author;
   final String dateAdded;
   final String imageURL;
+  final int servings;
 
   final double calories;
   final double proteins;
@@ -45,7 +47,9 @@ class Recipe {
   factory Recipe.fromJson(Map<String, dynamic> json) {
     String authorTemp = (json['author'] == null) ? "" : json['author'];
     String dateAddedTemp = (json['dateAdded'] == null) ? "" : json['dateAdded'];
-    List<String> stepsTemp = (json['steps'] == null) ? [] : (json['steps'] as List).map((i) => i.toString()).toList();
+    List<String> stepsTemp = (json['steps'] == null)
+        ? []
+        : (json['steps'] as List).map((i) => i.toString()).toList();
     return Recipe(
       id: json['id'],
       isExternal: json['external'],
@@ -55,6 +59,7 @@ class Recipe {
           .toList(), // here
       steps: stepsTemp, // here
       readyInMinutes: json['readyInMinutes'],
+      servings: json['servings'],
       author: authorTemp,
       dateAdded: dateAddedTemp,
       imageURL: json['imageURL'],

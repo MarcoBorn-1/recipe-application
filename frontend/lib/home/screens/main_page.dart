@@ -108,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           loadedRecipes[index].imageURL);
                     });
               } else {
-                return const CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator(color: Colors.white));
               }
             },
           )),
