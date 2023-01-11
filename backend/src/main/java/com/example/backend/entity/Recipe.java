@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -50,6 +51,7 @@ public class Recipe {
         fats = externalRecipeDTO.getFats();
         ingredients = externalRecipeDTO.getIngredients();
         imageURL = externalRecipeDTO.getImageURL();
+        servings = externalRecipeDTO.getServings();
     }
     private int id;
     private boolean external;
@@ -63,6 +65,7 @@ public class Recipe {
     private String author;
     private String dateAdded;
     private String imageURL;
+    private int servings;
 
     // Review information
 
@@ -75,4 +78,5 @@ public class Recipe {
     private Double proteins;
     private Double carbohydrates;
     private Double fats;
+
 }

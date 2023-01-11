@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -24,7 +25,7 @@ public class ExternalRecipeDTO {
         title = jsonObject.getString("title");
 
         calories = nutrient_info.getJSONObject(0).getDouble("amount");
-        proteins = nutrient_info.getJSONObject(9).getDouble("amount");
+        proteins = nutrient_info.getJSONObject(8).getDouble("amount");
         carbohydrates = nutrient_info.getJSONObject(3).getDouble("amount");
         fats = nutrient_info.getJSONObject(1).getDouble("amount");
 
@@ -45,6 +46,7 @@ public class ExternalRecipeDTO {
 
         readyInMinutes = jsonObject.getDouble("readyInMinutes");
         imageURL = jsonObject.getString("image");
+        servings = jsonObject.getInt("servings");
     }
 
     private int id;
@@ -59,4 +61,5 @@ public class ExternalRecipeDTO {
 
     private double readyInMinutes;
     private String imageURL;
+    private int servings;
 }

@@ -78,6 +78,7 @@ public class CRUDService {
         urlBuilder.append("number=").append(amount);
         urlBuilder.append("&addRecipeNutrition=").append(true);
         urlBuilder.append("&addRecipeInformation=").append(true);
+        urlBuilder.append("&limitLicense=").append(true);
         urlBuilder.append("&apiKey=").append(SPOONACULAR_API_KEY);
         URL url = new URL(urlBuilder.toString());
         String json = IOUtils.toString(url, StandardCharsets.UTF_8);

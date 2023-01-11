@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 public class Ingredient {
@@ -16,6 +18,15 @@ public class Ingredient {
         id = json.getInt("id");
         name = json.getString("name");
         amount = json.getDouble("amount");
-        unit = json.getString("unit");
+        unit = convertUnit(json.getString("unit"));
+    }
+
+    // Some units from the external API are incorrect.
+    // All found mistakes are corrected here.
+    private String convertUnit(String unit) {
+        if (Objects.equals(unit, "T") || Objects.equals(unit, "t")) {
+            return "tbsp";
+        }
+        return unit;
     }
 }
