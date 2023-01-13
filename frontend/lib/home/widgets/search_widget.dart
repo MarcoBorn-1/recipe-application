@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SearchWidget extends StatelessWidget {
@@ -6,33 +7,30 @@ class SearchWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+      padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
       child: TextField(
-        enabled: false,
-    textAlign: TextAlign.left,
-    style: const TextStyle(fontSize: 30),
-    keyboardType: TextInputType.text,
-    decoration: InputDecoration(
-        hintText: ' ',
-        hintStyle: const TextStyle(fontSize: 24, fontStyle: FontStyle.italic),
-        border: OutlineInputBorder(
+        enabled: true,
+        textAlign: TextAlign.left,
+        style: const TextStyle(fontSize: 20),
+        keyboardType: TextInputType.text,
+        decoration: InputDecoration(
+          hintText: ' ',
+          hintStyle: const TextStyle(fontSize: 24, fontStyle: FontStyle.italic),
+          border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
                 width: 0, 
                 style: BorderStyle.none,
             ),
+          ),
+          filled: true,
+          contentPadding: const EdgeInsets.only(left: 20),
+          fillColor: Colors.white,
+          prefixIcon: GestureDetector(
+            child: const Icon(CupertinoIcons.search, color: Colors.black)
+          ),
         ),
-        filled: true,
-        contentPadding: const EdgeInsets.only(left: 20),
-        fillColor: Colors.white,
-        prefixIcon: Container(
-          padding: const EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 10),
-          width: 55,
-          height: 55,
-          child: Image.asset('assets/icons/search1.png'),
-                        
-    ),
-),
-    ));
+      )
+    );
   }
 }

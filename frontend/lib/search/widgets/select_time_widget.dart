@@ -8,7 +8,7 @@ class SelectTimeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8.0, left: 12, right: 12),
       child: Column(
         children: [
           const Padding(
@@ -18,7 +18,7 @@ class SelectTimeWidget extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white, 
-                fontSize: 32,
+                fontSize: 24,
               ),
             ),
           ),
@@ -44,6 +44,7 @@ class SelectTimeWidget extends StatelessWidget {
                           padding: EdgeInsets.only(bottom: 10.0),
                           child: Text(
                             "Under 15 minutes", 
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -74,6 +75,7 @@ class SelectTimeWidget extends StatelessWidget {
                           padding: EdgeInsets.only(bottom: 10.0),
                           child: Text(
                             "Under 30 minutes", 
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -104,6 +106,7 @@ class SelectTimeWidget extends StatelessWidget {
                           padding: EdgeInsets.only(bottom: 10.0),
                           child: Text(
                             "Under 60 minutes", 
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,

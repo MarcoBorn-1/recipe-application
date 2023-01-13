@@ -10,7 +10,7 @@ class RecipeReviewsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget showReviews = (amountOfReviews > 5)
-      ? const CustomButton("Show all reviews", test)
+      ? const CustomButton("Show all reviews", false, 24)
       : const Text("");
     return Column(children: [
       const Text(
@@ -30,7 +30,7 @@ class RecipeReviewsWidget extends StatelessWidget {
             return RecipeReviewContainer(reviewList[index]);
           }),
       showReviews,
-      const CustomButton("Add review", test)
+      const CustomButton("Add review", false, 24)
     ]);
   }
 }
