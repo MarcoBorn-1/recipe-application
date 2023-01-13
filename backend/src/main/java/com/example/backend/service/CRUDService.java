@@ -107,4 +107,45 @@ public class CRUDService {
         return "Deleted recipe " + id;
     }
 
+    public List<RecipePreview> searchRecipesByName(String query, Integer maxReadyTime,
+                                                   Integer minCalories, Integer maxCalories,
+                                                   Integer minProtein, Integer maxProtein,
+                                                   Integer minCarbs, Integer maxCarbs,
+                                                   Integer minFat, Integer maxFat,
+                                                   String intolerances) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("https://api.spoonacular.com/recipes/complexSearch").append("?");
+        urlBuilder.append("addRecipeNutrition=").append(true);
+        urlBuilder.append("&addRecipeInformation=").append(true);
+        urlBuilder.append("&query=").append(query);
+        if (maxReadyTime != null) urlBuilder.append("&maxReadyTime=").append(maxReadyTime);
+        if (minCalories != null) urlBuilder.append("&minCalories=").append(minCalories);
+        if (maxCalories != null) urlBuilder.append("&maxCalories=").append(maxCalories);
+        if (minProtein != null) urlBuilder.append("&minProtein=").append(minProtein);
+        if (maxProtein != null) urlBuilder.append("&maxProtein=").append(maxProtein);
+        if (minCarbs != null) urlBuilder.append("&minCarbs=").append(minCarbs);
+        if (maxCarbs != null) urlBuilder.append("&maxCarbs=").append(maxCarbs);
+        if (minFat != null) urlBuilder.append("&minFat=").append(minFat);
+        if (maxFat != null) urlBuilder.append("&maxFat=").append(maxFat);
+        if (intolerances != null) urlBuilder.append("&intolerances=").append(intolerances);
+        //urlBuilder.append("&number=30");
+        urlBuilder.append("&apiKey=").append(SPOONACULAR_API_KEY);
+
+        System.out.println(urlBuilder.toString());
+
+        URL url = new URL(urlBuilder.toString());
+        String json = IOUtils.toString(url, StandardCharsets.UTF_8);
+        JSONObject jsonObject = new JSONObject(json);
+        JSONArray jsonArray = jsonObject.getJSONArray("results");
+
+        List<RecipePreview> list = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            ExternalRecipeDTO externalRecipeDTO = new ExternalRecipeDTO(jsonArray.getJSONObject(i));
+            Recipe recipe = new Recipe(externalRecipeDTO);
+            RecipePreview recipePreview = new RecipePreview(recipe);
+            list.add(recipePreview);
+        }
+
+        return list;
+    }
 }

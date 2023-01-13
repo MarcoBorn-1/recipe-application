@@ -38,6 +38,21 @@ public class CRUDController {
         return crudService.getRandomRecipes(amount);
     }
 
+    @GetMapping("/search_by_name")
+    public List<RecipePreview> searchRecipesByName(@RequestParam String query,
+                                                   @RequestParam(required = false) Integer maxReadyTime,
+                                                   @RequestParam(required = false) Integer minCalories,
+                                                   @RequestParam(required = false) Integer maxCalories,
+                                                   @RequestParam(required = false) Integer minProteins,
+                                                   @RequestParam(required = false) Integer maxProteins,
+                                                   @RequestParam(required = false) Integer minCarbohydrates,
+                                                   @RequestParam(required = false) Integer maxCarbohydrates,
+                                                   @RequestParam(required = false) Integer minFats,
+                                                   @RequestParam(required = false) Integer maxFats,
+                                                   @RequestParam(required = false) String intolerances) throws IOException {
+        return crudService.searchRecipesByName(query, maxReadyTime, minCalories, maxCalories, minProteins, maxProteins, minCarbohydrates, maxCarbohydrates, minFats, maxFats, intolerances);
+    }
+
     @PutMapping("/put")
     public String updateRecipe(@RequestBody Recipe recipe) {
         return crudService.updateRecipe(recipe);
