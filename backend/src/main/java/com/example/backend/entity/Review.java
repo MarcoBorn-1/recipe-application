@@ -8,6 +8,7 @@ import lombok.Setter;
 public class Review {
     private int rating;
     private String userUID;
+    private String username;
     private String comment;
     private String userImageURL;
 }

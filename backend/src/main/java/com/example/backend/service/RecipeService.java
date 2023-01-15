@@ -13,7 +13,6 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -23,11 +22,20 @@ import java.util.concurrent.ExecutionException;
 import static com.example.backend.config.Constants.SPOONACULAR_API_KEY;
 
 @Service
-public class CRUDService {
+public class RecipeService {
 
-    public String createRecipe(Recipe crud) throws ExecutionException, InterruptedException {
+    public String createRecipe(InternalRecipeDTO recipe) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("recipes").document(String.valueOf(crud.getId())).set(crud);
+
+        DocumentReference recipeDocumentReference = dbFirestore.collection("admin").document("variables");
+        ApiFuture<DocumentSnapshot> future = recipeDocumentReference.get();
+        DocumentSnapshot document = future.get();
+        if (!document.exists()) return null;
+        Long id = document.getLong("internal_recipe_id");
+        if (id == null) return null;
+        dbFirestore.collection("admin").document("variables").update("internal_recipe_id", id + 1);
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("recipes").document(id.toString()).set(recipe);
+
         return collectionsApiFuture.get().getUpdateTime().toString();
     }
 
@@ -60,7 +68,7 @@ public class CRUDService {
         return recipe;
     }
 
-    public Recipe getExternalRecipe(int id) throws IOException {
+    public Recipe getExternalRecipe(int id) throws IOException, ExecutionException, InterruptedException {
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append("https://api.spoonacular.com/recipes/").append(id);
         urlBuilder.append("/information?includeNutrition=true&");
@@ -131,7 +139,7 @@ public class CRUDService {
         //urlBuilder.append("&number=30");
         urlBuilder.append("&apiKey=").append(SPOONACULAR_API_KEY);
 
-        System.out.println(urlBuilder.toString());
+        System.out.println(urlBuilder);
 
         URL url = new URL(urlBuilder.toString());
         String json = IOUtils.toString(url, StandardCharsets.UTF_8);
