@@ -15,6 +15,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
+  final TextEditingController _controllerDisplayName = TextEditingController();
 
   Future<void> signInWithEmailAndPassword() async {
     try {
@@ -34,6 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       await Auth().createUserWithEmailAndPassword(
         email: _controllerEmail.text,
         password: _controllerPassword.text,
+        displayName: _controllerDisplayName.text,
       );
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -43,7 +45,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _title() {
-    return const Text('Login');
+    if (isLogin) {
+      return const Text('Login');
+    } else {
+      return const Text('Register');
+    }
+  }
+
+  Widget _passwordTextField(String title, TextEditingController controller) {
+    return TextField(
+      style: const TextStyle(color: Colors.white),
+      controller: controller,
+      obscureText: true,
+      enableSuggestions: false,
+      autocorrect: false,
+      decoration: InputDecoration(
+        labelText: title,
+        labelStyle: TextStyle(color: Colors.white),
+        errorStyle: TextStyle(color: Colors.red),
+        helperStyle: TextStyle(color: Colors.white70),
+      ),
+    );
   }
 
   Widget _entryField(
@@ -82,6 +104,9 @@ class _LoginPageState extends State<LoginPage> {
       onPressed: () {
         setState(() {
           isLogin = !isLogin;
+          _controllerDisplayName.clear();
+          _controllerEmail.clear();
+          _controllerPassword.clear();
           errorMessage = '';
         });
       },
@@ -95,27 +120,32 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: _title(),
-        leading: const Icon(Icons.login, color: Colors.white),
-      ),
-      backgroundColor: const Color(0xFF242424),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _entryField('E-mail', _controllerEmail),
-            _entryField('Password', _controllerPassword),
-            _errorMessage(),
-            _submitButton(),
-            _loginOrRegisterButton(),
-          ],
+        appBar: AppBar(
+          title: _title(),
+          leading: const Icon(Icons.login, color: Colors.white),
         ),
-      ),
-    );
+        backgroundColor: const Color(0xFF242424),
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: Container(
+            height: double.infinity,
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                _entryField('E-mail', _controllerEmail),
+                (isLogin) ? const Text("") :_entryField('Username', _controllerDisplayName),
+                _passwordTextField('Password', _controllerPassword),
+                _errorMessage(),
+                _submitButton(),
+                _loginOrRegisterButton(),
+              ],
+            ),
+          ),
+        ));
   }
 }
