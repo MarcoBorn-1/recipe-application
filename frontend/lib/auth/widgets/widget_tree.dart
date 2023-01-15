@@ -1,5 +1,5 @@
 import 'package:frontend/auth/widgets/auth.dart';
-import 'package:frontend/auth/screens/test_home_page.dart';
+import 'package:frontend/profile/screens/profile_screen.dart';
 import 'package:frontend/auth/screens/login_register.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,7 @@ class _WidgetTreeState extends State<WidgetTree> {
       stream: Auth().authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return HomePage();
+          return ProfileScreen();
         } else {
           return const LoginPage();
         }
