@@ -80,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     user = Auth().currentUser;
+    print("User: ");
     print(user?.displayName);
     return Scaffold(
       backgroundColor: const Color(0xFF242424),

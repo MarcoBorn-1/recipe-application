@@ -1,9 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/recipe/models/recipe.dart';
-import 'package:frontend/recipe/widgets/recipe_info_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_header_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_ingredients_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_nutrients_widget.dart';
@@ -127,12 +125,18 @@ class _RecipeScreenState extends State<RecipeScreen> {
             recipe = snapshot.data!;
             loadedData = true;
             List<Widget> widgetList = [
-              RecipeHeaderWidget(recipe.title, recipe.imageURL, recipe.averageReviewScore,
-                  recipe.readyInMinutes, recipe.isExternal, recipe.amountOfReviews),
+              RecipeHeaderWidget(
+                recipe.title,
+                recipe.imageURL,
+                recipe.averageReviewScore,
+                recipe.readyInMinutes,
+                recipe.isExternal,
+                recipe.amountOfReviews
+              ),
               RecipeNutrientsWidget(
-                calories: recipe.calories, 
-                proteins: recipe.proteins, 
-                carbohydrates: recipe.carbohydrates, 
+                calories: recipe.calories,
+                proteins: recipe.proteins,
+                carbohydrates: recipe.carbohydrates,
                 fats: recipe.fats
               ),
               RecipeIngredientsWidget(recipe.ingredients, recipe.servings),
@@ -158,14 +162,14 @@ class _RecipeScreenState extends State<RecipeScreen> {
     if (loadedData == true) {
       return recipe;
     }
-    final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/get_external?id=${widget.recipeId}'));
+    final response = await http.get(
+        Uri.parse('http://10.0.2.2:8080/get_external?id=${widget.recipeId}'));
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,r
       // then parse the JSON.
-      print(response.body);
       recipe = Recipe.fromJson(json.decode(response.body));
+      print("ID: ${recipe.id}, isExternal: ${recipe.isExternal}");
       loadedData = true;
       return recipe;
     } else {
