@@ -19,7 +19,7 @@ class RecipeIngredientsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Row> rows = [];
     for (var element in ingredientList) {
-      String temp = (element.unit.isEmpty) ? "" : " " + element.unit;
+      String temp = (element.unit.isEmpty) ? "" : " ${element.unit}";
       rows.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

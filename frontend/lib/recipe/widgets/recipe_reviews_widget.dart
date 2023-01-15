@@ -30,7 +30,10 @@ class RecipeReviewsWidget extends StatelessWidget {
             return RecipeReviewContainer(reviewList[index]);
           }),
       showReviews,
-      const CustomButton("Add review", false, 24)
+      const Padding(
+        padding: EdgeInsets.only(top: 0.0, left: 16, right: 16, bottom: 24),
+        child: CustomButton("Add review", true, 24),
+      ),
     ]);
   }
 }

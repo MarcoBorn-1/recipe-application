@@ -17,7 +17,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final User? user = Auth().currentUser;
+  User? user = Auth().currentUser;
   bool loadedData = false;
   List<RecipePreview> loadedRecipes = [];
 
@@ -27,7 +27,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    //await loadData();
     super.initState();
   }
 
@@ -80,6 +79,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    user = Auth().currentUser;
+    print(user?.displayName);
     return Scaffold(
       backgroundColor: const Color(0xFF242424),
       body: GestureDetector(
@@ -90,40 +91,40 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             const SearchWidget(),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: FutureBuilder<List<RecipePreview>>(
-                  future: loadData(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text(snapshot.error.toString()));
-                    } 
-                    else if (snapshot.hasData) {
-                      loadedRecipes = snapshot.data!;
-                      loadedData = true;
-                      return ListView.builder(
+                child: Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: FutureBuilder<List<RecipePreview>>(
+                future: loadData(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                        child: Text(
+                      snapshot.error.toString(),
+                      style: const TextStyle(color: Colors.white),
+                    ));
+                  } else if (snapshot.hasData) {
+                    loadedRecipes = snapshot.data!;
+                    loadedData = true;
+                    return ListView.builder(
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         padding: const EdgeInsets.all(8),
                         itemCount: loadedRecipes.length,
                         itemBuilder: (BuildContext context, int index) {
                           return RecipeContainer(
-                            loadedRecipes[index].id,
-                            loadedRecipes[index].title,
-                            loadedRecipes[index].readyInMinutes,
-                            loadedRecipes[index].calories,
-                            loadedRecipes[index].imageURL
-                          );
-                        }
-                      );
-                    } 
-                    else {
-                      return const Center(child: CircularProgressIndicator(color: Colors.white));
-                    }
-                  },
-                ),
-              )
-            ),
+                              loadedRecipes[index].id,
+                              loadedRecipes[index].title,
+                              loadedRecipes[index].readyInMinutes,
+                              loadedRecipes[index].calories,
+                              loadedRecipes[index].imageURL);
+                        });
+                  } else {
+                    return const Center(
+                        child: CircularProgressIndicator(color: Colors.white));
+                  }
+                },
+              ),
+            )),
           ],
         ),
       ),

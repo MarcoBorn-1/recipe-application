@@ -156,12 +156,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
   Future<Recipe> loadData() async {
     if (loadedData == true) {
-      print(recipe.amountOfReviews);
-      print(recipe.steps);
       return recipe;
     }
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/get_external?id=' + widget.recipeId.toString()));
+        'http://10.0.2.2:8080/get_external?id=${widget.recipeId}'));
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,r
