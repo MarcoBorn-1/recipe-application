@@ -50,8 +50,9 @@ public class RecipeController {
                                                    @RequestParam(required = false) Integer maxCarbohydrates,
                                                    @RequestParam(required = false) Integer minFats,
                                                    @RequestParam(required = false) Integer maxFats,
-                                                   @RequestParam(required = false) String intolerances) throws IOException {
-        return recipeService.searchRecipesByName(query, maxReadyTime, minCalories, maxCalories, minProteins, maxProteins, minCarbohydrates, maxCarbohydrates, minFats, maxFats, intolerances);
+                                                   @RequestParam(required = false) String intolerances,
+                                                   @RequestParam(required = false) Integer amount) throws IOException {
+        return recipeService.searchRecipesByName(query, maxReadyTime, minCalories, maxCalories, minProteins, maxProteins, minCarbohydrates, maxCarbohydrates, minFats, maxFats, intolerances, amount);
     }
 
     @PutMapping("/put")

@@ -120,24 +120,24 @@ public class RecipeService {
                                                    Integer minProtein, Integer maxProtein,
                                                    Integer minCarbs, Integer maxCarbs,
                                                    Integer minFat, Integer maxFat,
-                                                   String intolerances) throws IOException {
+                                                   String intolerances, Integer amount) throws IOException {
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append("https://api.spoonacular.com/recipes/complexSearch").append("?");
-        urlBuilder.append("addRecipeNutrition=").append(true);
-        urlBuilder.append("&addRecipeInformation=").append(true);
-        urlBuilder.append("&query=").append(query);
-        if (maxReadyTime != null) urlBuilder.append("&maxReadyTime=").append(maxReadyTime);
-        if (minCalories != null) urlBuilder.append("&minCalories=").append(minCalories);
-        if (maxCalories != null) urlBuilder.append("&maxCalories=").append(maxCalories);
-        if (minProtein != null) urlBuilder.append("&minProtein=").append(minProtein);
-        if (maxProtein != null) urlBuilder.append("&maxProtein=").append(maxProtein);
-        if (minCarbs != null) urlBuilder.append("&minCarbs=").append(minCarbs);
-        if (maxCarbs != null) urlBuilder.append("&maxCarbs=").append(maxCarbs);
-        if (minFat != null) urlBuilder.append("&minFat=").append(minFat);
-        if (maxFat != null) urlBuilder.append("&maxFat=").append(maxFat);
-        if (intolerances != null) urlBuilder.append("&intolerances=").append(intolerances);
-        //urlBuilder.append("&number=30");
-        urlBuilder.append("&apiKey=").append(SPOONACULAR_API_KEY);
+        if (maxReadyTime != null) urlBuilder.append("maxReadyTime=").append(maxReadyTime).append("&");
+        if (minCalories != null) urlBuilder.append("minCalories=").append(minCalories).append("&");
+        if (maxCalories != null) urlBuilder.append("maxCalories=").append(maxCalories).append("&");
+        if (minProtein != null) urlBuilder.append("minProtein=").append(minProtein).append("&");
+        if (maxProtein != null) urlBuilder.append("maxProtein=").append(maxProtein).append("&");
+        if (minCarbs != null) urlBuilder.append("minCarbs=").append(minCarbs).append("&");
+        if (maxCarbs != null) urlBuilder.append("maxCarbs=").append(maxCarbs).append("&");
+        if (minFat != null) urlBuilder.append("minFat=").append(minFat).append("&");
+        if (maxFat != null) urlBuilder.append("maxFat=").append(maxFat).append("&");
+        if (intolerances != null) urlBuilder.append("intolerances=").append(intolerances).append("&");
+        if (amount != null) urlBuilder.append("number=").append(amount).append("&");
+        urlBuilder.append("addRecipeNutrition=").append(true).append("&");
+        urlBuilder.append("addRecipeInformation=").append(true).append("&");
+        urlBuilder.append("query=").append(query).append("&");
+        urlBuilder.append("apiKey=").append(SPOONACULAR_API_KEY);
 
         System.out.println(urlBuilder);
 
