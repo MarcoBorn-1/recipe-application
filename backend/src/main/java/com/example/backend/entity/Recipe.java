@@ -69,9 +69,9 @@ public class Recipe {
 
     // Review information
 
-    private ArrayList<Review> reviews = new ArrayList<>();
+    private ArrayList<ReviewPreview> reviews = new ArrayList<>();
 
-    private int amountOfReviews = 0;
+    private Long amountOfReviews = 0L;
     private Double averageReviewScore = (double) 0;
 
     private Double calories;
