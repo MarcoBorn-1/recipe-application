@@ -22,7 +22,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
     print("Parameters " + widget.parameters);
     if (loadedData == true) return loadedRecipes;
     final response = await http.get(
-        Uri.parse('http://10.0.2.2:8080/search_by_name?${widget.parameters}'));
+        Uri.parse('http://10.0.2.2:8080/recipe/search_by_name?${widget.parameters}'));
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,r

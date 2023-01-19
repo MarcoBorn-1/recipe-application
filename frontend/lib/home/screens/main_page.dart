@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/home/models/recipe_preview.dart';
 import 'package:frontend/home/widgets/recipe_container.dart';
@@ -19,7 +20,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   User? user = Auth().currentUser;
   bool loadedData = false;
+  final TextEditingController textController = TextEditingController();
   List<RecipePreview> loadedRecipes = [];
+  String loadedQuery = "";
 
   Future<void> signOut() async {
     await Auth().signOut();
@@ -31,10 +34,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<List<RecipePreview>> loadData() async {
-    if (loadedData == true) return loadedRecipes;
-    final response = await http
-        .get(Uri.parse('http://10.0.2.2:8080/get_random_recipes?amount=20'));
-    print("Loaded data from endpoint.");
+    if (loadedData == true) {
+      return loadedRecipes;
+    }
+    final response = await http.get(Uri.parse(
+        'http://10.0.2.2:8080/recipe/search_by_name?query=${textController.text}&amount=20'));
+    //print("Loaded data from endpoint.");
+    loadedQuery = textController.text;
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,r
       // then parse the JSON.
@@ -48,6 +54,11 @@ class _MyHomePageState extends State<MyHomePage> {
       // then throw an exception.
       throw Exception('Failed to load data');
     }
+  }
+
+  void load() async {
+    //print(textController.text);
+    await loadData();
   }
 
   Map<int, List<String>> itemMap = {
@@ -80,8 +91,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     user = Auth().currentUser;
-    print("User: ");
-    print(user?.displayName);
+    //print("User: ");
+    //print(user?.displayName);
     return Scaffold(
       backgroundColor: const Color(0xFF242424),
       body: GestureDetector(
@@ -90,7 +101,49 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         child: Column(
           children: [
-            const SearchWidget(),
+            Padding(
+                padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
+                child: TextField(
+                  onSubmitted: (value) {
+                    if (loadedQuery != textController.text) {
+                      setState(() {
+                        loadedRecipes = [];
+                        loadedData = false;
+                      });
+                    }
+                  },
+                  controller: textController,
+                  enabled: true,
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(fontSize: 20),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    hintText: ' ',
+                    hintStyle: const TextStyle(
+                        fontSize: 24, fontStyle: FontStyle.italic),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        width: 0,
+                        style: BorderStyle.none,
+                      ),
+                    ),
+                    filled: true,
+                    contentPadding: const EdgeInsets.only(left: 20),
+                    fillColor: Colors.white,
+                    prefixIcon: GestureDetector(
+                        onTap:() {
+                          if (loadedQuery != textController.text) {
+                            setState(() {
+                              loadedRecipes = [];
+                              loadedData = false;
+                            });
+                          }
+                        },
+                        child: const Icon(CupertinoIcons.search,
+                            color: Colors.black)),
+                  ),
+                )),
             Expanded(
                 child: Padding(
               padding: const EdgeInsets.only(top: 20.0),

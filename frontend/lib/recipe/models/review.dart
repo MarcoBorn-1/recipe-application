@@ -1,3 +1,5 @@
+import 'package:frontend/recipe/models/review_DTO.dart';
+
 class Review {
   Review(
       {required this.rating,
@@ -5,7 +7,7 @@ class Review {
       required this.username,
       required this.comment,
       required this.userImageURL});
-  final int rating;
+  final double rating;
   final String userUID;
   final String username;
   final String comment;
@@ -18,5 +20,14 @@ class Review {
         username: json['username'],
         comment: json['comment'],
         userImageURL: json['userImageURL']);
+  }
+
+  ReviewDTO toDTO(int recipeID, bool isExternal) {
+    return ReviewDTO(
+        rating: rating,
+        userUID: userUID,
+        comment: comment,
+        recipeID: recipeID,
+        isExternal: isExternal);
   }
 }

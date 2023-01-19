@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/recipe/models/recipe.dart';
@@ -32,7 +33,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
   bool isFavorite = false;
   final double ratingAvg = 4;
-  final int amountOfReviews = 1;
   final int timeToPrepareMin = 30;
   Map<String, Map<String, dynamic>> nutritionValues = {
     'calories': {'amount': 690, 'measurement': ''},
@@ -80,9 +80,9 @@ class _RecipeScreenState extends State<RecipeScreen> {
     {
       'user_id': 'userID3',
       'username': 'Jarl Cohnson',
-      'review': 'takie srednie te zarelko',
+      'review': 'takie sredni ten przepis',
       'image_url': 'imgURL',
-      'rating': 5
+      'rating': 2
     }
   ];
 
@@ -141,7 +141,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
               ),
               RecipeIngredientsWidget(recipe.ingredients, recipe.servings),
               RecipeStepsWidget(recipe.steps),
-              RecipeReviewsWidget(2, reviewsPreview),
+              RecipeReviewsWidget(recipe.amountOfReviews, recipe.reviews, recipe.id, recipe.isExternal),
             ];
             return ListView.builder(
               itemCount: widgetList.length,
@@ -163,7 +163,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
       return recipe;
     }
     final response = await http.get(
-        Uri.parse('http://10.0.2.2:8080/get_external?id=${widget.recipeId}'));
+        Uri.parse('http://10.0.2.2:8080/recipe/get_external?id=${widget.recipeId}'));
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,r

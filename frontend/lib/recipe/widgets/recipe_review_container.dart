@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/recipe/models/review.dart';
 
 class RecipeReviewContainer extends StatelessWidget {
   const RecipeReviewContainer(this.review, {super.key});
-  final Map<String, dynamic> review;
+  final Review review;
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +41,14 @@ class RecipeReviewContainer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          review['username']!, 
+                          review.username, 
                           style: const TextStyle(
                             color: Colors.white, 
                             fontSize: 18
                           ),
                         ),
                         Text(
-                          review['review']!, 
+                          review.comment, 
                           style: const TextStyle(
                             color: Colors.white, 
                             fontSize: 14,
