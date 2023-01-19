@@ -41,7 +41,7 @@ class _SearchDishNameState extends State<SearchDishName> {
     String parameters = buildParameters();
     final response = await http
         .get(Uri.parse('http://10.0.2.2:8080/search_by_name?$parameters'));
-    print("Loaded data from endpoint.");
+    //print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,r
       // then parse the JSON.
@@ -112,13 +112,7 @@ class _SearchDishNameState extends State<SearchDishName> {
 
   @override
   Widget build(BuildContext context) {
-    print(buildParameters());
-    // print("Chosen values:");
-    // print("Time: ${chosenOptionTime}");
-    // print("Calories: ${chosenOptionCalories}");
-    // print("Proteins: ${chosenOptionProteins}");
-    // print("Carbohydrates: ${chosenOptionCarbohydrates}");
-    // print("Fats: ${chosenOptionFats}");
+    //print(buildParameters());
     List<Widget> listOfWidgets = [
       SearchWidget(),
       TimeWidget(),

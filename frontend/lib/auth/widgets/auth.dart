@@ -28,7 +28,7 @@ class Auth {
     final data = {
       "uid": user.uid,
       "username": displayName,
-      "e-mail": user.email,
+      "email": user.email,
       "imageURL": ''
     };
 
