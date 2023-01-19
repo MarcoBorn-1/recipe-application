@@ -4,18 +4,18 @@ import com.example.backend.entity.InternalRecipeDTO;
 import com.example.backend.entity.Recipe;
 import com.example.backend.entity.RecipePreview;
 import com.example.backend.service.RecipeService;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+@AllArgsConstructor
 @RestController
+@RequestMapping("/recipe/")
 public class RecipeController {
     public RecipeService recipeService;
-    public RecipeController(RecipeService recipeService) {
-        this.recipeService = recipeService;
-    }
 
 
     @PostMapping("/create")
@@ -30,7 +30,6 @@ public class RecipeController {
 
     @GetMapping("/get_internal")
     public Recipe getInternalRecipeById(@RequestParam String id) throws InterruptedException, ExecutionException {
-        System.out.println("test");
         return recipeService.getInternalRecipe(id);
     }
 
