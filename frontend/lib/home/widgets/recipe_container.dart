@@ -2,32 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:frontend/recipe/screens/recipe_screen.dart';
 
 class RecipeContainer extends StatelessWidget {
-  RecipeContainer(
-      this.recipeId, this.recipeName, this.timeToMake, this.calories, this.imageURL,
+  RecipeContainer(this.recipeId, this.recipeName, this.timeToMake,
+      this.calories, this.imageURL, this.isExternal,
       {super.key});
   final int recipeId;
   final String recipeName;
   final double timeToMake;
   final double calories;
   final String imageURL;
+  final bool isExternal;
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => RecipeScreen(
-                    recipeImg: imageURL,
-                    title: recipeName,
-                    recipeId: recipeId,
-                    isExternal: true,
-                  )
-            )
-          );
+              context,
+              MaterialPageRoute(
+                  builder: (context) => RecipeScreen(
+                        recipeImg: imageURL,
+                        title: recipeName,
+                        recipeId: recipeId,
+                        isExternal: isExternal,
+                      )));
         },
         child: Container(
           decoration: BoxDecoration(

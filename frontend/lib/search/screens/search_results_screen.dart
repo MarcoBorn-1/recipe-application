@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/home/models/recipe_preview.dart';
+import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/home/widgets/recipe_container.dart';
 import 'package:http/http.dart' as http;
 
@@ -71,7 +71,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                         loadedRecipes[index].title,
                         loadedRecipes[index].readyInMinutes,
                         loadedRecipes[index].calories,
-                        loadedRecipes[index].imageURL);
+                        loadedRecipes[index].imageURL,
+                        loadedRecipes[index].isExternal);
                   });
             } else {
               return const Center(

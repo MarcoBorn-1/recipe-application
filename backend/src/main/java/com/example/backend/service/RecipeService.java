@@ -34,6 +34,7 @@ public class RecipeService {
         Long id = document.getLong("internal_recipe_id");
         if (id == null) return null;
         dbFirestore.collection("admin").document("variables").update("internal_recipe_id", id + 1);
+        recipe.setId(Math.toIntExact(id));
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("recipes").document(id.toString()).set(recipe);
 
         return collectionsApiFuture.get().getUpdateTime().toString();
@@ -53,7 +54,7 @@ public class RecipeService {
         Recipe recipe = new Recipe(internalRecipeDTO);
 
         // Reviews
-        CollectionReference reviewsCollection = dbFirestore.collection("reviews").document("internal_reviews").collection("1");
+        CollectionReference reviewsCollection = dbFirestore.collection("reviews").document("internal_reviews").collection(id);
         AggregateQuerySnapshot snapshot = reviewsCollection.count().get().get();
         System.out.println("Count: " + snapshot.getCount());
         if (snapshot.getCount() == 0) {
@@ -62,8 +63,44 @@ public class RecipeService {
             recipe.setAverageReviewScore((double) 0);
             return recipe;
         }
-        ApiFuture<QuerySnapshot> reviewsFuture = dbFirestore.collection("reviews").document("internal_reviews").collection("1").get();
+        else {
+            getReviewCount(recipe, reviewsCollection, snapshot);
+        }
+        ApiFuture<QuerySnapshot> reviewsFuture = dbFirestore.collection("reviews").document("internal_reviews").collection(id).get();
         List<QueryDocumentSnapshot> documents = reviewsFuture.get().getDocuments();
+
+        return recipe;
+    }
+
+    // TODO: move to ReviewService
+    private Recipe getReviewCount(Recipe recipe, CollectionReference reviewsCollection, AggregateQuerySnapshot snapshot) throws InterruptedException, ExecutionException {
+        ArrayList<ReviewDTO> reviewDTOList = new ArrayList<>();
+        ArrayList<ReviewPreview> reviewPreviewList = new ArrayList<>();
+        int reviews_added = 0;
+        double averageReviewScore = 0;
+        Double rating;
+        QuerySnapshot documentSnapshots = reviewsCollection.get().get();
+        List<QueryDocumentSnapshot> documentList = documentSnapshots.getDocuments();
+        recipe.setAmountOfReviews(snapshot.getCount());
+        for (QueryDocumentSnapshot documentSnapshot: documentList) {
+            if (REVIEWS_IN_RECIPE - reviews_added >= 0) {
+                ReviewDTO reviewDTO = documentSnapshot.toObject(ReviewDTO.class);
+                reviewDTOList.add(reviewDTO);
+                reviews_added += 1;
+            }
+            rating = documentSnapshot.getDouble("rating");
+            if (rating != null) averageReviewScore += rating;
+        }
+        recipe.setAverageReviewScore(averageReviewScore / snapshot.getCount());
+
+        for (ReviewDTO reviewDTO: reviewDTOList) {
+            ReviewPreview reviewPreview = new ReviewPreview(reviewDTO);
+            UserPreview user = userService.getUserInformation(reviewPreview.getUserUID());
+            reviewPreview.addUserInformation(user);
+            reviewPreviewList.add(reviewPreview);
+        }
+
+        recipe.setReviews(reviewPreviewList);
 
         return recipe;
     }
@@ -89,37 +126,7 @@ public class RecipeService {
             return recipe;
         }
         else {
-            ArrayList<ReviewDTO> reviewDTOList = new ArrayList<>();
-            ArrayList<ReviewPreview> reviewPreviewList = new ArrayList<>();
-            int reviews_added = 0;
-            double averageReviewScore = 0;
-            Double rating = 0.0;
-            QuerySnapshot documentSnapshots = reviewsCollection.get().get();
-            List<QueryDocumentSnapshot> documentList = documentSnapshots.getDocuments();
-            recipe.setAmountOfReviews(snapshot.getCount());
-            for (QueryDocumentSnapshot documentSnapshot: documentList) {
-                if (REVIEWS_IN_RECIPE - reviews_added >= 0) {
-                    ReviewDTO reviewDTO = documentSnapshot.toObject(ReviewDTO.class);
-                    reviewDTOList.add(reviewDTO);
-                    reviews_added += 1;
-                }
-                rating = documentSnapshot.getDouble("rating");
-                if (rating != null) averageReviewScore += rating;
-            }
-            recipe.setAverageReviewScore(averageReviewScore / snapshot.getCount());
-
-            for (ReviewDTO reviewDTO: reviewDTOList) {
-                ReviewPreview reviewPreview = new ReviewPreview(reviewDTO);
-                UserPreview user = userService.getUserInformation(reviewPreview.getUserUID());
-                reviewPreview.addUserInformation(user);
-                reviewPreviewList.add(reviewPreview);
-            }
-
-            recipe.setReviews(reviewPreviewList);
-
-            System.out.println(recipe.getAmountOfReviews());
-            System.out.println(recipe.getReviews());
-            System.out.println(recipe.getAverageReviewScore());
+            getReviewCount(recipe, reviewsCollection, snapshot);
         }
         return recipe;
     }
@@ -196,9 +203,21 @@ public class RecipeService {
             ExternalRecipeDTO externalRecipeDTO = new ExternalRecipeDTO(jsonArray.getJSONObject(i));
             Recipe recipe = new Recipe(externalRecipeDTO);
             RecipePreview recipePreview = new RecipePreview(recipe);
+            System.out.println(recipePreview.isExternal());
             list.add(recipePreview);
         }
 
         return list;
+    }
+
+    public List<RecipePreview> getRecipesByUserUID(String userUID) throws ExecutionException, InterruptedException {
+        ArrayList<RecipePreview> recipeList = new ArrayList<>();
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference recipesRef = db.collection("recipes");
+        QuerySnapshot query = recipesRef.whereEqualTo("author", userUID).get().get();
+        for (QueryDocumentSnapshot document : query.getDocuments()) {
+            recipeList.add(new RecipePreview(document.toObject(InternalRecipeDTO.class)));
+        }
+        return recipeList;
     }
 }

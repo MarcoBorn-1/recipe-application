@@ -14,6 +14,15 @@ public class RecipePreview {
         calories = recipe.getCalories();
         isExternal = recipe.isExternal();
     }
+
+    public RecipePreview(InternalRecipeDTO recipeDTO) {
+        id = recipeDTO.getId();
+        title = recipeDTO.getTitle();
+        imageURL = recipeDTO.getImageURL();
+        readyInMinutes = recipeDTO.getReadyInMinutes();
+        calories = ((Number) recipeDTO.getCalories()).doubleValue();
+        isExternal = false;
+    }
     private int id;
     private String title;
     private String imageURL;

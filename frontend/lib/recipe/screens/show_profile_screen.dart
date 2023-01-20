@@ -2,24 +2,40 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/auth/widgets/auth.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/home/widgets/recipe_container.dart';
+import 'package:frontend/profile/widgets/profile_header.dart';
+import 'package:frontend/recipe/models/recipe.dart';
+import 'package:frontend/recipe/models/user_information.dart';
 import 'package:http/http.dart' as http;
 
-class MyRecipesScreen extends StatefulWidget {
-  const MyRecipesScreen({super.key});
+class ShowProfileScreen extends StatefulWidget {
+  const ShowProfileScreen({required this.uid, super.key});
+  final String uid;
 
   @override
-  State<MyRecipesScreen> createState() => _MyRecipesScreenState();
+  State<StatefulWidget> createState() => _ShowProfileScreenState();
 }
 
-class _MyRecipesScreenState extends State<MyRecipesScreen> {
+class _ShowProfileScreenState extends State<ShowProfileScreen> {
+  late UserInformation userInfo;
   late List<RecipePreview> recipeList;
-  User? user = Auth().currentUser;
+
+  Future<UserInformation> getProfileData() async {
+    final response = await http.get(
+        Uri.parse('http://10.0.2.2:8080/user/get_info?user_uid=${widget.uid}'));
+    print("Loaded data from endpoint.");
+    if (response.statusCode == 200) {
+      userInfo = UserInformation.fromJson(json.decode(response.body));
+      return userInfo;
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
   Future<List<RecipePreview>> getRecipeData() async {
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/get_by_user_uid?user_uid=${user!.uid}'));
+        'http://10.0.2.2:8080/recipe/get_by_user_uid?user_uid=${widget.uid}'));
     if (response.statusCode == 200) {
       List<RecipePreview> recipes;
       recipes = (json.decode(response.body) as List)
@@ -37,30 +53,34 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        title: const Text("My recipes"),
-        actions: [
-          GestureDetector(
-            onTap: () {},
-            child: const Padding(
-              padding: EdgeInsets.only(right: 8.0),
-              child: Icon(
-                Icons.add,
-                color: Colors.white,
-              ),
-            ),
-          )
-        ],
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: const Icon(Icons.arrow_back, color: Colors.white)),
+        title: Text("View Profile"),
       ),
       backgroundColor: const Color(0xFF242424),
-      body: SafeArea(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              FutureBuilder<List<RecipePreview>>(
+      body: Column(
+        children: [
+          FutureBuilder<UserInformation>(
+            future: getProfileData(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text("1" + snapshot.error.toString()));
+              } else if (snapshot.hasData) {
+                userInfo = snapshot.data!;
+                return ProfileHeader(
+                  username: userInfo.username,
+                  imageURL: userInfo.imageURL,
+                  showIcons: false
+                );
+              } else {
+                return const Center(
+                    child: CircularProgressIndicator(color: Colors.white));
+              }
+            },
+          ),
+          FutureBuilder<List<RecipePreview>>(
             future: getRecipeData(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
@@ -87,7 +107,7 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
               }
             },
           ),
-            ]),
+        ],
       ),
     );
   }

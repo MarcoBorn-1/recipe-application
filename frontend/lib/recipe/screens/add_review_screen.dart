@@ -21,6 +21,7 @@ class AddReviewScreen extends StatefulWidget {
 }
 
 class _AddReviewScreenState extends State<AddReviewScreen> {
+  String errorMessage = "";
   User? user = Auth().currentUser;
   double chosenRating = -1;
   final TextEditingController _controllerComment = TextEditingController();
@@ -36,18 +37,26 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
       style: const TextStyle(color: Colors.black),
       controller: controller,
       decoration: InputDecoration(
-        filled: true,
-        fillColor: Color.fromARGB(255, 247, 255, 255),
-        labelText: title,
-        labelStyle: const TextStyle(color: Colors.black),
-        errorStyle: const TextStyle(color: Colors.red),
-        helperStyle: const TextStyle(color: Colors.black),
-      ),
+          filled: true,
+          fillColor: const Color.fromARGB(255, 247, 255, 255),
+          labelText: title,
+          labelStyle: const TextStyle(color: Colors.black),
+          errorStyle: const TextStyle(color: Colors.red),
+          helperStyle: const TextStyle(color: Colors.black),
+          suffixIcon: GestureDetector(
+              onTap: () {
+                controller.text = "";
+              },
+              child: const Icon(
+                Icons.cancel,
+                color: Colors.grey,
+              ))),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -55,7 +64,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
               Navigator.pop(context, true);
             },
             child: const Icon(Icons.arrow_back, color: Colors.white)),
-        title: Text("Add review"),
+        title: const Text("Add review"),
       ),
       backgroundColor: const Color(0xFF242424),
       body: SafeArea(
@@ -97,11 +106,23 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                             horizontal: 50.0, vertical: 20),
                         child: _entryField("Comment", _controllerComment),
                       ),
+                      Text(
+                        errorMessage,
+                        style: const TextStyle(color: Colors.red),
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 50.0),
                         child: GestureDetector(
-                          onTap: () {
-                            addReview();
+                          onTap: () async {
+                            bool added = await addReview();
+                            if (!added) {
+                              setState(() {
+                                errorMessage = "Fill out all fields!";
+                              });
+                            }
+                            else {
+                              errorMessage = "";
+                            }
                             print(chosenRating);
                             print(_controllerComment.text);
                           },
@@ -116,14 +137,14 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                     child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 30.0),
-                      child: const TitleText(
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 30.0),
+                      child: TitleText(
                         "You have already reviewed this recipe!",
                         fontSize: 16,
                       ),
                     ),
-                    TitleText("Your review:"),
+                    const TitleText("Your review:"),
                     RatingBar.builder(
                       itemSize: 25,
                       ignoreGestures: true,
@@ -146,9 +167,10 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                           onTap: () {
                             setState(() {
                               editRecipe = true;
+                              errorMessage = "";
                             });
                           },
-                          child: CustomButton("Edit review", true, 24)),
+                          child: const CustomButton("Edit review", true, 24)),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -156,8 +178,11 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                       child: GestureDetector(
                           onTap: () {
                             removeReview();
+                            setState(() {
+                              errorMessage = "";
+                            });
                           },
-                          child: CustomButton(
+                          child: const CustomButton(
                             "Remove review",
                             false,
                             24,
@@ -177,8 +202,8 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
     );
   }
 
-  void addReview() async {
-    if (chosenRating == -1 || _controllerComment.text.isEmpty) return;
+  Future<bool> addReview() async {
+    if (chosenRating <= 0 || _controllerComment.text.isEmpty) return false;
     ReviewDTO reviewDTO = ReviewDTO(
         rating: chosenRating,
         userUID: user!.uid,
@@ -204,6 +229,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
       loadedData = false;
       review = newReview;
     });
+    return true;
   }
 
   void removeReview() async {

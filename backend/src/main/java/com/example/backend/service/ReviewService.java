@@ -52,9 +52,6 @@ public class ReviewService {
         review.setUserUID(userUID);
         review.setUsername(user.getUsername());
         review.setUserImageURL(user.getImageURL());
-        System.out.println("Sending review info");
-        System.out.println(review.getUserUID());
-        System.out.println(review.getUserImageURL());
         return review;
     }
 

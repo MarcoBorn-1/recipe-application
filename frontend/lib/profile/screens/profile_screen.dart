@@ -63,6 +63,7 @@ class ProfileScreen extends StatelessWidget {
                 onLogoutTap: signOut, 
                 username: _userUid(), 
                 imageURL: _imageURL(),
+                showIcons: true,
               ),
               const ProfileOptionWidget(
                 title: "Favorites", 

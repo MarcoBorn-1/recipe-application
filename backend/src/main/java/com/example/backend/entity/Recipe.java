@@ -14,6 +14,8 @@ import java.util.Objects;
 public class Recipe {
 
     public Recipe(InternalRecipeDTO internalRecipeDTO) {
+        title = internalRecipeDTO.getTitle();
+        imageURL = internalRecipeDTO.getImageURL();
         external = false;
         author = internalRecipeDTO.getAuthor();
         dateAdded = internalRecipeDTO.getDateAdded();
@@ -24,6 +26,7 @@ public class Recipe {
         proteins = ((Number) internalRecipeDTO.getProteins()).doubleValue();
         carbohydrates = ((Number) internalRecipeDTO.getCarbohydrates()).doubleValue();
         fats = ((Number) internalRecipeDTO.getFats()).doubleValue();
+        servings = internalRecipeDTO.getServings();
 
         Map<String, Map<String, Object>> map = internalRecipeDTO.getIngredients_map();
 

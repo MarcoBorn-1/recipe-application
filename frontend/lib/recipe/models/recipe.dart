@@ -47,8 +47,6 @@ class Recipe {
   final double averageReviewScore;
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
-    String authorTemp = (json['author'] == null) ? "" : json['author'];
-    String dateAddedTemp = (json['dateAdded'] == null) ? "" : json['dateAdded'];
     List<String> stepsTemp = (json['steps'] == null)
         ? []
         : (json['steps'] as List).map((i) => i.toString()).toList();
@@ -62,8 +60,8 @@ class Recipe {
       steps: stepsTemp, // here
       readyInMinutes: json['readyInMinutes'],
       servings: json['servings'],
-      author: authorTemp,
-      dateAdded: dateAddedTemp,
+      author: json['author'] ?? "",
+      dateAdded: json['dateAdded'] ?? "",
       imageURL: json['imageURL'],
       calories: json['calories'],
       proteins: json['proteins'],

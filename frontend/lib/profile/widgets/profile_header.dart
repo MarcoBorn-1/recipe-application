@@ -3,15 +3,48 @@ import 'package:flutter/material.dart';
 
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader(
-      {required this.onSettingsTap,
-      required this.onLogoutTap,
+      {this.onSettingsTap,
+      this.onLogoutTap,
       required this.username,
       required this.imageURL,
+      required this.showIcons,
       super.key});
-  final VoidCallback onSettingsTap;
-  final VoidCallback onLogoutTap;
+  final VoidCallback? onSettingsTap;
+  final VoidCallback? onLogoutTap;
   final String username;
   final String imageURL;
+  final bool showIcons;
+
+  Widget _settings() {
+    if (showIcons) {
+      return GestureDetector(
+        onTap: onSettingsTap,
+        child: const Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: Icon(
+            Icons.settings,
+            color: Colors.white,
+            size: 30,
+          ),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
+
+  Widget _logout() {
+    if (showIcons) {
+      return GestureDetector(
+          onTap: onLogoutTap,
+          child: const Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: Icon(Icons.logout, color: Colors.white, size: 30),
+          ));
+    } else {
+      return Container();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,53 +64,46 @@ class ProfileHeader extends StatelessWidget {
             children: [
               Expanded(
                 flex: 1,
-                child: GestureDetector(
-                  onTap: onSettingsTap,
-                  child: const Padding(
-                    padding: EdgeInsets.only(top: 8.0),
-                    child: Icon(
-                      Icons.settings,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ),
-                ),
+                child: _settings()
               ),
               Expanded(
                 flex: 6,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CircleAvatar(
-                        radius: 48,
-                        backgroundImage: NetworkImage(imageURL)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                          username,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            color: Colors.white
-                          ),
-                        ),
-                      )
-                    ]),
+                child:
+                    Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  CircleAvatar(
+                      radius: 48,
+                      backgroundImage: (imageURL == "")
+                          ? Image.asset("assets/images/profile_picture.jpg")
+                              .image
+                          : Image.network(
+                              imageURL,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                return const CircularProgressIndicator(
+                                    color: Colors.white);
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                    "assets/images/profile_picture.jpg");
+                              },
+                            ).image),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      username,
+                      style: const TextStyle(fontSize: 24, color: Colors.white),
+                    ),
+                  )
+                ]),
               ),
               Expanded(
                 flex: 1,
-                child: GestureDetector(
-                    onTap: onLogoutTap,
-                    child: const Padding(
-                      padding: EdgeInsets.only(top: 8.0),
-                      child: Icon(
-                        Icons.logout,
-                        color: Colors.white,
-                        size: 30
-                      ),
-                    )),
+                child: _logout()
               ),
             ],
           )),
     );
   }
+
+  void fun() {}
 }

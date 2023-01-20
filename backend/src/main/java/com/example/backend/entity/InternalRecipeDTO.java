@@ -23,6 +23,8 @@ public class InternalRecipeDTO {
     private double readyInMinutes;
     private String imageURL;
 
+    private int servings;
+
     private String author;
     private String dateAdded;
 }

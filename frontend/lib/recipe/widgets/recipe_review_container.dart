@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:frontend/recipe/models/review.dart';
+import 'package:frontend/recipe/screens/show_profile_screen.dart';
 
 class RecipeReviewContainer extends StatelessWidget {
   const RecipeReviewContainer(this.review, {super.key});
@@ -19,46 +21,92 @@ class RecipeReviewContainer extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(15.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 0, 0, 255),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      width: 40,
-                      height: 40,
-                      child: const CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          "https://static.wikia.nocookie.net/gtawiki/images/7/70/CJ-GTASA.png/revision/latest?cb=20190612091918"
-                        )
-                      ),
+                  Expanded(
+                    flex: 10,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            print("User UID: ${review.userUID}");
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ShowProfileScreen(uid: review.userUID)
+                              )
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 0, 0, 255),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              width: 40,
+                              height: 40,
+                              child: CircleAvatar(
+                                backgroundImage: (review.userImageURL == "") ? 
+                                Image.asset("assets/images/profile_picture.jpg").image : 
+                                NetworkImage(
+                                    review.userImageURL
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  fit: FlexFit.loose,
+                                  child: Text(
+                                    review.username,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 18),
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    review.comment,
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.w400),
+                                    softWrap: true,
+                                  ),
+                                ),
+                              ]),
+                        ),
+                      ],
                     ),
                   ),
                   Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          review.username, 
-                          style: const TextStyle(
-                            color: Colors.white, 
-                            fontSize: 18
+                    flex: 4,
+                    fit: FlexFit.loose,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          RatingBar.builder(
+                            itemSize: 13,
+                            ignoreGestures: true,
+                            initialRating: review.rating,
+                            direction: Axis.horizontal,
+                            itemCount: 5,
+                            itemBuilder: (context, _) => const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                            ),
+                            onRatingUpdate: (rating) {},
                           ),
-                        ),
-                        Text(
-                          review.comment, 
-                          style: const TextStyle(
-                            color: Colors.white, 
-                            fontSize: 14,
-                            fontStyle: FontStyle.italic,
-                            fontWeight: FontWeight.w400
-                          ),
-                        ),
-                        // maybe add star rating here
-                    ]),
-                  ),
+                        ]),
+                  )
                 ],
               ),
             )));
