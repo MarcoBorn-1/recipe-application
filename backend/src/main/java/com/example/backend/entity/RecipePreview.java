@@ -15,13 +15,22 @@ public class RecipePreview {
         isExternal = recipe.isExternal();
     }
 
-    public RecipePreview(InternalRecipeDTO recipeDTO) {
-        id = recipeDTO.getId();
-        title = recipeDTO.getTitle();
-        imageURL = recipeDTO.getImageURL();
-        readyInMinutes = recipeDTO.getReadyInMinutes();
-        calories = ((Number) recipeDTO.getCalories()).doubleValue();
+    public RecipePreview(InternalRecipeDTO internalRecipeDTO) {
+        id = internalRecipeDTO.getId();
+        title = internalRecipeDTO.getTitle();
+        imageURL = internalRecipeDTO.getImageURL();
+        readyInMinutes = internalRecipeDTO.getReadyInMinutes();
+        calories = ((Number) internalRecipeDTO.getCalories()).doubleValue();
         isExternal = false;
+    }
+
+    public RecipePreview(ExternalRecipeDTO externalRecipeDTO) {
+        id = externalRecipeDTO.getId();
+        title = externalRecipeDTO.getTitle();
+        imageURL = externalRecipeDTO.getImageURL();
+        readyInMinutes = externalRecipeDTO.getReadyInMinutes();
+        calories = externalRecipeDTO.getCalories();
+        isExternal = true;
     }
     private int id;
     private String title;
@@ -29,4 +38,6 @@ public class RecipePreview {
     private Double readyInMinutes;
     private Double calories;
     private boolean isExternal;
+
+
 }

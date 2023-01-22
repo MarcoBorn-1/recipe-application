@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:ffi';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/auth/widgets/auth.dart';
+import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/recipe/models/recipe.dart';
+import 'package:frontend/recipe/screens/add_review_screen.dart';
 import 'package:frontend/recipe/widgets/recipe_header_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_ingredients_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_nutrients_widget.dart';
@@ -30,8 +34,8 @@ class RecipeScreen extends StatefulWidget {
 class _RecipeScreenState extends State<RecipeScreen> {
   bool loadedData = false;
   late Recipe recipe;
-
-  bool isFavorite = false;
+  User? user = Auth().currentUser;
+  late bool isFavorite;
   final double ratingAvg = 4;
   final int timeToPrepareMin = 30;
   Map<String, Map<String, dynamic>> nutritionValues = {
@@ -94,6 +98,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
       padding: EdgeInsets.only(right: 20),
       child: Icon(Icons.favorite_outline, color: Colors.white, size: 30));
 
+  Widget loadingWidget = const Padding(
+      padding: EdgeInsets.only(right: 20),
+      child: CircularProgressIndicator(color: Colors.white));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,14 +113,25 @@ class _RecipeScreenState extends State<RecipeScreen> {
             child: const Icon(Icons.arrow_back, color: Colors.white)),
         title: Text(widget.title),
         actions: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                isFavorite = !isFavorite;
-              });
-            },
-            child: (isFavorite ? favorite : notFavorite),
-          )
+          FutureBuilder<bool>(
+              future: isRecipeFavorite(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Container();
+                } else if (snapshot.hasData) {
+                  isFavorite = snapshot.data ?? false;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        changeFavoriteStatus();
+                      });
+                    },
+                    child: (isFavorite ? favorite : notFavorite),
+                  );
+                } else {
+                  return loadingWidget;
+                }
+              }),
         ],
       ),
       backgroundColor: const Color(0xFF242424),
@@ -141,6 +160,24 @@ class _RecipeScreenState extends State<RecipeScreen> {
               RecipeStepsWidget(recipe.steps),
               RecipeReviewsWidget(recipe.amountOfReviews, recipe.reviews,
                   recipe.id, recipe.isExternal),
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 0.0, left: 16, right: 16, bottom: 24),
+                child: GestureDetector(
+                    onTap: () async {
+                      var value = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddReviewScreen(
+                                  widget.recipeId, widget.isExternal)));
+                      if (value) {
+                        setState(() {
+                          loadedData = false;
+                        });
+                      }
+                    },
+                    child: const CustomButton("Add review", true, 24)),
+              ),
             ];
             return ListView.builder(
               itemCount: widgetList.length,
@@ -157,11 +194,34 @@ class _RecipeScreenState extends State<RecipeScreen> {
     );
   }
 
+  Future<void> changeFavoriteStatus() async {
+    if (isFavorite) {
+      await http.delete(Uri.parse(
+          'http://10.0.2.2:8080/favorite/remove?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
+    } else {
+      await http.post(Uri.parse(
+          'http://10.0.2.2:8080/favorite/add?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
+    }
+    isFavorite = !isFavorite;
+  }
+
+  Future<bool> isRecipeFavorite() async {
+    if (user == null) return false;
+    var response = await http.get(Uri.parse(
+        'http://10.0.2.2:8080/favorite/is_favorite?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
+    if (response.statusCode == 200) {
+      String result = response.body;
+      return (result == "true") ? true : false;
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
   Future<Recipe> loadData() async {
     if (loadedData == true) {
       return recipe;
     }
-    var response;
+    http.Response response;
     if (widget.isExternal) {
       response = await http.get(Uri.parse(
           'http://10.0.2.2:8080/recipe/get_external?id=${widget.recipeId}'));
@@ -171,7 +231,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
     }
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
-      print(response.body);
       recipe = Recipe.fromJson(json.decode(response.body));
       print("ID: ${recipe.id}, isExternal: ${recipe.isExternal}");
       loadedData = true;

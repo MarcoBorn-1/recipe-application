@@ -69,7 +69,7 @@ public class RecipeController {
     }
 
     @GetMapping("/get_internal")
-    public Recipe getInternalRecipeById(@RequestParam String id) throws InterruptedException, ExecutionException {
+    public Recipe getInternalRecipeById(@RequestParam int id) throws InterruptedException, ExecutionException {
         return recipeService.getInternalRecipe(id);
     }
 
@@ -97,6 +97,12 @@ public class RecipeController {
                                                    @RequestParam(required = false) String intolerances,
                                                    @RequestParam(required = false) Integer amount) throws IOException {
         return recipeService.searchRecipesByName(query, maxReadyTime, minCalories, maxCalories, minProteins, maxProteins, minCarbohydrates, maxCarbohydrates, minFats, maxFats, intolerances, amount);
+    }
+
+    @GetMapping("/get_favorite")
+    public List<RecipePreview> getFavoritesByUserUID(@RequestParam String user_uid)
+            throws ExecutionException, InterruptedException, IOException {
+        return recipeService.getFavoritesByUserUID(user_uid);
     }
 
     @PutMapping("/put")

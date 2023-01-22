@@ -50,26 +50,6 @@ class _RecipeReviewsWidgetState extends State<RecipeReviewsWidget> {
       ),
       showReviews,
       showAllReviewsButton,
-      Padding(
-        padding:
-            const EdgeInsets.only(top: 0.0, left: 16, right: 16, bottom: 24),
-        child: GestureDetector(
-            onTap: () async {
-              var value = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        AddReviewScreen(widget.recipeId, widget.isRecipeExternal)
-                )
-              );
-              if (value) {
-                setState(() {
-                  
-                });
-              }
-            },
-            child: const CustomButton("Add review", true, 24)),
-      ),
     ]);
   }
   

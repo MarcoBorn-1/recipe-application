@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:frontend/auth/widgets/auth.dart';
+import 'package:frontend/profile/screens/favorite_screen.dart';
 import 'package:frontend/profile/screens/my_recipes_screen.dart';
 import 'package:frontend/profile/widgets/profile_header.dart';
 import 'package:frontend/profile/widgets/profile_option_widget.dart';
@@ -32,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MyRecipesScreen()
+          builder: (context) => const MyRecipesScreen()
         )
       );
     }
@@ -42,14 +43,19 @@ class ProfileScreen extends StatelessWidget {
     }
 
     void openFavorites() {
-
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const FavoriteScreen()
+        )
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
           leading: const Icon(Icons.person,
               color: Colors.white),
-          title: Text("Profile"),
+          title: const Text("Profile"),
           
         ),
       backgroundColor: const Color(0xFF242424),
@@ -65,10 +71,13 @@ class ProfileScreen extends StatelessWidget {
                 imageURL: _imageURL(),
                 showIcons: true,
               ),
-              const ProfileOptionWidget(
-                title: "Favorites", 
-                description: "Access recipes you marked as favorite", 
-                icon: Icons.favorite_border, 
+              GestureDetector(
+                onTap: () => openFavorites(),
+                child: const ProfileOptionWidget(
+                  title: "Favorites", 
+                  description: "Access recipes you marked as favorite", 
+                  icon: Icons.favorite_border, 
+                ),
               ),
               GestureDetector(
                 onTap: () => openMyRecipes(),

@@ -7,19 +7,19 @@ import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/home/widgets/recipe_container.dart';
 import 'package:http/http.dart' as http;
 
-class MyRecipesScreen extends StatefulWidget {
-  const MyRecipesScreen({super.key});
+class FavoriteScreen extends StatefulWidget {
+  const FavoriteScreen({super.key});
 
   @override
-  State<MyRecipesScreen> createState() => _MyRecipesScreenState();
+  State<FavoriteScreen> createState() => _FavoriteScreenState();
 }
 
-class _MyRecipesScreenState extends State<MyRecipesScreen> {
+class _FavoriteScreenState extends State<FavoriteScreen> {
   late List<RecipePreview> recipeList;
   User? user = Auth().currentUser;
   Future<List<RecipePreview>> getRecipeData() async {
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/get_by_user_uid?user_uid=${user!.uid}'));
+        'http://10.0.2.2:8080/recipe/get_favorite?user_uid=${user!.uid}'));
     if (response.statusCode == 200) {
       List<RecipePreview> recipes;
       recipes = (json.decode(response.body) as List)
@@ -40,19 +40,7 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
           onTap: () => Navigator.pop(context),
           child: const Icon(Icons.arrow_back, color: Colors.white),
         ),
-        title: const Text("My recipes"),
-        actions: [
-          GestureDetector(
-            onTap: () {},
-            child: const Padding(
-              padding: EdgeInsets.only(right: 8.0),
-              child: Icon(
-                Icons.add,
-                color: Colors.white,
-              ),
-            ),
-          )
-        ],
+        title: const Text("Favorite recipes"),
       ),
       backgroundColor: const Color(0xFF242424),
       body: SafeArea(

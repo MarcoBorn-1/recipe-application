@@ -28,6 +28,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
   bool loadedData = false;
   late Review review;
   bool editRecipe = false;
+  bool changedReview = false;
 
   Widget _entryField(
     String title,
@@ -56,12 +57,11 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
             onTap: () {
-              Navigator.pop(context, true);
+              Navigator.pop(context, changedReview);
             },
             child: const Icon(Icons.arrow_back, color: Colors.white)),
         title: const Text("Add review"),
@@ -119,9 +119,9 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                               setState(() {
                                 errorMessage = "Fill out all fields!";
                               });
-                            }
-                            else {
+                            } else {
                               errorMessage = "";
+                              changedReview = true;
                             }
                             print(chosenRating);
                             print(_controllerComment.text);

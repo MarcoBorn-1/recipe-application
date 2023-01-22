@@ -24,6 +24,7 @@ import static com.example.backend.config.Constants.SPOONACULAR_API_KEY;
 public class RecipeService {
     final int REVIEWS_IN_RECIPE = 3;
     final UserService userService;
+    final FavoriteService favoriteService;
     public String createRecipe(InternalRecipeDTO recipe) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
 
@@ -40,9 +41,9 @@ public class RecipeService {
         return collectionsApiFuture.get().getUpdateTime().toString();
     }
 
-    public Recipe getInternalRecipe(String id) throws ExecutionException, InterruptedException {
+    public Recipe getInternalRecipe(int id) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        DocumentReference recipeDocumentReference = dbFirestore.collection("recipes").document(id);
+        DocumentReference recipeDocumentReference = dbFirestore.collection("recipes").document(String.valueOf(id));
         ApiFuture<DocumentSnapshot> future = recipeDocumentReference.get();
         DocumentSnapshot document = future.get();
         if (!document.exists()) {
@@ -54,7 +55,7 @@ public class RecipeService {
         Recipe recipe = new Recipe(internalRecipeDTO);
 
         // Reviews
-        CollectionReference reviewsCollection = dbFirestore.collection("reviews").document("internal_reviews").collection(id);
+        CollectionReference reviewsCollection = dbFirestore.collection("reviews").document("internal_reviews").collection(String.valueOf(id));
         AggregateQuerySnapshot snapshot = reviewsCollection.count().get().get();
         System.out.println("Count: " + snapshot.getCount());
         if (snapshot.getCount() == 0) {
@@ -64,16 +65,16 @@ public class RecipeService {
             return recipe;
         }
         else {
-            getReviewCount(recipe, reviewsCollection, snapshot);
+            addReviewInformationToRecipe(recipe, reviewsCollection, snapshot.getCount());
         }
-        ApiFuture<QuerySnapshot> reviewsFuture = dbFirestore.collection("reviews").document("internal_reviews").collection(id).get();
+        ApiFuture<QuerySnapshot> reviewsFuture = dbFirestore.collection("reviews").document("internal_reviews").collection(String.valueOf(id)).get();
         List<QueryDocumentSnapshot> documents = reviewsFuture.get().getDocuments();
 
         return recipe;
     }
 
     // TODO: move to ReviewService
-    private Recipe getReviewCount(Recipe recipe, CollectionReference reviewsCollection, AggregateQuerySnapshot snapshot) throws InterruptedException, ExecutionException {
+    private Recipe addReviewInformationToRecipe(Recipe recipe, CollectionReference reviewsCollection, long count) throws InterruptedException, ExecutionException {
         ArrayList<ReviewDTO> reviewDTOList = new ArrayList<>();
         ArrayList<ReviewPreview> reviewPreviewList = new ArrayList<>();
         int reviews_added = 0;
@@ -81,7 +82,7 @@ public class RecipeService {
         Double rating;
         QuerySnapshot documentSnapshots = reviewsCollection.get().get();
         List<QueryDocumentSnapshot> documentList = documentSnapshots.getDocuments();
-        recipe.setAmountOfReviews(snapshot.getCount());
+        recipe.setAmountOfReviews(count);
         for (QueryDocumentSnapshot documentSnapshot: documentList) {
             if (REVIEWS_IN_RECIPE - reviews_added >= 0) {
                 ReviewDTO reviewDTO = documentSnapshot.toObject(ReviewDTO.class);
@@ -91,7 +92,7 @@ public class RecipeService {
             rating = documentSnapshot.getDouble("rating");
             if (rating != null) averageReviewScore += rating;
         }
-        recipe.setAverageReviewScore(averageReviewScore / snapshot.getCount());
+        recipe.setAverageReviewScore(averageReviewScore / count);
 
         for (ReviewDTO reviewDTO: reviewDTOList) {
             ReviewPreview reviewPreview = new ReviewPreview(reviewDTO);
@@ -126,7 +127,7 @@ public class RecipeService {
             return recipe;
         }
         else {
-            getReviewCount(recipe, reviewsCollection, snapshot);
+            addReviewInformationToRecipe(recipe, reviewsCollection, snapshot.getCount());
         }
         return recipe;
     }
@@ -218,6 +219,56 @@ public class RecipeService {
         for (QueryDocumentSnapshot document : query.getDocuments()) {
             recipeList.add(new RecipePreview(document.toObject(InternalRecipeDTO.class)));
         }
+        return recipeList;
+    }
+
+    public List<RecipePreview> getFavoritesByUserUID(String user_uid) throws ExecutionException, InterruptedException, IOException {
+        ArrayList<RecipePreview> recipeList = new ArrayList<>();
+        Favorites favorites = favoriteService.getFavoriteRecipeIds(user_uid);
+        if (favorites == null) return recipeList;
+        System.out.println(favorites.getItems_external().toString());
+        recipeList.addAll(getListOfInternalRecipes(favorites.getItems_internal()));
+        recipeList.addAll(getListOfExternalRecipes(favorites.getItems_external()));
+        return recipeList;
+    }
+
+    public List<RecipePreview> getListOfExternalRecipes(ArrayList<Integer> recipeIdList) throws IOException, ExecutionException, InterruptedException {
+        List<RecipePreview> recipeList = new ArrayList<>();
+        if (recipeIdList == null) return recipeList;
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("https://api.spoonacular.com/recipes/informationBulk?apiKey=").append(SPOONACULAR_API_KEY);
+        urlBuilder.append("&includeNutrition=").append(true);
+        urlBuilder.append("&ids=");
+
+        for (int i = 0; i < recipeIdList.size(); i++) {
+            urlBuilder.append(recipeIdList.get(i));
+            if (i != recipeIdList.size() - 1) urlBuilder.append(",");
+        }
+
+        System.out.println(urlBuilder);
+        URL url = new URL(urlBuilder.toString());
+        String json = IOUtils.toString(url, StandardCharsets.UTF_8);
+        JSONArray jsonArray = new JSONArray(json);
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            ExternalRecipeDTO externalRecipeDTO = new ExternalRecipeDTO(jsonArray.getJSONObject(i));
+            recipeList.add(new RecipePreview(externalRecipeDTO));
+        }
+
+        return recipeList;
+    }
+
+    public List<RecipePreview> getListOfInternalRecipes(ArrayList<Integer> recipeIdList) throws ExecutionException, InterruptedException {
+        List<RecipePreview> recipeList = new ArrayList<>();
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference recipesRef = db.collection("recipes");
+
+        for (Integer integer : recipeIdList) {
+            QuerySnapshot query = recipesRef.whereEqualTo("id", integer).limit(1).get().get();
+            QueryDocumentSnapshot document = query.getDocuments().get(0);
+            recipeList.add(new RecipePreview(document.toObject(InternalRecipeDTO.class)));
+        }
+
         return recipeList;
     }
 }
