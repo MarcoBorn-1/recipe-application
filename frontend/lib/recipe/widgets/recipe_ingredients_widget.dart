@@ -65,7 +65,7 @@ class RecipeIngredientsWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                  "Values for " + servings.toString() + " serving(s)",
+                  "Values for $servings serving(s)",
                   style: const TextStyle(color: Color.fromARGB(131, 255, 255, 255), fontSize: 12),
                 ),
             ],

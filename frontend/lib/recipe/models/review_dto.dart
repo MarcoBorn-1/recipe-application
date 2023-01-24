@@ -1,4 +1,4 @@
-import 'package:frontend/recipe/models/review.dart';
+// ignore_for_file: file_names
 
 class ReviewDTO {
   final double rating;

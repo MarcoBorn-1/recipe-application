@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/auth/widgets/auth.dart';
+import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
-import 'package:frontend/home/widgets/recipe_container.dart';
+import 'package:frontend/common/widgets/recipe_container.dart';
 import 'package:http/http.dart' as http;
 
 class FavoriteScreen extends StatefulWidget {

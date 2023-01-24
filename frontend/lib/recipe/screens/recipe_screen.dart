@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/auth/widgets/auth.dart';
+import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/recipe/models/recipe.dart';
 import 'package:frontend/recipe/screens/add_review_screen.dart';

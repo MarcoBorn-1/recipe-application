@@ -4,10 +4,10 @@ class ShowReviewsPage extends StatefulWidget {
   const ShowReviewsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _showReviewsPageState();
+  State<StatefulWidget> createState() => _ShowReviewsPageState();
 }
 
-class _showReviewsPageState extends State<ShowReviewsPage> {
+class _ShowReviewsPageState extends State<ShowReviewsPage> {
   @override
   Widget build(BuildContext context) {
     return Text("");

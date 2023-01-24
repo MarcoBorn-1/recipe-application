@@ -57,8 +57,8 @@ class RecipeHeaderWidget extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
-                      amountOfReviews.toString() + " review" + ((amountOfReviews != 1) ? "s":""),
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      "$amountOfReviews review${(amountOfReviews != 1) ? "s":""}",
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   )
                 ],
@@ -71,8 +71,8 @@ class RecipeHeaderWidget extends StatelessWidget {
                     color: Colors.white,
                   ),
                   Text(
-                    " " + timeToPrepare.toStringAsFixed(0) + " minutes",
-                    style: TextStyle(color: Colors.white),
+                    " ${timeToPrepare.toStringAsFixed(0)} minutes",
+                    style: const TextStyle(color: Colors.white),
                   )
                 ],
               )

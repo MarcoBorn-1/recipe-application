@@ -1,11 +1,9 @@
 import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
-import 'package:frontend/home/widgets/recipe_container.dart';
-import 'package:frontend/profile/widgets/profile_header.dart';
-import 'package:frontend/recipe/models/recipe.dart';
+import 'package:frontend/common/widgets/recipe_container.dart';
+import 'package:frontend/profile/profile_screen/widgets/profile_header_widget.dart';
 import 'package:frontend/recipe/models/user_information.dart';
 import 'package:http/http.dart' as http;
 
@@ -57,7 +55,7 @@ class _ShowProfileScreenState extends State<ShowProfileScreen> {
               Navigator.pop(context);
             },
             child: const Icon(Icons.arrow_back, color: Colors.white)),
-        title: Text("View Profile"),
+        title: const Text("View Profile"),
       ),
       backgroundColor: const Color(0xFF242424),
       body: Column(
@@ -66,7 +64,7 @@ class _ShowProfileScreenState extends State<ShowProfileScreen> {
             future: getProfileData(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
-                return Center(child: Text("1" + snapshot.error.toString()));
+                return Center(child: Text("${snapshot.error}"));
               } else if (snapshot.hasData) {
                 userInfo = snapshot.data!;
                 return ProfileHeader(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/recipe/screens/recipe_screen.dart';
 
 class RecipeContainer extends StatelessWidget {
-  RecipeContainer(this.recipeId, this.recipeName, this.timeToMake,
+  const RecipeContainer(this.recipeId, this.recipeName, this.timeToMake,
       this.calories, this.imageURL, this.isExternal,
       {super.key});
   final int recipeId;
@@ -71,7 +71,7 @@ class RecipeContainer extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 5),
                             child: Text(
-                              timeToMake.toStringAsFixed(0) + " minutes",
+                              "${timeToMake.toStringAsFixed(0)} minutes",
                               style: const TextStyle(
                                 color: Colors.white70,
                                 fontStyle: FontStyle.italic,
@@ -90,7 +90,7 @@ class RecipeContainer extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 5),
                             child: Text(
-                              calories.round().toString() + " calories",
+                              "${calories.round()} calories",
                               style: const TextStyle(
                                   color: Colors.white70,
                                   fontStyle: FontStyle.italic),

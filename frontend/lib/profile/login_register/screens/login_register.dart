@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../widgets/auth.dart';
+import '../../../common/models/auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -61,9 +61,9 @@ class _LoginPageState extends State<LoginPage> {
       autocorrect: false,
       decoration: InputDecoration(
         labelText: title,
-        labelStyle: TextStyle(color: Colors.white),
-        errorStyle: TextStyle(color: Colors.red),
-        helperStyle: TextStyle(color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.white),
+        errorStyle: const TextStyle(color: Colors.red),
+        helperStyle: const TextStyle(color: Colors.white70),
       ),
     );
   }
@@ -77,9 +77,9 @@ class _LoginPageState extends State<LoginPage> {
       controller: controller,
       decoration: InputDecoration(
         labelText: title,
-        labelStyle: TextStyle(color: Colors.white),
-        errorStyle: TextStyle(color: Colors.red),
-        helperStyle: TextStyle(color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.white),
+        errorStyle: const TextStyle(color: Colors.red),
+        helperStyle: const TextStyle(color: Colors.white70),
       ),
     );
   }
@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _errorMessage() {
     return Text(
       errorMessage == '' ? '' : '$errorMessage',
-      style: TextStyle(color: Colors.redAccent),
+      style: const TextStyle(color: Colors.redAccent),
     );
   }
 
@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Text(
         isLogin ? 'Register instead' : 'Login instead',
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
       ),
     );
   }

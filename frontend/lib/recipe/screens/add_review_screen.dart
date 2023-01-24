@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:frontend/auth/widgets/auth.dart';
+import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/title_text.dart';
 import 'package:frontend/recipe/models/review.dart';

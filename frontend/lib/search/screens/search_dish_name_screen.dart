@@ -8,7 +8,6 @@ import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/icon_title_button.dart';
 import 'package:frontend/common/widgets/title_text.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
-import 'package:frontend/home/widgets/search_widget.dart';
 import 'package:frontend/search/screens/search_results_screen.dart';
 import 'package:http/http.dart' as http;
 

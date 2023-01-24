@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/search/screens/search_dish_name.dart';
+import 'package:frontend/search/screens/search_dish_name_screen.dart';
 import 'package:frontend/search/widgets/search_option_container.dart';
 
 class SearchOptionScreen extends StatelessWidget {
@@ -18,7 +18,7 @@ class SearchOptionScreen extends StatelessWidget {
       appBar: AppBar(
           leading: const Icon(CupertinoIcons.search,
               color: Colors.white),
-          title: Text("Search using..."),
+          title: const Text("Search using..."),
         ),
       backgroundColor: const Color(0xFF242424),
       body: SafeArea(

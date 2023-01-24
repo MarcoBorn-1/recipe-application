@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:frontend/auth/widgets/auth.dart';
-import 'package:frontend/profile/screens/favorite_screen.dart';
-import 'package:frontend/profile/screens/my_recipes_screen.dart';
-import 'package:frontend/profile/widgets/profile_header.dart';
-import 'package:frontend/profile/widgets/profile_option_widget.dart';
+import 'package:frontend/common/models/auth.dart';
+import 'package:frontend/profile/favorites/screens/favorite_screen.dart';
+import 'package:frontend/profile/my_recipes/screens/my_recipes_screen.dart';
+import 'package:frontend/profile/profile_screen/widgets/profile_header_widget.dart';
+import 'package:frontend/profile/profile_screen/widgets/profile_option_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});

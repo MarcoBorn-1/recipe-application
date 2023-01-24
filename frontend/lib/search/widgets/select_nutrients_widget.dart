@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/widgets/custom_container.dart';
 import 'package:frontend/common/widgets/title_text.dart';
@@ -39,9 +38,7 @@ class _SelectNutrientsWidgetState extends State<SelectNutrientsWidget> {
                       child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      widget.valueMin.toString() +
-                          " - " +
-                          widget.valueAvg.toString() + " " + widget.unit,
+                      "${widget.valueMin} - ${widget.valueAvg} ${widget.unit}",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,
@@ -59,9 +56,7 @@ class _SelectNutrientsWidgetState extends State<SelectNutrientsWidget> {
                       child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      widget.valueAvg.toString() +
-                          " - " +
-                          widget.valueMax.toString() + " " + widget.unit,
+                      "${widget.valueAvg} - ${widget.valueMax} ${widget.unit}",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,
@@ -79,7 +74,7 @@ class _SelectNutrientsWidgetState extends State<SelectNutrientsWidget> {
                       child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      "> " + widget.valueMax.toString() + " " + widget.unit,
+                      "> ${widget.valueMax} ${widget.unit}",
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,

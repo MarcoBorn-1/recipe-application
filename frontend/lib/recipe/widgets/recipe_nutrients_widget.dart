@@ -50,10 +50,10 @@ class RecipeNutrientsWidget extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 25.0, right: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
-            children: [
+            children: const [
               Text(
                   "Values for one serving",
-                  style: const TextStyle(color: Color.fromARGB(131, 255, 255, 255), fontSize: 12),
+                  style: TextStyle(color: Color.fromARGB(131, 255, 255, 255), fontSize: 12),
                 ),
             ],
           ),
@@ -69,12 +69,12 @@ class RecipeNutrientsWidget extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
+          const Text(
             "Calories",
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
           Text(
-            calories.toStringAsFixed(0) + " kcal",
+            "${calories.toStringAsFixed(0)} kcal",
             style: const TextStyle(color: Colors.white, fontSize: 18),
           )
         ],
@@ -84,12 +84,12 @@ class RecipeNutrientsWidget extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
+          const Text(
             "Proteins",
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
           Text(
-            proteins.toStringAsFixed(1) + " g",
+            "${proteins.toStringAsFixed(1)} g",
             style: const TextStyle(color: Colors.white, fontSize: 18),
           )
         ],
@@ -99,12 +99,12 @@ class RecipeNutrientsWidget extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
+          const Text(
             "Carbohydrates",
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
           Text(
-            carbohydrates.toStringAsFixed(1) + " g",
+            "${carbohydrates.toStringAsFixed(1)} g",
             style: const TextStyle(color: Colors.white, fontSize: 18),
           )
         ],
@@ -114,12 +114,12 @@ class RecipeNutrientsWidget extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
+          const Text(
             "Fats",
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
           Text(
-            fats.toStringAsFixed(1) + " g",
+            "${fats.toStringAsFixed(1)} g",
             style: const TextStyle(color: Colors.white, fontSize: 18),
           )
         ],

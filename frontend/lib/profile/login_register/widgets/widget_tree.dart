@@ -1,9 +1,7 @@
-import 'package:frontend/auth/widgets/auth.dart';
-import 'package:frontend/profile/screens/profile_screen.dart';
-import 'package:frontend/auth/screens/login_register.dart';
+import 'package:frontend/common/models/auth.dart';
+import 'package:frontend/profile/profile_screen/screens/profile_screen.dart';
+import 'package:frontend/profile/login_register/screens/login_register.dart';
 import 'package:flutter/material.dart';
-
-import '../../home/screens/main_page.dart';
 
 class WidgetTree extends StatefulWidget {
   const WidgetTree({Key? key}) : super(key: key);

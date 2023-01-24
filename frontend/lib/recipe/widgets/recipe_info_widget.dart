@@ -17,23 +17,23 @@ class RecipeInformationWidget extends StatelessWidget {
           style: const TextStyle(color: Colors.white, fontSize: 24),
         ),
         Padding(
-          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 25, top: 10),
+          padding:
+              const EdgeInsets.only(left: 10, right: 10, bottom: 25, top: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 48, 47, 47),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: Colors.deepPurple,
-                width: 0.8,
-              )
-            ),
+                color: const Color.fromARGB(255, 48, 47, 47),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.deepPurple,
+                  width: 0.8,
+                )),
             width: double.infinity,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               child: Column(
                 children: informationMap.entries.map((entry) {
-                  var value = entry.value['amount'].toString() + " " +
-                      entry.value['measurement'];
+                  var value =
+                      "${entry.value['amount']} ${entry.value['measurement']}";
 
                   var labelText = Text(
                     entry.key.titleCase,

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:frontend/auth/widgets/widget_tree.dart';
+import 'package:frontend/profile/login_register/widgets/widget_tree.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/home/screens/main_page.dart';
+import 'package:frontend/home/screens/homepage_screen.dart';
 import 'package:frontend/search/screens/search_option_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
@@ -35,12 +35,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: const MaterialColor(0xFF221722, color),
       ),
-      home: MyBottomNavigator(),
+      home: const MyBottomNavigator(),
     );
   }
 }
 
 class MyBottomNavigator extends StatefulWidget {
+  const MyBottomNavigator({super.key});
+
   @override
   State<MyBottomNavigator> createState() => _MyBottomNavigatorState();
 }
@@ -61,7 +63,7 @@ class _MyBottomNavigatorState extends State<MyBottomNavigator> {
   
   List<Widget> _buildScreens() {
       return [
-        const MyHomePage(),
+        const HomePage(),
         SearchOptionScreen(),
         const WidgetTree(),
       ];
