@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/profile/favorites/screens/favorite_screen.dart';
 import 'package:frontend/profile/my_recipes/screens/my_recipes_screen.dart';
+import 'package:frontend/profile/pantry/screens/pantry_screen.dart';
 import 'package:frontend/profile/profile_screen/widgets/profile_header_widget.dart';
 import 'package:frontend/profile/profile_screen/widgets/profile_option_widget.dart';
 
@@ -38,7 +39,12 @@ class ProfileScreen extends StatelessWidget {
     }
 
     void openPantry() {
-
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const PantryScreen()
+        )
+      );
     }
 
     void openFavorites() {
@@ -86,10 +92,13 @@ class ProfileScreen extends StatelessWidget {
                   icon: Icons.food_bank_outlined, 
                 ),
               ),
-              const ProfileOptionWidget(
-                title: "Pantry", 
-                description: "Manage your pantry, allowing you to search for recipes easier!", 
-                icon: Icons.egg_alt_outlined, 
+              GestureDetector(
+                onTap:() => openPantry(),
+                child: const ProfileOptionWidget(
+                  title: "Pantry", 
+                  description: "Manage your pantry, allowing you to search for recipes easier!", 
+                  icon: Icons.egg_alt_outlined, 
+                ),
               ),
             ]),
       ),

@@ -3,55 +3,63 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/common/models/recipe_preview.dart';
-import 'package:frontend/common/widgets/recipe_container.dart';
+import 'package:frontend/common/models/auth.dart';
+import 'package:frontend/common/models/ingredient_preview.dart';
+import 'package:frontend/profile/pantry/widgets/ingredient_container.dart';
+import 'package:frontend/profile/pantry/widgets/ingredient_dialog.dart';
 import 'package:http/http.dart' as http;
 
-import '../../common/models/auth.dart';
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class SearchIngredientScreen extends StatefulWidget {
+  const SearchIngredientScreen({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<StatefulWidget> createState() => _SearchIngredientState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _SearchIngredientState extends State<SearchIngredientScreen> {
   User? user = Auth().currentUser;
   bool loadedData = false;
   final TextEditingController textController = TextEditingController();
-  List<RecipePreview> loadedRecipes = [];
+  List<IngredientPreview> loadedIngredients = [];
   String loadedQuery = "";
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Future<List<RecipePreview>> loadData() async {
+  Future<List<IngredientPreview>> loadData() async {
     if (loadedData == true) {
-      return loadedRecipes;
+      return loadedIngredients;
     }
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/search_by_name?query=${textController.text}&amount=20'));
+        'http://10.0.2.2:8080/pantry/search?query=${textController.text}&user_uid=${user!.uid}'));
     print("Loaded main screen data from endpoint.");
     loadedQuery = textController.text;
     if (response.statusCode == 200) {
-      List<RecipePreview> recipes;
-      recipes = (json.decode(response.body) as List)
-          .map((i) => RecipePreview.fromJson(i))
+      List<IngredientPreview> ingredients;
+      ingredients = (json.decode(response.body) as List)
+          .map((i) => IngredientPreview.fromJson(i))
           .toList();
-      
-      return recipes;
+
+      return ingredients;
     } else {
       throw Exception('Failed to load data');
     }
   }
 
+  void addIngredient(int ingredientId) async {
+    await http.post(Uri.parse(
+        'http://10.0.2.2:8080/pantry/add?ingredient_id=$ingredientId&user_uid=${user!.uid}'));
+  }
+
   @override
   Widget build(BuildContext context) {
-    user = Auth().currentUser;
     return Scaffold(
+      appBar: AppBar(
+          leading: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.arrow_back,
+                  color: Colors.white)),
+          title: Text("Search for ingredients"),
+        ),
       backgroundColor: const Color(0xFF242424),
       body: GestureDetector(
         onTap: () {
@@ -60,12 +68,12 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Padding(
-                padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
+                padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
                 child: TextField(
                   onSubmitted: (value) {
                     if (loadedQuery != textController.text) {
                       setState(() {
-                        loadedRecipes = [];
+                        loadedIngredients = [];
                         loadedData = false;
                       });
                     }
@@ -93,7 +101,7 @@ class _HomePageState extends State<HomePage> {
                         onTap: () {
                           if (loadedQuery != textController.text) {
                             setState(() {
-                              loadedRecipes = [];
+                              loadedIngredients = [];
                               loadedData = false;
                             });
                           }
@@ -105,7 +113,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
                 child: Padding(
               padding: const EdgeInsets.only(top: 20.0),
-              child: FutureBuilder<List<RecipePreview>>(
+              child: FutureBuilder<List<IngredientPreview>>(
                 future: loadData(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
@@ -115,21 +123,34 @@ class _HomePageState extends State<HomePage> {
                       style: const TextStyle(color: Colors.white),
                     ));
                   } else if (snapshot.hasData) {
-                    loadedRecipes = snapshot.data!;
+                    loadedIngredients = snapshot.data!;
                     loadedData = true;
                     return ListView.builder(
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         padding: const EdgeInsets.all(8),
-                        itemCount: loadedRecipes.length,
+                        itemCount: loadedIngredients.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return RecipeContainer(
-                              loadedRecipes[index].id,
-                              loadedRecipes[index].title,
-                              loadedRecipes[index].readyInMinutes,
-                              loadedRecipes[index].calories,
-                              loadedRecipes[index].imageURL,
-                              loadedRecipes[index].isExternal);
+                          return GestureDetector(
+                            onTap: () async {
+                              IngredientPreview ingredient =
+                                  loadedIngredients[index];
+                              bool val = await showDialog(
+                                context: context,
+                                builder: (context) => IngredientDialog(
+                                  ingredient: ingredient,
+                                  isRemoving: false,
+                                ),
+                              );
+                              if (val) {
+                                addIngredient(ingredient.id);
+                                //Navigator.pop(context); // TODO: test out tomorrow
+                              }
+                            },
+                            child: IngredientContainer(
+                              ingredient: loadedIngredients[index],
+                            ),
+                          );
                         });
                   } else {
                     return const Center(
