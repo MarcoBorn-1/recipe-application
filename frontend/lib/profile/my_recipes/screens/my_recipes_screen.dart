@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/widgets/recipe_container.dart';
+import 'package:frontend/profile/add_recipe/screens/add_recipe_screen.dart';
 import 'package:http/http.dart' as http;
 
 class MyRecipesScreen extends StatefulWidget {
@@ -43,7 +44,13 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
         title: const Text("My recipes"),
         actions: [
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddRecipeScreen(
+                      )));
+            },
             child: const Padding(
               padding: EdgeInsets.only(right: 8.0),
               child: Icon(

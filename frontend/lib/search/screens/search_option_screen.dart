@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/providers/intolerance_provider.dart';
 import 'package:frontend/search/screens/search_dish_name_screen.dart';
 import 'package:frontend/search/widgets/search_option_container.dart';
+import 'package:provider/provider.dart';
 
 class SearchOptionScreen extends StatelessWidget {
   SearchOptionScreen({super.key});

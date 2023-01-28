@@ -204,7 +204,6 @@ public class RecipeService {
             ExternalRecipeDTO externalRecipeDTO = new ExternalRecipeDTO(jsonArray.getJSONObject(i));
             Recipe recipe = new Recipe(externalRecipeDTO);
             RecipePreview recipePreview = new RecipePreview(recipe);
-            System.out.println(recipePreview.isExternal());
             list.add(recipePreview);
         }
 
