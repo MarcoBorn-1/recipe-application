@@ -8,8 +8,11 @@ import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/icon_title_button.dart';
 import 'package:frontend/common/widgets/title_text.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
+import 'package:frontend/common/providers/intolerance_provider.dart';
 import 'package:frontend/search/screens/search_results_screen.dart';
+import 'package:frontend/search/widgets/search_intolerances_dialog.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class SearchDishName extends StatefulWidget {
   const SearchDishName({super.key});
@@ -105,9 +108,7 @@ class _SearchDishNameState extends State<SearchDishName> {
     super.dispose();
   }
 
-  void _textFieldListener() {
-
-  }
+  void _textFieldListener() {}
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +120,19 @@ class _SearchDishNameState extends State<SearchDishName> {
       ProteinsWidget(),
       CarbohydratesWidget(),
       FatsWidget(),
-      const Padding(
-        padding: EdgeInsets.only(top: 16.0, left: 16, right: 16, bottom: 24),
-        child: CustomButton("Intolerances", true, 24),
+      Padding(
+        padding:
+            const EdgeInsets.only(top: 16.0, left: 16, right: 16, bottom: 24),
+        child: GestureDetector(
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return const IntolerancesDialog();
+                  }
+              );
+            },
+            child: const CustomButton("Intolerances", true, 24))
       ),
     ];
 
@@ -586,13 +597,11 @@ class _SearchDishNameState extends State<SearchDishName> {
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SearchResultScreen(
-                              parameters: buildParameters(),
-                        )
-                    )
-                  );
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SearchResultScreen(
+                                parameters: buildParameters(),
+                              )));
                 },
                 child: const Icon(CupertinoIcons.search, color: Colors.black)),
           ),
