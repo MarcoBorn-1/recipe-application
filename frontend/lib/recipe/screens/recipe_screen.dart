@@ -37,57 +37,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
   late bool isFavorite;
   final double ratingAvg = 4;
   final int timeToPrepareMin = 30;
-  Map<String, Map<String, dynamic>> nutritionValues = {
-    'calories': {'amount': 690, 'measurement': ''},
-    'fat': {'amount': 23, 'measurement': 'g'},
-    'carbohydrates': {'amount': 55, 'measurement': 'g'},
-    'protein': {'amount': 30, 'measurement': 'g'},
-  };
-  Map<String, Map<String, dynamic>> ingredients = {
-    'chillies': {
-      'amount': 0.67,
-      'measurement': '',
-    },
-    'garlic': {'amount': 0.33, 'measurement': 'tbsp'},
-    'ground_pepper': {
-      'amount': 1,
-      'measurement': 'serving',
-    },
-    'parsley_leaves': {
-      'amount': 0.17,
-      'measurement': 'cups',
-    }
-  };
-  List<String> instructions = [
-    "Once pasta is cooked, drain and leave to cool for a minute",
-    "Place small skillet on medium fire, drizzle olive oil, add in red pepper and stir-fry for 1-2 minutes. ",
-    "Put aside. ",
-    "Toss pasta shells, red pepper, tuna, parsley, garlic, chillies and lemon juice.",
-    "Season with ground black pepper to taste, spoon into serving bowls."
-  ];
-  List<Map<String, dynamic>> reviewsPreview = [
-    {
-      'user_id': 'userID1',
-      'username': 'Andrzej Drwal',
-      'review': 'Świetny przepis!',
-      'image_url': 'imgURL',
-      'rating': 4
-    },
-    {
-      'user_id': 'userID2',
-      'username': 'Joanna Radna',
-      'review': 'super!!! pozdrawiam cieplutko!',
-      'image_url': 'imgURL',
-      'rating': 5
-    },
-    {
-      'user_id': 'userID3',
-      'username': 'Jarl Cohnson',
-      'review': 'takie sredni ten przepis',
-      'image_url': 'imgURL',
-      'rating': 2
-    }
-  ];
+  
 
   Widget favorite = const Padding(
       padding: EdgeInsets.only(right: 20),
