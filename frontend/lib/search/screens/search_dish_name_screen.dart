@@ -60,6 +60,7 @@ class _SearchDishNameState extends State<SearchDishName> {
   }
 
   String buildParameters() {
+    final intolerancesProvider = Provider.of<IntolerancesProvider>(context);
     String parameters = "";
     parameters += "query=${textEditingController.text}";
     if (chosenOptionTime != 0) {
@@ -91,6 +92,13 @@ class _SearchDishNameState extends State<SearchDishName> {
         parameters += "&maxFats=${fatsValues[chosenOptionFats]}";
       }
     }
+    if (intolerancesProvider.selectedItems.isNotEmpty) {
+      print("Added intolenrances");
+      String intolerances = intolerancesProvider.selectedItems.toString();
+      intolerances = intolerances.replaceAll(' ', '');
+      parameters +=
+          "&intolerances=${intolerances.substring(1, intolerances.length - 1)}";
+    }
     return parameters;
   }
 
@@ -121,19 +129,17 @@ class _SearchDishNameState extends State<SearchDishName> {
       CarbohydratesWidget(),
       FatsWidget(),
       Padding(
-        padding:
-            const EdgeInsets.only(top: 16.0, left: 16, right: 16, bottom: 24),
-        child: GestureDetector(
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return const IntolerancesDialog();
-                  }
-              );
-            },
-            child: const CustomButton("Intolerances", true, 24))
-      ),
+          padding:
+              const EdgeInsets.only(top: 16.0, left: 16, right: 16, bottom: 24),
+          child: GestureDetector(
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const IntolerancesDialog();
+                    });
+              },
+              child: const CustomButton("Intolerances", true, 24))),
     ];
 
     return Scaffold(
