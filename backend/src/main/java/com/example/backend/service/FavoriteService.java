@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @AllArgsConstructor
@@ -35,12 +37,21 @@ public class FavoriteService {
     public void removeRecipeFromFavorites(int recipe_id, boolean isExternal, String user_uid) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
         DocumentReference favoritesRef = db.collection("favorites").document(user_uid);
-        favoritesRef.update((isExternal) ? "items_external" : "items_internal", FieldValue.arrayRemove(recipe_id));
+        if (favoritesRef.get().get().exists()) {
+            favoritesRef.update((isExternal) ? "items_external" : "items_internal", FieldValue.arrayRemove(recipe_id));
+        }
     }
 
     public void addRecipeToFavorites(int recipe_id, boolean isExternal, String user_uid) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
         DocumentReference favoritesRef = db.collection("favorites").document(user_uid);
+        if (!favoritesRef.get().get().exists()) {
+            System.out.println("test");
+            Map<String, Object> favorites = new HashMap<>();
+            favorites.put("items_external", new ArrayList<>());
+            favorites.put("items_internal", new ArrayList<>());
+            favoritesRef.set(favorites);
+        }
         favoritesRef.update((isExternal) ? "items_external" : "items_internal", FieldValue.arrayUnion(recipe_id));
     }
 }

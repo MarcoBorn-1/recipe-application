@@ -37,7 +37,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
   late bool isFavorite;
   final double ratingAvg = 4;
   final int timeToPrepareMin = 30;
-  
 
   Widget favorite = const Padding(
       padding: EdgeInsets.only(right: 20),
@@ -145,13 +144,17 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
   Future<void> changeFavoriteStatus() async {
     if (isFavorite) {
+      print("delete fav");
       await http.delete(Uri.parse(
           'http://10.0.2.2:8080/favorite/remove?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
     } else {
+      print("add fav");
       await http.post(Uri.parse(
           'http://10.0.2.2:8080/favorite/add?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
     }
-    isFavorite = !isFavorite;
+    setState(() {
+      isFavorite = !isFavorite;
+    });
   }
 
   Future<bool> isRecipeFavorite() async {

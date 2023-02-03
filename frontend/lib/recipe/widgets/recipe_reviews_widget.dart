@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/information_container.dart';
 import 'package:frontend/recipe/models/review.dart';
+import 'package:frontend/recipe/screens/show_reviews_screen.dart';
 import 'package:frontend/recipe/widgets/recipe_review_container.dart';
 
 class RecipeReviewsWidget extends StatefulWidget {
@@ -17,11 +18,25 @@ class RecipeReviewsWidget extends StatefulWidget {
 }
   
 class _RecipeReviewsWidgetState extends State<RecipeReviewsWidget> {
-  static const maxAmountOfReviews = 5;
+  static const maxAmountOfReviews = 2;
   @override
   Widget build(BuildContext context) {
     Widget showAllReviewsButton = (widget.amountOfReviews > maxAmountOfReviews)
-        ? const CustomButton("Show all reviews", false, 24)
+        ? Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ShowReviewsPage(recipeId: widget.recipeId, isExternal: widget.isRecipeExternal,)
+                              )
+                            );
+            },
+            child: const CustomButton("Show all reviews", false, 24)
+          ),
+        )
         : const Text("");
 
     Widget showReviews = (widget.amountOfReviews == 0) ?
@@ -31,7 +46,7 @@ class _RecipeReviewsWidgetState extends State<RecipeReviewsWidget> {
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
         padding: const EdgeInsets.all(8),
-        itemCount: widget.reviewList.length,
+        itemCount: (widget.reviewList.length > maxAmountOfReviews) ? maxAmountOfReviews: widget.reviewList.length,
         itemBuilder: (BuildContext context, int index) {
           return RecipeReviewContainer(widget.reviewList[index]);
         }

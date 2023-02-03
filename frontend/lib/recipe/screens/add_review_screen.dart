@@ -119,6 +119,10 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                                 errorMessage = "Fill out all fields!";
                               });
                             } else {
+                              setState(() {
+                              editRecipe = false;
+                              loadedData = false;
+                            });
                               errorMessage = "";
                               changedReview = true;
                             }
@@ -223,11 +227,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
         username: review.username,
         comment: _controllerComment.text,
         userImageURL: review.userImageURL);
-    setState(() {
-      editRecipe = false;
-      loadedData = false;
-      review = newReview;
-    });
+    review = newReview;
     return true;
   }
 

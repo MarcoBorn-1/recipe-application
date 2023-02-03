@@ -22,9 +22,9 @@ import static com.example.backend.config.Constants.SPOONACULAR_API_KEY;
 @AllArgsConstructor
 @Service
 public class RecipeService {
-    final int REVIEWS_IN_RECIPE = 3;
     final UserService userService;
     final FavoriteService favoriteService;
+    final ReviewService reviewService;
     public String createRecipe(InternalRecipeDTO recipe) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
 
@@ -53,58 +53,11 @@ public class RecipeService {
         InternalRecipeDTO internalRecipeDTO = document.toObject(InternalRecipeDTO.class);
         if (internalRecipeDTO == null) return null;
         Recipe recipe = new Recipe(internalRecipeDTO);
-
-        // Reviews
-        CollectionReference reviewsCollection = dbFirestore.collection("reviews").document("internal_reviews").collection(String.valueOf(id));
-        AggregateQuerySnapshot snapshot = reviewsCollection.count().get().get();
-        System.out.println("Count: " + snapshot.getCount());
-        if (snapshot.getCount() == 0) {
-            recipe.setAmountOfReviews(0L);
-            recipe.setReviews(null);
-            recipe.setAverageReviewScore((double) 0);
-            return recipe;
-        }
-        else {
-            addReviewInformationToRecipe(recipe, reviewsCollection, snapshot.getCount());
-        }
-        ApiFuture<QuerySnapshot> reviewsFuture = dbFirestore.collection("reviews").document("internal_reviews").collection(String.valueOf(id)).get();
-        List<QueryDocumentSnapshot> documents = reviewsFuture.get().getDocuments();
-
+        reviewService.addReviewInformationToRecipe(recipe);
         return recipe;
     }
 
     // TODO: move to ReviewService
-    private Recipe addReviewInformationToRecipe(Recipe recipe, CollectionReference reviewsCollection, long count) throws InterruptedException, ExecutionException {
-        ArrayList<ReviewDTO> reviewDTOList = new ArrayList<>();
-        ArrayList<ReviewPreview> reviewPreviewList = new ArrayList<>();
-        int reviews_added = 0;
-        double averageReviewScore = 0;
-        Double rating;
-        QuerySnapshot documentSnapshots = reviewsCollection.get().get();
-        List<QueryDocumentSnapshot> documentList = documentSnapshots.getDocuments();
-        recipe.setAmountOfReviews(count);
-        for (QueryDocumentSnapshot documentSnapshot: documentList) {
-            if (REVIEWS_IN_RECIPE - reviews_added >= 0) {
-                ReviewDTO reviewDTO = documentSnapshot.toObject(ReviewDTO.class);
-                reviewDTOList.add(reviewDTO);
-                reviews_added += 1;
-            }
-            rating = documentSnapshot.getDouble("rating");
-            if (rating != null) averageReviewScore += rating;
-        }
-        recipe.setAverageReviewScore(averageReviewScore / count);
-
-        for (ReviewDTO reviewDTO: reviewDTOList) {
-            ReviewPreview reviewPreview = new ReviewPreview(reviewDTO);
-            UserPreview user = userService.getUserInformation(reviewPreview.getUserUID());
-            reviewPreview.addUserInformation(user);
-            reviewPreviewList.add(reviewPreview);
-        }
-
-        recipe.setReviews(reviewPreviewList);
-
-        return recipe;
-    }
 
     public Recipe getExternalRecipe(int id) throws IOException, ExecutionException, InterruptedException {
         StringBuilder urlBuilder = new StringBuilder();
@@ -116,19 +69,7 @@ public class RecipeService {
         JSONObject jsonObject = new JSONObject(json);
         ExternalRecipeDTO externalRecipe = new ExternalRecipeDTO(jsonObject);
         Recipe recipe = new Recipe(externalRecipe);
-
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-        CollectionReference reviewsCollection = dbFirestore.collection("reviews").document("external_reviews").collection(String.valueOf(id));
-        AggregateQuerySnapshot snapshot = reviewsCollection.count().get().get();
-        if (snapshot.getCount() == 0) {
-            recipe.setAmountOfReviews(0L);
-            recipe.setReviews(new ArrayList<>());
-            recipe.setAverageReviewScore((double) 0);
-            return recipe;
-        }
-        else {
-            addReviewInformationToRecipe(recipe, reviewsCollection, snapshot.getCount());
-        }
+        reviewService.addReviewInformationToRecipe(recipe);
         return recipe;
     }
 

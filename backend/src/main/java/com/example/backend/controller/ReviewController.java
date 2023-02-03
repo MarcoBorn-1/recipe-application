@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.entity.Review;
+import com.example.backend.entity.ReviewPreview;
 import com.example.backend.service.ReviewService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,9 @@ public class ReviewController {
         return reviewService.createReview(review);
     }
 
-    public List<Review> getReviews(Integer id, boolean isExternal) {
-        return reviewService.getReviews(id, isExternal);
+    @GetMapping("/get")
+    public List<ReviewPreview> getReviews(Integer recipe_id, boolean isExternal) throws ExecutionException, InterruptedException {
+        return reviewService.getReviews(recipe_id, isExternal);
     }
 
     @GetMapping("/get_by_user_uid")
