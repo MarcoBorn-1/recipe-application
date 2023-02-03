@@ -4,10 +4,9 @@ import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/profile/favorites/screens/favorite_screen.dart';
 import 'package:frontend/profile/my_recipes/screens/my_recipes_screen.dart';
 import 'package:frontend/profile/pantry/screens/pantry_screen.dart';
-import 'package:frontend/common/providers/intolerance_provider.dart';
 import 'package:frontend/profile/profile_screen/widgets/profile_header_widget.dart';
 import 'package:frontend/profile/profile_screen/widgets/profile_option_widget.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/profile/settings/screens/settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
@@ -15,10 +14,6 @@ class ProfileScreen extends StatelessWidget {
 
   Future<void> signOut() async {
     await Auth().signOut();
-  }
-
-  void openSettings() {
-
   }
 
   String _imageURL() {
@@ -31,6 +26,15 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void openSettings() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SettingsScreen()
+        )
+      );
+    }
+
     void openMyRecipes() {
       Navigator.push(
         context,
@@ -59,51 +63,52 @@ class ProfileScreen extends StatelessWidget {
     }
 
     return Scaffold(
-        appBar: AppBar(
-            leading: const Icon(Icons.person,
-                color: Colors.white),
-            title: const Text("Profile"),
-            
-          ),
-        backgroundColor: const Color(0xFF242424),
-        body: SafeArea(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ProfileHeader(
-                  onSettingsTap: openSettings, 
-                  onLogoutTap: signOut, 
-                  username: _userUid(), 
-                  imageURL: _imageURL(),
-                  showIcons: true,
-                ),
-                GestureDetector(
-                  onTap: () => openFavorites(),
-                  child: const ProfileOptionWidget(
-                    title: "Favorites", 
-                    description: "Access recipes you marked as favorite", 
-                    icon: Icons.favorite_border, 
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => openMyRecipes(),
-                  child: const ProfileOptionWidget(
-                    title: "My recipes", 
-                    description: "Add, edit, remove and look through recipes you added", 
-                    icon: Icons.food_bank_outlined, 
-                  ),
-                ),
-                GestureDetector(
-                  onTap:() => openPantry(),
-                  child: const ProfileOptionWidget(
-                    title: "Pantry", 
-                    description: "Manage your pantry, allowing you to search for recipes easier!", 
-                    icon: Icons.egg_alt_outlined, 
-                  ),
-                ),
-              ]),
+      appBar: AppBar(
+        leading: const Icon(
+          Icons.person,
+          color: Colors.white
         ),
+        title: const Text("Profile"),
+      ),
+      backgroundColor: const Color(0xFF242424),
+      body: SafeArea(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ProfileHeader(
+                onSettingsTap: openSettings, 
+                onLogoutTap: signOut, 
+                username: _userUid(), 
+                imageURL: _imageURL(),
+                showIcons: true,
+              ),
+              GestureDetector(
+                onTap: () => openFavorites(),
+                child: const ProfileOptionWidget(
+                  title: "Favorites", 
+                  description: "Access recipes you marked as favorite", 
+                  icon: Icons.favorite_border, 
+                ),
+              ),
+              GestureDetector(
+                onTap: () => openMyRecipes(),
+                child: const ProfileOptionWidget(
+                  title: "My recipes", 
+                  description: "Add, edit, remove and look through recipes you added", 
+                  icon: Icons.food_bank_outlined, 
+                ),
+              ),
+              GestureDetector(
+                onTap:() => openPantry(),
+                child: const ProfileOptionWidget(
+                  title: "Pantry", 
+                  description: "Manage your pantry, allowing you to search for recipes easier!", 
+                  icon: Icons.egg_alt_outlined, 
+                ),
+              ),
+            ]),
+      ),
     );
   }
 }
