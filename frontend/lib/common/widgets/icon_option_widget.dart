@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ProfileOptionWidget extends StatelessWidget {
-  const ProfileOptionWidget({required this.title, required this.description, required this.icon, super.key});
+class IconOptionWidget extends StatelessWidget {
+  const IconOptionWidget({required this.title, required this.description, required this.icon, super.key});
   final String title;
   final String description;
   final IconData icon;

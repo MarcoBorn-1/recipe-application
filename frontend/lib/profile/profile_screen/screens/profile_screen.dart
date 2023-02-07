@@ -5,7 +5,7 @@ import 'package:frontend/profile/favorites/screens/favorite_screen.dart';
 import 'package:frontend/profile/my_recipes/screens/my_recipes_screen.dart';
 import 'package:frontend/profile/pantry/screens/pantry_screen.dart';
 import 'package:frontend/profile/profile_screen/widgets/profile_header_widget.dart';
-import 'package:frontend/profile/profile_screen/widgets/profile_option_widget.dart';
+import 'package:frontend/common/widgets/icon_option_widget.dart';
 import 'package:frontend/profile/settings/screens/settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -85,7 +85,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () => openFavorites(),
-                child: const ProfileOptionWidget(
+                child: const IconOptionWidget(
                   title: "Favorites", 
                   description: "Access recipes you marked as favorite", 
                   icon: Icons.favorite_border, 
@@ -93,18 +93,18 @@ class ProfileScreen extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () => openMyRecipes(),
-                child: const ProfileOptionWidget(
+                child: const IconOptionWidget(
                   title: "My recipes", 
                   description: "Add, edit, remove and look through recipes you added", 
-                  icon: Icons.food_bank_outlined, 
+                  icon: Icons.menu_book_outlined
                 ),
               ),
               GestureDetector(
                 onTap:() => openPantry(),
-                child: const ProfileOptionWidget(
+                child: const IconOptionWidget(
                   title: "Pantry", 
                   description: "Manage your pantry, allowing you to search for recipes easier!", 
-                  icon: Icons.egg_alt_outlined, 
+                  icon: Icons.kitchen_outlined, 
                 ),
               ),
             ]),

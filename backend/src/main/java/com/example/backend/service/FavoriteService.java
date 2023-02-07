@@ -46,7 +46,6 @@ public class FavoriteService {
         Firestore db = FirestoreClient.getFirestore();
         DocumentReference favoritesRef = db.collection("favorites").document(user_uid);
         if (!favoritesRef.get().get().exists()) {
-            System.out.println("test");
             Map<String, Object> favorites = new HashMap<>();
             favorites.put("items_external", new ArrayList<>());
             favorites.put("items_internal", new ArrayList<>());

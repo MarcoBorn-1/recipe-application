@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/common/providers/intolerance_provider.dart';
+import 'package:frontend/common/widgets/icon_option_widget.dart';
 import 'package:frontend/search/screens/search_dish_name_screen.dart';
-import 'package:frontend/search/widgets/search_option_container.dart';
-import 'package:provider/provider.dart';
 
 class SearchOptionScreen extends StatelessWidget {
   SearchOptionScreen({super.key});
@@ -28,14 +26,6 @@ class SearchOptionScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // const Padding(
-              //   padding:  EdgeInsets.only(top: 20.0),
-              //   child: Icon(
-              //     CupertinoIcons.search,
-              //     size: 100,
-              //     color: Colors.white,
-              //   ),
-              // ),
               const Padding(
                 padding: EdgeInsets.only(left: 10, right: 10, top: 00, bottom: 40),
                 child: Text(
@@ -57,14 +47,22 @@ class SearchOptionScreen extends StatelessWidget {
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: SearchOptionContainer(titleList[0], descList[0]),
+                  child: IconOptionWidget(
+                    title: titleList[0], 
+                    description: descList[0],
+                    icon: Icons.text_format_outlined,
+                  ),
                 )
               ),
               GestureDetector(
                 onTap: () => {},
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: SearchOptionContainer(titleList[1], descList[1]),
+                  child: IconOptionWidget(
+                    title: titleList[1], 
+                    description: descList[1],
+                    icon: Icons.egg_alt_outlined,
+                  ),
                 )
               ),
             ]),

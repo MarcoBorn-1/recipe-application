@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/profile/profile_screen/widgets/profile_option_widget.dart';
+import 'package:frontend/common/widgets/icon_option_widget.dart';
 import 'package:frontend/profile/settings/screens/change_profile_picture_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -50,7 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   padding: const EdgeInsets.only(top: 16.0),
                   child: GestureDetector(
                     onTap: () => changeProfilePicture(),
-                    child: const ProfileOptionWidget(
+                    child: const IconOptionWidget(
                       title: "Profile picture", 
                       description: "Change your profile picture", 
                       icon: Icons.image, 
@@ -59,7 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 GestureDetector(
                   onTap: () => changeUsername(),
-                  child: const ProfileOptionWidget(
+                  child: const IconOptionWidget(
                     title: "Username", 
                     description: "You can edit your username here", 
                     icon: Icons.supervised_user_circle, 
@@ -67,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 GestureDetector(
                   onTap: () => changePassword(),
-                  child: const ProfileOptionWidget(
+                  child: const IconOptionWidget(
                     title: "Password", 
                     description: "You can change your password here", 
                     icon: Icons.password_rounded, 
