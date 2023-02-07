@@ -2,15 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:frontend/common/models/ingredient_preview.dart';
 import 'package:recase/recase.dart';
 
-class IngredientContainer extends StatefulWidget {
-  const IngredientContainer({required this.ingredient, super.key});
+class IngredientPreviewContainer extends StatefulWidget {
+  const IngredientPreviewContainer({required this.ingredient, super.key});
   final IngredientPreview ingredient;
 
   @override
-  State<StatefulWidget> createState() => _IngredientContainerState();
+  State<StatefulWidget> createState() => _IngredientPreviewContainerState();
 }
 
-class _IngredientContainerState extends State<IngredientContainer> {
+class _IngredientPreviewContainerState extends State<IngredientPreviewContainer> {
   @override
   Widget build(BuildContext context) {
     return Padding(

@@ -13,4 +13,11 @@ class Ingredient {
       unit: json['unit']
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'amount': amount,
+    'unit': unit,
+  };
 }

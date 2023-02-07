@@ -1,4 +1,4 @@
-import 'package:frontend/recipe/models/ingredient.dart';
+import 'package:frontend/common/models/ingredient.dart';
 import 'package:frontend/recipe/models/review.dart';
 
 class Recipe {

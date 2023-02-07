@@ -4,11 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/ingredient_preview.dart';
+import 'package:frontend/common/models/ingredient_search_enum.dart';
 import 'package:frontend/common/widgets/title_text.dart';
 import 'package:frontend/profile/pantry/screens/search_ingredient_screen.dart';
-import 'package:frontend/profile/pantry/widgets/ingredient_container.dart';
+import 'package:frontend/profile/pantry/widgets/ingredient_preview_container.dart';
 import 'package:frontend/profile/pantry/widgets/ingredient_dialog.dart';
-import 'package:frontend/recipe/models/ingredient.dart';
+import 'package:frontend/common/models/ingredient.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -31,6 +32,7 @@ class _PantryScreenState extends State<PantryScreen> {
     final response = await http.get(
         Uri.parse('http://10.0.2.2:8080/pantry/get?user_uid=${user!.uid}'));
     if (response.statusCode == 200) {
+      print("Loaded in pantry");
       List<IngredientPreview> ingredients;
       ingredients = (json.decode(response.body) as List)
           .map((i) => IngredientPreview.fromJson(i))
@@ -87,12 +89,20 @@ class _PantryScreenState extends State<PantryScreen> {
           title: const Text("My pantry"),
           actions: [
             GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SearchIngredientScreen(
-                      )));
+              onTap: () async {
+                var tmp = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SearchIngredientScreen(
+                            mode: IngredientSearch.pantry)));
+
+                if (tmp != null) {
+                  await Future.delayed(const Duration(seconds: 2));
+                  setState(() {
+                    loadedData = false;
+                    ingredientList = [];
+                  });
+                }
               },
               child: const Padding(
                 padding: EdgeInsets.only(right: 8.0),
@@ -143,7 +153,7 @@ class _PantryScreenState extends State<PantryScreen> {
                             });
                           }
                         },
-                        child: IngredientContainer(
+                        child: IngredientPreviewContainer(
                             ingredient: ingredientList[index]),
                       );
                     });

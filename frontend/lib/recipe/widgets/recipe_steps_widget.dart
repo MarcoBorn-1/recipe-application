@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:frontend/common/widgets/title_text.dart';
 import 'package:frontend/recipe/widgets/recipe_step_container.dart';
 
-class RecipeStepsWidget extends StatelessWidget {
-  const RecipeStepsWidget(this.recipeSteps, {super.key});
+class RecipeStepsWidget extends StatefulWidget {
+  const RecipeStepsWidget(this.recipeSteps, {this.editable = false, super.key});
   final List<String> recipeSteps;
+  final bool editable;
 
   @override
+  State<StatefulWidget> createState() => _RecipeStepsState();
+}
+
+class _RecipeStepsState extends State<RecipeStepsWidget> {
+  @override
   Widget build(BuildContext context) {
-    int tmp = 0;
-    if (recipeSteps.isEmpty) tmp = 1;
     return Column(
       children: [
         const TitleText("Instructions"),
@@ -18,15 +22,33 @@ class RecipeStepsWidget extends StatelessWidget {
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             padding: const EdgeInsets.all(8),
-            itemCount: recipeSteps.length + tmp,
+            itemCount: ((widget.recipeSteps.isEmpty) ? 1 : widget.recipeSteps.length),
             itemBuilder: (BuildContext context, int index) {
-              if (recipeSteps.isEmpty) {
+              if (widget.recipeSteps.isEmpty) {
                 return const Center(
-                  child: RecipeStepContainer(-1, "No instructions available!")
+                    child: RecipeStepContainer(
+                        index: -1, step: "No instructions available!"));
+              }
+              if (widget.editable) {
+                return RecipeStepContainer(
+                  index: index,
+                  step: widget.recipeSteps[index],
+                  actions: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          widget.recipeSteps.removeAt(index);
+                        });
+                      },
+                      child: const Icon(Icons.delete, color: Colors.red)
+                    ),
+                  ],
                 );
               }
-                
-              return RecipeStepContainer(index, recipeSteps[index]);
+              return RecipeStepContainer(
+                index: index,
+                step: widget.recipeSteps[index],
+              );
             }),
       ],
     );

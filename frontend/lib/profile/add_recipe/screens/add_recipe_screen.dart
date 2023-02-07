@@ -1,6 +1,22 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/profile/add_recipe/widgets/input_field.dart';
-import 'package:frontend/recipe/models/ingredient.dart';
+import 'package:frontend/common/models/auth.dart';
+import 'package:frontend/common/models/ingredient_search_enum.dart';
+import 'package:frontend/common/widgets/custom_button.dart';
+import 'package:frontend/common/widgets/title_text.dart';
+import 'package:frontend/common/widgets/input_field.dart';
+import 'package:frontend/profile/add_recipe/models/recipe_dto.dart';
+import 'package:frontend/profile/add_recipe/widgets/ingredient_list_widget.dart';
+import 'package:frontend/profile/pantry/screens/search_ingredient_screen.dart';
+import 'package:frontend/common/models/ingredient.dart';
+import 'package:frontend/recipe/models/recipe.dart';
+import 'package:frontend/recipe/widgets/recipe_steps_widget.dart';
+import 'package:http/http.dart' as http;
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -9,57 +25,14 @@ class AddRecipeScreen extends StatefulWidget {
   State<AddRecipeScreen> createState() => _AddRecipeState();
 }
 
-// title
-// ready in minutes
-// calories
-// proteins
-// carbohydrates
-// fats
-// servings
-// ingredients
-// steps
-
-// ingredients + steps:
-// provider (?)
-// after adding: consumer
-
-Widget _inputField(
-    String title, TextEditingController controller, bool isNumber) {
-  return TextField(
-    style: const TextStyle(color: Colors.black),
-    keyboardType: (isNumber)
-        ? const TextInputType.numberWithOptions(signed: true, decimal: true)
-        : TextInputType.text,
-    controller: controller,
-    decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color.fromARGB(255, 247, 255, 255),
-        labelText: title,
-        labelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
-        errorStyle: const TextStyle(color: Colors.red),
-        helperStyle: const TextStyle(color: Colors.black),
-        suffixIcon: 
-        GestureDetector(
-            onTap: () {
-              controller.text = "";
-            },
-            child: const Icon(
-              Icons.cancel,
-              color: Colors.grey,
-            ))),
-  );
-}
-
-// title
-// ready in minutes
-// calories
-// proteins
-// carbohydrates
-// fats
-// servings
-// ingredients
-// steps
 class _AddRecipeState extends State<AddRecipeScreen> {
+  User? user = Auth().currentUser;
+  PlatformFile? pickedImage;
+  UploadTask? upload;
+
+  List<Ingredient> ingredients = [];
+  List<String> steps = [];
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _readyInMinutesController =
       TextEditingController();
@@ -69,18 +42,199 @@ class _AddRecipeState extends State<AddRecipeScreen> {
       TextEditingController();
   final TextEditingController _fatsController = TextEditingController();
   final TextEditingController _servingsController = TextEditingController();
-  List<Ingredient> ingredients = [];
-  List<String> steps = [];
+
+  final TextEditingController _instructionsController = TextEditingController();
+
+  void selectFile() async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    if (result == null) return;
+
+    setState(() {
+      pickedImage = result.files.first;
+    });
+  }
+
+  Future<String> uploadFile() async {
+    var time = DateTime.now().millisecondsSinceEpoch.toString();
+    final path = "recipes/$time";
+    final file = File(pickedImage!.path!);
+
+    final ref = FirebaseStorage.instance.ref().child(path);
+    upload = ref.putFile(file);
+
+    final snapshot = await upload!.whenComplete(() => {});
+    String urlDownload = await snapshot.ref.getDownloadURL();
+    return Future<String>.value(urlDownload);
+    //user!.updatePhotoURL(urlDownload);
+
+    // TODO: move somewhere (Auth/Spring)
+    //final db = FirebaseFirestore.instance;
+    //db.collection("users").doc(user!.uid).update({"imageURL": urlDownload});
+  }
+
+  bool checkData() {
+    if (_titleController.text.isEmpty) return false;
+    if (_readyInMinutesController.text.isEmpty) return false;
+    if (_caloriesController.text.isEmpty) return false;
+    if (_proteinsController.text.isEmpty) return false;
+    if (_fatsController.text.isEmpty) return false;
+    if (_servingsController.text.isEmpty) return false;
+    if (ingredients.isEmpty) return false;
+    if (steps.isEmpty) return false;
+    return true;
+  }
+
+  void addRecipe() async {
+    bool check = checkData();
+    if (!check) return;
+
+    String imageURL = "";
+    if (pickedImage != null) {
+      imageURL = await uploadFile();
+    }
+
+    RecipeDTO recipeDTO = RecipeDTO(
+        title: _titleController.text,
+        readyInMinutes: double.tryParse(_readyInMinutesController.text) ?? 0,
+        imageURL: imageURL,
+        servings: int.tryParse(_servingsController.text) ?? 0,
+        calories: double.tryParse(_caloriesController.text) ?? 0,
+        proteins: double.tryParse(_proteinsController.text) ?? 0,
+        carbohydrates: double.tryParse(_carbohydratesController.text) ?? 0,
+        fats: double.tryParse(_fatsController.text) ?? 0,
+        steps: steps,
+        ingredients: ingredients,
+        author: user!.uid
+    );
+    Map<String, dynamic> json = recipeDTO.toJson();
+    print(jsonEncode(json));
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8080/recipe/create'), 
+      body: jsonEncode(json),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+    } else {
+      throw Exception('Failed to load data');
+    }
+
+    
+  }
+
   @override
   Widget build(BuildContext context) {
+    Widget imagePicker;
+    if (pickedImage != null) {
+      imagePicker = SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: 200,
+        child: FittedBox(
+          fit: BoxFit.fill,
+          child: Image.file(
+            File(pickedImage!.path!),
+          ),
+        ),
+      );
+    } else {
+      imagePicker = GestureDetector(
+        onTap: selectFile,
+        child: Center(
+            child: Container(
+          width: double.infinity,
+          height: 200,
+          color: Colors.grey,
+          child: const Icon(
+            Icons.add_a_photo,
+            color: Colors.white,
+            size: 100,
+          ),
+        )),
+      );
+    }
     List<Widget> widgetList = [
+      const TitleText("Image"),
+      imagePicker,
+      if (pickedImage != null)
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              pickedImage = null;
+            });
+          },
+          child: const CustomButton("Remove image", true, 24),
+        ),
+      const TitleText("Recipe information"),
       InputField(title: "Title", controller: _titleController),
-      InputField(title: "Time to prepare (minutes)", controller: _readyInMinutesController, isSigned: true, type: "INTEGER"),
-      InputField(title: "Calories", controller: _caloriesController, isSigned: true, type: "DECIMAL"),
-      InputField(title: "Proteins", controller: _proteinsController, isSigned: true, type: "DECIMAL"),
-      InputField(title: "Carbohydrates", controller: _carbohydratesController, isSigned: true, type: "DECIMAL"),
-      InputField(title: "Fats", controller: _fatsController, isSigned: true, type: "DECIMAL"),
-      InputField(title: "Servings", controller: _servingsController, isSigned: true, type: "INTEGER"),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Expanded(
+              flex: 12,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: InputField(
+                    title: "Prep time (min)",
+                    controller: _readyInMinutesController,
+                    isSigned: true,
+                    type: "INTEGER"),
+              )),
+          Expanded(
+              flex: 10,
+              child: InputField(
+                  title: "Servings",
+                  controller: _servingsController,
+                  isSigned: true,
+                  type: "INTEGER")),
+        ],
+      ),
+      const TitleText("Nutrients"),
+      InputField(
+          title: "Calories",
+          controller: _caloriesController,
+          isSigned: true,
+          type: "DECIMAL"),
+      InputField(
+          title: "Proteins",
+          controller: _proteinsController,
+          isSigned: true,
+          type: "DECIMAL"),
+      InputField(
+          title: "Carbohydrates",
+          controller: _carbohydratesController,
+          isSigned: true,
+          type: "DECIMAL"),
+      InputField(
+          title: "Fats",
+          controller: _fatsController,
+          isSigned: true,
+          type: "DECIMAL"),
+      IngredientListWidget(ingredientList: ingredients),
+      GestureDetector(
+          onTap: () async {
+            var tmp = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const SearchIngredientScreen(
+                        mode: IngredientSearch.addRecipe)));
+            if (tmp != null) {
+              setState(() {
+                ingredients.add(tmp);
+              });
+            }
+          },
+          child: const CustomButton("Add ingredient", true, 24)),
+      RecipeStepsWidget(steps, editable: true),
+      InputField(title: "Instruction", controller: _instructionsController),
+      GestureDetector(
+          onTap: () {
+            setState(() {
+              steps.add(_instructionsController.text);
+              _instructionsController.clear();
+            });
+          },
+          child: const CustomButton("Add instructions", true, 24)),
     ];
     return Scaffold(
       appBar: AppBar(
@@ -89,17 +243,38 @@ class _AddRecipeState extends State<AddRecipeScreen> {
           child: const Icon(Icons.arrow_back, color: Colors.white),
         ),
         title: const Text("Add recipe"),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              addRecipe();
+            },
+            child: const Padding(
+              padding: EdgeInsets.only(right: 8.0),
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+            ),
+          )
+        ],
       ),
       backgroundColor: const Color(0xFF242424),
-      body: SafeArea(child: ListView.builder(
-        itemCount: widgetList.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
-            child: widgetList[index],
-          );
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
         },
-      )),
+        child: SafeArea(
+            child: ListView.builder(
+          itemCount: widgetList.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
+              child: widgetList[index],
+            );
+          },
+        )),
+      ),
     );
   }
 }

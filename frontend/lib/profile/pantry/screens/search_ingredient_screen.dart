@@ -5,12 +5,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/ingredient_preview.dart';
-import 'package:frontend/profile/pantry/widgets/ingredient_container.dart';
+import 'package:frontend/common/models/ingredient_search_enum.dart';
+import 'package:frontend/profile/add_recipe/screens/add_ingredient.dart';
+import 'package:frontend/profile/pantry/widgets/ingredient_preview_container.dart';
 import 'package:frontend/profile/pantry/widgets/ingredient_dialog.dart';
 import 'package:http/http.dart' as http;
 
 class SearchIngredientScreen extends StatefulWidget {
-  const SearchIngredientScreen({super.key});
+  const SearchIngredientScreen(
+      {required this.mode, this.excludedIngredientList = const [], super.key});
+  final IngredientSearch mode;
+  final List<IngredientPreview> excludedIngredientList;
 
   @override
   State<StatefulWidget> createState() => _SearchIngredientState();
@@ -23,13 +28,61 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
   List<IngredientPreview> loadedIngredients = [];
   String loadedQuery = "";
 
-  Future<List<IngredientPreview>> loadData() async {
+  // MODES
+  // pantry
+  //    - filtered out ingredients already present in pantry (in Spring)
+  //    - onClick: do you want to add to your pantry? (Y/N)
+  // search:
+  //    - filtered out ingredients already present in search (in Flutter)
+  //    - onClick: just adds to search
+  // addRecipe:
+  //    - filtered out ingredients already present in recipe (in Flutter)
+  //    - onClick: opens window with image/name + fields to add unit + amount
+
+  // Filters ingredients based on a provided list
+  List<IngredientPreview> filterIngredients(List<IngredientPreview> list) {
+    List<IngredientPreview> filteredList = [];
+    List<int> ingredientIdList = [];
+    for (IngredientPreview ingredient in widget.excludedIngredientList) {
+      ingredientIdList.add(ingredient.id);
+    }
+
+    for (IngredientPreview ingredient in list) {
+      if (!ingredientIdList.contains(ingredient.id)) {
+        filteredList.add(ingredient);
+      }
+    }
+
+    return filteredList;
+  }
+
+  Future<List<IngredientPreview>> loadIngredientData() async {
+    if (loadedData == true) {
+      return loadedIngredients;
+    }
+    final response = await http.get(Uri.parse(
+        'http://10.0.2.2:8080/ingredient/search?query=${textController.text}'));
+    print("Loaded ingredient search results data from endpoint.");
+    loadedQuery = textController.text;
+    if (response.statusCode == 200) {
+      List<IngredientPreview> ingredients;
+      ingredients = (json.decode(response.body) as List)
+          .map((i) => IngredientPreview.fromJson(i))
+          .toList();
+      ingredients = filterIngredients(ingredients); // TODO: could be done better
+      return ingredients;
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  Future<List<IngredientPreview>> loadPantryData() async {
     if (loadedData == true) {
       return loadedIngredients;
     }
     final response = await http.get(Uri.parse(
         'http://10.0.2.2:8080/pantry/search?query=${textController.text}&user_uid=${user!.uid}'));
-    print("Loaded main screen data from endpoint.");
+    print("Loaded pantry search results data from endpoint.");
     loadedQuery = textController.text;
     if (response.statusCode == 200) {
       List<IngredientPreview> ingredients;
@@ -50,16 +103,47 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
 
   @override
   Widget build(BuildContext context) {
+    void pantryOnClick(IngredientPreview ingredient) async {
+      bool val = await showDialog(
+        context: context,
+        builder: (context) => IngredientDialog(
+          ingredient: ingredient,
+          isRemoving: false,
+        ),
+      );
+      if (val) {
+        addIngredient(ingredient.id);
+        if (!mounted) return;
+        Navigator.pop(context, ingredient);
+      }
+    }
+
+    void addToRecipeOnClick(IngredientPreview ingredient) async {
+      var tmp = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddIngredient(
+              ingredientPreview: ingredient)
+        )
+      );
+      if (tmp != null) {
+        if (!mounted) return;
+        Navigator.pop(context, tmp);
+      }
+    }
+
+    void searchOnClick(IngredientPreview ingredient) async {
+
+    }
     return Scaffold(
       appBar: AppBar(
-          leading: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.arrow_back,
-                  color: Colors.white)),
-          title: Text("Search for ingredients"),
-        ),
+        leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: const Icon(Icons.arrow_back, color: Colors.white)),
+        title: const Text("Search for ingredients"),
+      ),
       backgroundColor: const Color(0xFF242424),
       body: GestureDetector(
         onTap: () {
@@ -114,7 +198,9 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
                 child: Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: FutureBuilder<List<IngredientPreview>>(
-                future: loadData(),
+                future: (widget.mode == IngredientSearch.pantry)
+                    ? loadPantryData()
+                    : loadIngredientData(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(
@@ -133,21 +219,20 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
                         itemBuilder: (BuildContext context, int index) {
                           return GestureDetector(
                             onTap: () async {
-                              IngredientPreview ingredient =
-                                  loadedIngredients[index];
-                              bool val = await showDialog(
-                                context: context,
-                                builder: (context) => IngredientDialog(
-                                  ingredient: ingredient,
-                                  isRemoving: false,
-                                ),
-                              );
-                              if (val) {
-                                addIngredient(ingredient.id);
-                                //Navigator.pop(context); // TODO: test out tomorrow
+                              IngredientPreview ingredient = loadedIngredients[index];
+                              switch (widget.mode) {
+                                case IngredientSearch.pantry:
+                                  pantryOnClick(ingredient);
+                                  break;
+                                case IngredientSearch.addRecipe:
+                                  addToRecipeOnClick(ingredient);
+                                  break;
+                                case IngredientSearch.search:
+                                  searchOnClick(ingredient);
+                                  break;
                               }
                             },
-                            child: IngredientContainer(
+                            child: IngredientPreviewContainer(
                               ingredient: loadedIngredients[index],
                             ),
                           );

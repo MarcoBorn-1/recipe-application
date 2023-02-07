@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -25,7 +27,12 @@ public class RecipeService {
     final UserService userService;
     final FavoriteService favoriteService;
     final ReviewService reviewService;
-    public String createRecipe(InternalRecipeDTO recipe) throws ExecutionException, InterruptedException {
+    public String createRecipe(Recipe recipe) throws ExecutionException, InterruptedException {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDateTime now = LocalDateTime.now();
+        recipe.setDateAdded(dtf.format(now));
+        recipe.setExternal(false);
+
         Firestore dbFirestore = FirestoreClient.getFirestore();
 
         DocumentReference recipeDocumentReference = dbFirestore.collection("admin").document("variables");
@@ -36,7 +43,9 @@ public class RecipeService {
         if (id == null) return null;
         dbFirestore.collection("admin").document("variables").update("internal_recipe_id", id + 1);
         recipe.setId(Math.toIntExact(id));
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("recipes").document(id.toString()).set(recipe);
+
+        InternalRecipeDTO recipeDTO = new InternalRecipeDTO(recipe);
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("recipes").document(id.toString()).set(recipeDTO);
 
         return collectionsApiFuture.get().getUpdateTime().toString();
     }
@@ -56,8 +65,6 @@ public class RecipeService {
         reviewService.addReviewInformationToRecipe(recipe);
         return recipe;
     }
-
-    // TODO: move to ReviewService
 
     public Recipe getExternalRecipe(int id) throws IOException, ExecutionException, InterruptedException {
         StringBuilder urlBuilder = new StringBuilder();
