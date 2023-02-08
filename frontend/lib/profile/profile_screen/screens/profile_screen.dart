@@ -8,66 +8,55 @@ import 'package:frontend/profile/profile_screen/widgets/profile_header_widget.da
 import 'package:frontend/common/widgets/icon_option_widget.dart';
 import 'package:frontend/profile/settings/screens/settings_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
-  ProfileScreen({super.key});
-  final User? user = Auth().currentUser;
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  User? user = Auth().currentUser;
 
   Future<void> signOut() async {
     await Auth().signOut();
   }
 
-  String _imageURL() {
-    return user?.photoURL ?? "";
-  }
-
-  String _userUid() {
-    return user?.displayName ?? 'Username';
-  }
-
   @override
   Widget build(BuildContext context) {
-    void openSettings() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const SettingsScreen()
-        )
-      );
+    String imageURL = user?.photoURL ?? "";
+    String username = user?.displayName ?? 'Username';
+
+    void openSettings() async {
+      var isChanged = await Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const SettingsScreen()));
+      if (isChanged) {
+        setState(() {
+          user = Auth().currentUser;
+          imageURL = user?.photoURL ?? "";
+          username = user?.displayName ?? 'Username';
+        });
+      }
     }
 
     void openMyRecipes() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MyRecipesScreen()
-        )
-      );
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const MyRecipesScreen()));
     }
 
     void openPantry() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const PantryScreen()
-        )
-      );
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const PantryScreen()));
     }
 
     void openFavorites() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const FavoriteScreen()
-        )
-      );
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const FavoriteScreen()));
     }
 
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(
-          Icons.person,
-          color: Colors.white
-        ),
+        leading: const Icon(Icons.person, color: Colors.white),
         title: const Text("Profile"),
       ),
       backgroundColor: const Color(0xFF242424),
@@ -77,34 +66,35 @@ class ProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               ProfileHeader(
-                onSettingsTap: openSettings, 
-                onLogoutTap: signOut, 
-                username: _userUid(), 
-                imageURL: _imageURL(),
+                onSettingsTap: openSettings,
+                onLogoutTap: signOut,
+                username: username,
+                imageURL: imageURL,
                 showIcons: true,
               ),
               GestureDetector(
                 onTap: () => openFavorites(),
                 child: const IconOptionWidget(
-                  title: "Favorites", 
-                  description: "Access recipes you marked as favorite", 
-                  icon: Icons.favorite_border, 
+                  title: "Favorites",
+                  description: "Access recipes you marked as favorite",
+                  icon: Icons.favorite_border,
                 ),
               ),
               GestureDetector(
                 onTap: () => openMyRecipes(),
                 child: const IconOptionWidget(
-                  title: "My recipes", 
-                  description: "Add, edit, remove and look through recipes you added", 
-                  icon: Icons.menu_book_outlined
-                ),
+                    title: "My recipes",
+                    description:
+                        "Add, edit, remove and look through recipes you added",
+                    icon: Icons.menu_book_outlined),
               ),
               GestureDetector(
-                onTap:() => openPantry(),
+                onTap: () => openPantry(),
                 child: const IconOptionWidget(
-                  title: "Pantry", 
-                  description: "Manage your pantry, allowing you to search for recipes easier!", 
-                  icon: Icons.kitchen_outlined, 
+                  title: "Pantry",
+                  description:
+                      "Manage your pantry, allowing you to search for recipes easier!",
+                  icon: Icons.kitchen_outlined,
                 ),
               ),
             ]),

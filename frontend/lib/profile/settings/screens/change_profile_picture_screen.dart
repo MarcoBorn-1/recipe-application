@@ -21,6 +21,7 @@ class _ChangeProfilePictureScreenState
   User? user = Auth().currentUser;
   PlatformFile? pickedImage;
   UploadTask? upload;
+  bool isChanged = false;
 
   void selectFile() async {
     final result = await FilePicker.platform.pickFiles(type: FileType.image);
@@ -45,6 +46,7 @@ class _ChangeProfilePictureScreenState
     // TODO: move somewhere (Auth/Spring)
     final db = FirebaseFirestore.instance;
     db.collection("users").doc(user!.uid).update({"imageURL": urlDownload});
+    isChanged = true;
   }
 
   @override
@@ -52,7 +54,7 @@ class _ChangeProfilePictureScreenState
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
+          onTap: () => Navigator.pop(context, isChanged),
           child: const Icon(Icons.arrow_back, color: Colors.white),
         ),
         title: const Text("Change profile picture"),
