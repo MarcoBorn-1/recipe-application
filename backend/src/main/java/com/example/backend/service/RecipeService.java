@@ -105,8 +105,12 @@ public class RecipeService {
         return list;
     }
 
-    public String updateRecipe(Recipe crud) {
-        return null;
+    public String updateRecipe(Recipe recipe) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        InternalRecipeDTO recipeDTO = new InternalRecipeDTO(recipe);
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection("recipes").document(String.valueOf(recipe.getId())).set(recipeDTO);
+
+        return collectionsApiFuture.get().getUpdateTime().toString();
     }
 
 

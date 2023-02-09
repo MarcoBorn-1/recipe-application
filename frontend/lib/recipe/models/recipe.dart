@@ -70,4 +70,21 @@ class Recipe {
       averageReviewScore: json['averageReviewScore'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'isExternal': isExternal,
+    'title': title,
+    'author': author,
+    'dateAdded': dateAdded,
+    'readyInMinutes': readyInMinutes,
+    'imageURL': imageURL,
+    'servings': servings,
+    'calories': calories,
+    'proteins': proteins,
+    'carbohydrates': carbohydrates,
+    'fats': fats,
+    'steps': steps,
+    'ingredients': ingredients.map((i) => i.toJson()).toList(),
+  };
 }

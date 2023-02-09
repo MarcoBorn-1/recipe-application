@@ -6,6 +6,7 @@ import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/recipe/models/recipe.dart';
 import 'package:frontend/recipe/screens/add_review_screen.dart';
+import 'package:frontend/recipe/screens/edit_recipe_screen.dart';
 import 'package:frontend/recipe/widgets/recipe_header_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_ingredients_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_nutrients_widget.dart';
@@ -38,107 +39,121 @@ class _RecipeScreenState extends State<RecipeScreen> {
   final double ratingAvg = 4;
   final int timeToPrepareMin = 30;
 
-  Widget favorite = const Padding(
-      padding: EdgeInsets.only(right: 20),
-      child: Icon(Icons.favorite, color: Colors.white, size: 30));
-
-  Widget notFavorite = const Padding(
-      padding: EdgeInsets.only(right: 20),
-      child: Icon(Icons.favorite_outline, color: Colors.white, size: 30));
-
   Widget loadingWidget = const Padding(
       padding: EdgeInsets.only(right: 20),
       child: CircularProgressIndicator(color: Colors.white));
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Icon(Icons.arrow_back, color: Colors.white)),
-        title: Text(widget.title),
-        actions: [
-          FutureBuilder<bool>(
-              future: isRecipeFavorite(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Container();
-                } else if (snapshot.hasData) {
-                  isFavorite = snapshot.data ?? false;
-                  return GestureDetector(
-                    onTap: () {
+    return FutureBuilder<Recipe>(
+      future: loadData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text(snapshot.error.toString()));
+        } 
+        else if (snapshot.hasData) {
+          recipe = snapshot.data!;
+          loadedData = true;
+          List<Widget> widgetList = [
+            RecipeHeaderWidget(
+                recipe.title,
+                recipe.imageURL,
+                recipe.averageReviewScore,
+                recipe.readyInMinutes,
+                recipe.isExternal,
+                recipe.amountOfReviews),
+            RecipeNutrientsWidget(
+                calories: recipe.calories,
+                proteins: recipe.proteins,
+                carbohydrates: recipe.carbohydrates,
+                fats: recipe.fats),
+            RecipeIngredientsWidget(recipe.ingredients, recipe.servings),
+            RecipeStepsWidget(recipe.steps),
+            RecipeReviewsWidget(recipe.amountOfReviews, recipe.reviews,
+                recipe.id, recipe.isExternal),
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 0.0, left: 16, right: 16, bottom: 24),
+              child: GestureDetector(
+                  onTap: () async {
+                    var value = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddReviewScreen(
+                                widget.recipeId, widget.isExternal)));
+                    if (value) {
                       setState(() {
-                        changeFavoriteStatus();
+                        loadedData = false;
                       });
-                    },
-                    child: (isFavorite ? favorite : notFavorite),
-                  );
-                } else {
-                  return loadingWidget;
-                }
-              }),
-        ],
-      ),
-      backgroundColor: const Color(0xFF242424),
-      body: FutureBuilder<Recipe>(
-        future: loadData(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-          } else if (snapshot.hasData) {
-            recipe = snapshot.data!;
-            loadedData = true;
-            List<Widget> widgetList = [
-              RecipeHeaderWidget(
-                  recipe.title,
-                  recipe.imageURL,
-                  recipe.averageReviewScore,
-                  recipe.readyInMinutes,
-                  recipe.isExternal,
-                  recipe.amountOfReviews),
-              RecipeNutrientsWidget(
-                  calories: recipe.calories,
-                  proteins: recipe.proteins,
-                  carbohydrates: recipe.carbohydrates,
-                  fats: recipe.fats),
-              RecipeIngredientsWidget(recipe.ingredients, recipe.servings),
-              RecipeStepsWidget(recipe.steps),
-              RecipeReviewsWidget(recipe.amountOfReviews, recipe.reviews,
-                  recipe.id, recipe.isExternal),
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 0.0, left: 16, right: 16, bottom: 24),
-                child: GestureDetector(
-                    onTap: () async {
-                      var value = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddReviewScreen(
-                                  widget.recipeId, widget.isExternal)));
-                      if (value) {
-                        setState(() {
-                          loadedData = false;
-                        });
-                      }
-                    },
-                    child: const CustomButton("Add review", true, 24)),
-              ),
-            ];
-            return ListView.builder(
+                    }
+                  },
+                  child: const CustomButton("Add review", true, 24)),
+            ),
+          ];
+          return Scaffold(
+            appBar: AppBar(
+              leading: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Icon(Icons.arrow_back, color: Colors.white)),
+              title: Text(widget.title),
+              actions: [
+                if (recipe.author == user?.uid) GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => 
+                        EditRecipeScreen(
+                          recipe: recipe,
+                        )
+                      )
+                    );
+                    // TODO: add toast confirming the edit of the recipe + refresh page
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.only(right: 8.0),
+                    child: Icon(Icons.edit, color: Colors.white, size: 30),
+                  ),
+                ),
+                FutureBuilder<bool>(
+                  future: isRecipeFavorite(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Container();
+                    } else if (snapshot.hasData) {
+                      isFavorite = snapshot.data ?? false;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            changeFavoriteStatus();
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Icon((isFavorite)? Icons.favorite: Icons.favorite_outline, color: Colors.white, size: 30),
+                        ),
+                      );
+                    } else {
+                      return loadingWidget;
+                    }
+                  }
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFF242424),
+            body: ListView.builder(
               itemCount: widgetList.length,
               itemBuilder: (BuildContext context, int index) {
                 return widgetList[index];
               },
-            );
-          } else {
-            return const Center(
-                child: CircularProgressIndicator(color: Colors.white));
-          }
-        },
-      ),
+            )
+          );
+        } 
+        else {
+          return const Center(
+              child: CircularProgressIndicator(color: Colors.white));
+        }
+      },
     );
   }
 

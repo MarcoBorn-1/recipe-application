@@ -67,8 +67,8 @@ public class RecipeController {
         return recipeService.getFavoritesByUserUID(user_uid);
     }
 
-    @PutMapping("/put")
-    public String updateRecipe(@RequestBody Recipe recipe) {
+    @PutMapping("/update")
+    public String updateRecipe(@RequestBody Recipe recipe) throws ExecutionException, InterruptedException {
         return recipeService.updateRecipe(recipe);
     }
 
