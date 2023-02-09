@@ -23,7 +23,7 @@ class RecipeHeaderWidget extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 20.0),
-            child: Image.network(imageURL),
+            child: (imageURL != "")? Image.network(imageURL) : Image.asset("assets/images/no-image-found.jpg", width: 250, height: 250,),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 10.0),

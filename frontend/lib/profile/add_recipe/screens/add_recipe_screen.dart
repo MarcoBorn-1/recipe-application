@@ -14,7 +14,6 @@ import 'package:frontend/profile/add_recipe/models/recipe_dto.dart';
 import 'package:frontend/profile/add_recipe/widgets/ingredient_list_widget.dart';
 import 'package:frontend/profile/pantry/screens/search_ingredient_screen.dart';
 import 'package:frontend/common/models/ingredient.dart';
-import 'package:frontend/recipe/models/recipe.dart';
 import 'package:frontend/recipe/widgets/recipe_steps_widget.dart';
 import 'package:http/http.dart' as http;
 
@@ -234,7 +233,10 @@ class _AddRecipeState extends State<AddRecipeScreen> {
               _instructionsController.clear();
             });
           },
-          child: const CustomButton("Add instructions", true, 24)),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: const CustomButton("Add instructions", true, 24),
+          )),
     ];
     return Scaffold(
       appBar: AppBar(

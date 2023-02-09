@@ -37,11 +37,12 @@ class RecipeContainer extends StatelessWidget {
             Expanded(
                 flex: 4,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Image.network(
-                    imageURL,
-                  ),
-                )),
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: (imageURL != "")
+                        ? Image.network(
+                            imageURL,
+                          )
+                        : Image.asset("assets/images/no-image-found.jpg", width: 100, height: 100,))),
             Expanded(
               flex: 6,
               child: Padding(
