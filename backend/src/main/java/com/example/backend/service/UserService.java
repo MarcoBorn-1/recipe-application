@@ -24,10 +24,6 @@ public class UserService {
         }
         User user = document.toObject(User.class);
         if (user == null) return null;
-        System.out.println("Returning user information");
-        UserPreview preview = new UserPreview(user);
-        System.out.println(preview.getImageURL());
-        System.out.println(preview.getUsername());
         return new UserPreview(user);
     }
 }
