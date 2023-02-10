@@ -114,10 +114,29 @@ public class RecipeService {
     }
 
 
-    public String deleteRecipe(String id) {
+    public String deleteRecipe(Recipe recipe) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> result = dbFirestore.collection("recipes").document(id).delete();
-        return "Deleted recipe " + id;
+
+        // Removing recipe
+        ApiFuture<WriteResult> result = dbFirestore.collection("recipes").document(String.valueOf(recipe.getId())).delete();
+
+        // Removing reviews on recipe
+        CollectionReference reviewsRef = dbFirestore.collection("reviews").document("internal_reviews").collection(String.valueOf(recipe.getId()));
+        QuerySnapshot reviews = reviewsRef.get().get();
+        List<QueryDocumentSnapshot> documentSnapshots = reviews.getDocuments();
+        for (QueryDocumentSnapshot snapshot: documentSnapshots) {
+            snapshot.getReference().delete();
+        }
+
+        // Removing recipe from favorites
+        CollectionReference favoritesRef = dbFirestore.collection("favorites");
+        QuerySnapshot favorites = favoritesRef.whereArrayContains("items_internal", recipe.getId()).get().get();
+        List<QueryDocumentSnapshot> favoritesSnapshots = favorites.getDocuments();
+        for (QueryDocumentSnapshot snapshot: favoritesSnapshots) {
+            snapshot.getReference().update("items_internal", FieldValue.arrayRemove(recipe.getId()));
+        }
+
+        return "Deleted recipe " + recipe.getId();
     }
 
     public List<RecipePreview> searchRecipesByName(String query, Integer maxReadyTime,

@@ -11,11 +11,12 @@ import 'package:frontend/common/models/ingredient_search_enum.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/input_field.dart';
 import 'package:frontend/common/widgets/title_text.dart';
-import 'package:frontend/profile/add_recipe/models/recipe_dto.dart';
 import 'package:frontend/profile/add_recipe/widgets/ingredient_list_widget.dart';
 import 'package:frontend/profile/pantry/screens/search_ingredient_screen.dart';
+import 'package:frontend/recipe/models/edit_recipe_status_enum.dart';
 import 'package:frontend/recipe/models/recipe.dart';
 import 'package:frontend/recipe/widgets/recipe_steps_widget.dart';
+import 'package:frontend/recipe/widgets/remove_recipe_dialog.dart';
 import 'package:http/http.dart' as http;
 
 class EditRecipeScreen extends StatefulWidget {
@@ -86,6 +87,29 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
     return true;
   }
 
+  void deleteRecipe() async {
+    bool val = await showDialog(
+      context: context,
+      builder: (context) => const RemoveRecipeDialog(),
+    );
+    Map<String, dynamic> json = widget.recipe.toJson();
+    if (val) {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:8080/recipe/delete'),
+        body: jsonEncode(json),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+        print(response);
+        if (mounted) Navigator.pop(context, EditRecipeStatus.delete);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }
+  }
+
   void editRecipe() async {
     if (!checkData()) return;
 
@@ -124,7 +148,7 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
       },
     );
     if (response.statusCode == 200) {
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context, EditRecipeStatus.edit);
     } else {
       throw Exception('Failed to load data');
     }
@@ -145,10 +169,8 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
   @override
   Widget build(BuildContext context) {
     Recipe recipe = widget.recipe;
-    print(recipe.id);
     Widget imagePicker;
     if (pickedImage != null) {
-      print("Hello");
       imagePicker = SizedBox(
         width: MediaQuery.of(context).size.width,
         height: 200,
@@ -279,7 +301,7 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
         actions: [
           GestureDetector(
             onTap: () {
-              editRecipe();
+              deleteRecipe();
             },
             child: const Padding(
               padding: EdgeInsets.only(right: 8.0),

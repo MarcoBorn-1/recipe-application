@@ -73,7 +73,7 @@ public class RecipeController {
     }
 
     @DeleteMapping("/delete")
-    public String deleteRecipe(@RequestParam String id) {
-        return recipeService.deleteRecipe(id);
+    public String deleteRecipe(@RequestBody Recipe recipe) throws ExecutionException, InterruptedException {
+        return recipeService.deleteRecipe(recipe);
     }
 }

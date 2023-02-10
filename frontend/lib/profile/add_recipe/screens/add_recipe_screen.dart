@@ -83,9 +83,9 @@ class _AddRecipeState extends State<AddRecipeScreen> {
     return true;
   }
 
-  void addRecipe() async {
+  Future<bool> addRecipe() async {
     bool check = checkData();
-    if (!check) return;
+    if (!check) return false;
 
     String imageURL = "";
     if (pickedImage != null) {
@@ -103,23 +103,20 @@ class _AddRecipeState extends State<AddRecipeScreen> {
         fats: double.tryParse(_fatsController.text) ?? 0,
         steps: steps,
         ingredients: ingredients,
-        author: user!.uid
-    );
+        author: user!.uid);
     Map<String, dynamic> json = recipeDTO.toJson();
-    print(jsonEncode(json));
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/recipe/create'), 
+      Uri.parse('http://10.0.2.2:8080/recipe/create'),
       body: jsonEncode(json),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
     if (response.statusCode == 200) {
+      return true;
     } else {
       throw Exception('Failed to load data');
     }
-
-    
   }
 
   @override
@@ -233,9 +230,9 @@ class _AddRecipeState extends State<AddRecipeScreen> {
               _instructionsController.clear();
             });
           },
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: const CustomButton("Add instructions", true, 24),
+          child: const Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: CustomButton("Add instructions", true, 24),
           )),
     ];
     return Scaffold(
@@ -247,8 +244,11 @@ class _AddRecipeState extends State<AddRecipeScreen> {
         title: const Text("Add recipe"),
         actions: [
           GestureDetector(
-            onTap: () {
-              addRecipe();
+            onTap: () async {
+              bool val = await addRecipe();
+              if (val) {
+                if (mounted) Navigator.pop(context, true);
+              }
             },
             child: const Padding(
               padding: EdgeInsets.only(right: 8.0),
@@ -260,6 +260,7 @@ class _AddRecipeState extends State<AddRecipeScreen> {
           )
         ],
       ),
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFF242424),
       body: GestureDetector(
         onTap: () {

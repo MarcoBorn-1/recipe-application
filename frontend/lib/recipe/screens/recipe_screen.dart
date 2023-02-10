@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
+import 'package:frontend/recipe/models/edit_recipe_status_enum.dart';
 import 'package:frontend/recipe/models/recipe.dart';
 import 'package:frontend/recipe/screens/add_review_screen.dart';
 import 'package:frontend/recipe/screens/edit_recipe_screen.dart';
@@ -50,8 +51,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(child: Text(snapshot.error.toString()));
-        } 
-        else if (snapshot.hasData) {
+        } else if (snapshot.hasData) {
           recipe = snapshot.data!;
           loadedData = true;
           List<Widget> widgetList = [
@@ -91,65 +91,81 @@ class _RecipeScreenState extends State<RecipeScreen> {
             ),
           ];
           return Scaffold(
-            appBar: AppBar(
-              leading: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(Icons.arrow_back, color: Colors.white)),
-              title: Text(widget.title),
-              actions: [
-                if (recipe.author == user?.uid) GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => 
-                        EditRecipeScreen(
-                          recipe: recipe,
-                        )
-                      )
-                    );
-                    // TODO: add toast confirming the edit of the recipe + refresh page
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.only(right: 8.0),
-                    child: Icon(Icons.edit, color: Colors.white, size: 30),
-                  ),
-                ),
-                FutureBuilder<bool>(
-                  future: isRecipeFavorite(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Container();
-                    } else if (snapshot.hasData) {
-                      isFavorite = snapshot.data ?? false;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            changeFavoriteStatus();
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Icon((isFavorite)? Icons.favorite: Icons.favorite_outline, color: Colors.white, size: 30),
-                        ),
-                      );
-                    } else {
-                      return loadingWidget;
-                    }
-                  }
-                ),
-              ],
-            ),
-            backgroundColor: const Color(0xFF242424),
-            body: ListView.builder(
-              itemCount: widgetList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return widgetList[index];
-              },
-            )
-          );
-        } 
-        else {
+              appBar: AppBar(
+                leading: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.arrow_back, color: Colors.white)),
+                title: Text(widget.title),
+                actions: [
+                  if (recipe.author == user?.uid)
+                    GestureDetector(
+                      onTap: () async {
+                        var val = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditRecipeScreen(
+                                      recipe: recipe,
+                                    )));
+                        if (val != null) {
+                          switch (val) {
+                            case EditRecipeStatus.noEdit:
+                              break;
+                            case EditRecipeStatus.delete:
+                              if (mounted) Navigator.pop(context, true);
+                              break;
+                            case EditRecipeStatus.edit:
+                              setState(() {
+                                loadedData = false;
+                              });
+                              break;
+                          }
+                          // TODO: add toast confirming the deletion/edit of recipe
+                        }
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Icon(Icons.edit, color: Colors.white, size: 30),
+                      ),
+                    ),
+                  FutureBuilder<bool>(
+                      future: isRecipeFavorite(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Container();
+                        } else if (snapshot.hasData) {
+                          isFavorite = snapshot.data ?? false;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                changeFavoriteStatus();
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Icon(
+                                  (isFavorite)
+                                      ? Icons.favorite
+                                      : Icons.favorite_outline,
+                                  color: Colors.white,
+                                  size: 30),
+                            ),
+                          );
+                        } else {
+                          return loadingWidget;
+                        }
+                      }),
+                ],
+              ),
+              backgroundColor: const Color(0xFF242424),
+              body: ListView.builder(
+                itemCount: widgetList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return widgetList[index];
+                },
+              ));
+        } else {
           return const Center(
               child: CircularProgressIndicator(color: Colors.white));
         }
@@ -159,11 +175,9 @@ class _RecipeScreenState extends State<RecipeScreen> {
 
   Future<void> changeFavoriteStatus() async {
     if (isFavorite) {
-      print("delete fav");
       await http.delete(Uri.parse(
           'http://10.0.2.2:8080/favorite/remove?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
     } else {
-      print("add fav");
       await http.post(Uri.parse(
           'http://10.0.2.2:8080/favorite/add?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
     }

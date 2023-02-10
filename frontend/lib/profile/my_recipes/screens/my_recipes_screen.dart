@@ -44,12 +44,16 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
         title: const Text("My recipes"),
         actions: [
           GestureDetector(
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              bool? val = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AddRecipeScreen(
-                      )));
+                      builder: (context) => const AddRecipeScreen()));
+              if (val != null && val) {
+                setState(() {
+                  recipeList = [];
+                });
+              }
             },
             child: const Padding(
               padding: EdgeInsets.only(right: 8.0),
@@ -64,32 +68,32 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
       backgroundColor: const Color(0xFF242424),
       body: SafeArea(
         child: FutureBuilder<List<RecipePreview>>(
-            future: getRecipeData(),
-            builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(child: Text(snapshot.error.toString()));
-        } else if (snapshot.hasData) {
-          recipeList = snapshot.data!;
-          return ListView.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(8),
-              itemCount: recipeList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return RecipeContainer(
-                    recipeList[index].id,
-                    recipeList[index].title,
-                    recipeList[index].readyInMinutes,
-                    recipeList[index].calories,
-                    recipeList[index].imageURL,
-                    recipeList[index].isExternal);
-              });
-        } else {
-          return const Center(
-              child: CircularProgressIndicator(color: Colors.white));
-        }
-            },
-          ),
+          future: getRecipeData(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text(snapshot.error.toString()));
+            } else if (snapshot.hasData) {
+              recipeList = snapshot.data!;
+              return ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(8),
+                  itemCount: recipeList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return RecipeContainer(
+                        recipeList[index].id,
+                        recipeList[index].title,
+                        recipeList[index].readyInMinutes,
+                        recipeList[index].calories,
+                        recipeList[index].imageURL,
+                        recipeList[index].isExternal);
+                  });
+            } else {
+              return const Center(
+                  child: CircularProgressIndicator(color: Colors.white));
+            }
+          },
+        ),
       ),
     );
   }
