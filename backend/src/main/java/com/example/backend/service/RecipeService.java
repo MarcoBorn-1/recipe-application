@@ -1,5 +1,10 @@
 package com.example.backend.service;
 
+import com.algolia.search.DefaultSearchClient;
+import com.algolia.search.SearchClient;
+import com.algolia.search.SearchIndex;
+import com.algolia.search.models.indexing.Query;
+import com.algolia.search.models.indexing.SearchResult;
 import com.example.backend.entity.*;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
@@ -19,11 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static com.example.backend.config.Constants.SPOONACULAR_API_KEY;
+import static com.example.backend.config.Constants.*;
 
 @AllArgsConstructor
 @Service
 public class RecipeService {
+    final SearchClient client = DefaultSearchClient.create(ALGOLIA_APPLICATION_KEY, ALGOLIA_API_KEY);
+    final SearchIndex<InternalRecipeDTO> index = client.initIndex("recipes", InternalRecipeDTO.class);
+
     final UserService userService;
     final FavoriteService favoriteService;
     final ReviewService reviewService;
@@ -139,46 +147,35 @@ public class RecipeService {
         return "Deleted recipe " + recipe.getId();
     }
 
-    public List<RecipePreview> searchRecipesByName(String query, Integer maxReadyTime,
-                                                   Integer minCalories, Integer maxCalories,
-                                                   Integer minProtein, Integer maxProtein,
-                                                   Integer minCarbs, Integer maxCarbs,
-                                                   Integer minFat, Integer maxFat,
-                                                   String intolerances, Integer amount) throws IOException {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append("https://api.spoonacular.com/recipes/complexSearch").append("?");
-        if (maxReadyTime != null) urlBuilder.append("maxReadyTime=").append(maxReadyTime).append("&");
-        if (minCalories != null) urlBuilder.append("minCalories=").append(minCalories).append("&");
-        if (maxCalories != null) urlBuilder.append("maxCalories=").append(maxCalories).append("&");
-        if (minProtein != null) urlBuilder.append("minProtein=").append(minProtein).append("&");
-        if (maxProtein != null) urlBuilder.append("maxProtein=").append(maxProtein).append("&");
-        if (minCarbs != null) urlBuilder.append("minCarbs=").append(minCarbs).append("&");
-        if (maxCarbs != null) urlBuilder.append("maxCarbs=").append(maxCarbs).append("&");
-        if (minFat != null) urlBuilder.append("minFat=").append(minFat).append("&");
-        if (maxFat != null) urlBuilder.append("maxFat=").append(maxFat).append("&");
-        if (intolerances != null) urlBuilder.append("intolerances=").append(intolerances).append("&");
-        if (amount != null) urlBuilder.append("number=").append(amount).append("&");
-        urlBuilder.append("addRecipeNutrition=").append(true).append("&");
-        urlBuilder.append("addRecipeInformation=").append(true).append("&");
-        urlBuilder.append("query=").append(query).append("&");
-        urlBuilder.append("apiKey=").append(SPOONACULAR_API_KEY);
+    public List<RecipePreview> searchRecipesByName(SearchParameters parameters) throws IOException {
+        List<RecipePreview> recipeList = new ArrayList<>();
 
-        System.out.println(urlBuilder);
+        // External recipe search
 
-        URL url = new URL(urlBuilder.toString());
+        URL url = new URL(parameters.createSearchURL());
         String json = IOUtils.toString(url, StandardCharsets.UTF_8);
         JSONObject jsonObject = new JSONObject(json);
         JSONArray jsonArray = jsonObject.getJSONArray("results");
-
-        List<RecipePreview> list = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             ExternalRecipeDTO externalRecipeDTO = new ExternalRecipeDTO(jsonArray.getJSONObject(i));
             Recipe recipe = new Recipe(externalRecipeDTO);
             RecipePreview recipePreview = new RecipePreview(recipe);
-            list.add(recipePreview);
+            recipeList.add(recipePreview);
         }
 
-        return list;
+        // Internal recipe search
+
+        SearchResult<InternalRecipeDTO> result = index.search(parameters.createQuery());
+        List<InternalRecipeDTO> recipeDTOList = result.getHits();
+        System.out.println(recipeDTOList.size());
+
+        for (InternalRecipeDTO recipeDTO : recipeDTOList) {
+            Recipe recipe = new Recipe(recipeDTO);
+            RecipePreview recipePreview = new RecipePreview(recipe);
+            recipeList.add(recipePreview);
+        }
+
+        return recipeList;
     }
 
     public List<RecipePreview> getRecipesByUserUID(String userUID) throws ExecutionException, InterruptedException {

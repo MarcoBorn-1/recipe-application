@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.entity.InternalRecipeDTO;
 import com.example.backend.entity.Recipe;
 import com.example.backend.entity.RecipePreview;
+import com.example.backend.entity.SearchParameters;
 import com.example.backend.service.RecipeService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -56,9 +57,12 @@ public class RecipeController {
                                                    @RequestParam(required = false) Integer maxCarbohydrates,
                                                    @RequestParam(required = false) Integer minFats,
                                                    @RequestParam(required = false) Integer maxFats,
-                                                   @RequestParam(required = false) String intolerances,
+                                                   @RequestParam(required = false) List<String> intolerances,
                                                    @RequestParam(required = false) Integer amount) throws IOException {
-        return recipeService.searchRecipesByName(query, maxReadyTime, minCalories, maxCalories, minProteins, maxProteins, minCarbohydrates, maxCarbohydrates, minFats, maxFats, intolerances, amount);
+        SearchParameters parameters = new SearchParameters(
+                query, maxReadyTime, minCalories, maxCalories, minProteins, maxProteins, minCarbohydrates, maxCarbohydrates,
+                minFats, maxFats, intolerances, null, amount);
+        return recipeService.searchRecipesByName(parameters);
     }
 
     @GetMapping("/get_favorite")
