@@ -64,11 +64,6 @@ class _AddRecipeState extends State<AddRecipeScreen> {
     final snapshot = await upload!.whenComplete(() => {});
     String urlDownload = await snapshot.ref.getDownloadURL();
     return Future<String>.value(urlDownload);
-    //user!.updatePhotoURL(urlDownload);
-
-    // TODO: move somewhere (Auth/Spring)
-    //final db = FirebaseFirestore.instance;
-    //db.collection("users").doc(user!.uid).update({"imageURL": urlDownload});
   }
 
   bool checkData() {

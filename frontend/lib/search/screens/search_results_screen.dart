@@ -23,18 +23,14 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
     if (loadedData == true) return loadedRecipes;
     final response = await http.get(
         Uri.parse('http://10.0.2.2:8080/recipe/search_by_name?${widget.parameters}'));
-    print("Loaded data from endpoint.");
+    print("Loaded search data from endpoint.");
     if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,r
-      // then parse the JSON.
       List<RecipePreview> recipes;
       recipes = (json.decode(response.body) as List)
           .map((i) => RecipePreview.fromJson(i))
           .toList();
       return recipes;
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
       throw Exception('Failed to load data');
     }
   }

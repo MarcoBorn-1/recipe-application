@@ -2,10 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/recipe/models/review.dart';
-import 'package:frontend/recipe/models/review_dto.dart';
 import 'package:frontend/recipe/screens/add_review_screen.dart';
 import 'package:frontend/recipe/widgets/recipe_review_container.dart';
-import 'package:frontend/recipe/widgets/recipe_reviews_widget.dart';
 import 'package:http/http.dart' as http;
 
 class ShowReviewsPage extends StatefulWidget {

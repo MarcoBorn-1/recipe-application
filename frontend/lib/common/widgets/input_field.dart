@@ -51,7 +51,7 @@ class _InputFieldState extends State<InputField> {
               child: const Icon(
                 Icons.cancel,
                 color: Colors.grey,
-              )): Text("")),
+              )): const Text("")),
     );
   }
 }

@@ -9,7 +9,6 @@ import 'package:frontend/common/widgets/title_text.dart';
 import 'package:frontend/profile/pantry/screens/search_ingredient_screen.dart';
 import 'package:frontend/profile/pantry/widgets/ingredient_preview_container.dart';
 import 'package:frontend/profile/pantry/widgets/ingredient_dialog.dart';
-import 'package:frontend/common/models/ingredient.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -145,7 +144,6 @@ class _PantryScreenState extends State<PantryScreen> {
                               isRemoving: true,
                             ),
                           );
-                          print(val);
                           if (val) {
                             removeIngredient(ingredient.id);
                             setState(() {

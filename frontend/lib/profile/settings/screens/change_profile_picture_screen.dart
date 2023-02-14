@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
-import 'package:frontend/common/widgets/title_text.dart';
 
 class ChangeProfilePictureScreen extends StatefulWidget {
   const ChangeProfilePictureScreen({super.key});

@@ -102,7 +102,6 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
         },
       );
       if (response.statusCode == 200) {
-        print(response);
         if (mounted) Navigator.pop(context, EditRecipeStatus.delete);
       } else {
         throw Exception('Failed to load data');

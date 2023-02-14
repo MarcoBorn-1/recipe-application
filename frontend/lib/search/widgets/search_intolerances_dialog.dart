@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/common/models/ingredient_preview.dart';
 import 'package:frontend/common/providers/intolerance_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -18,27 +17,24 @@ class _IntolerancesDialogState extends State<IntolerancesDialog> {
         return AlertDialog(
           title: const Text("Select intolerances"),
           content: SingleChildScrollView(
-            child: Container(
-              width: double.infinity,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: intolerancesProvider.allItems
-                    .map((e) => CheckboxListTile(
-                          title: Text(e),
-                          onChanged: (value) {
-                            value!
-                                ? intolerancesProvider.addItem(e)
-                                : intolerancesProvider.removeItem(e);
-                          },
-                          value: intolerancesProvider.containsItem(e),
-                        ))
-                    .toList(),
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: intolerancesProvider.allItems
+                  .map((e) => CheckboxListTile(
+                        title: Text(e),
+                        onChanged: (value) {
+                          value!
+                              ? intolerancesProvider.addItem(e)
+                              : intolerancesProvider.removeItem(e);
+                        },
+                        value: intolerancesProvider.containsItem(e),
+                      ))
+                  .toList(),
             ),
           ),
           actions: [
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },

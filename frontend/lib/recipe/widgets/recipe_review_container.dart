@@ -30,7 +30,6 @@ class RecipeReviewContainer extends StatelessWidget {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            print("User UID: ${review.userUID}");
                             Navigator.push(
                               context,
                               MaterialPageRoute(

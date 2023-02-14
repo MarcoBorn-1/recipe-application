@@ -126,8 +126,6 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                               errorMessage = "";
                               changedReview = true;
                             }
-                            print(chosenRating);
-                            print(_controllerComment.text);
                           },
                           child: const CustomButton("Add review", true, 24),
                         ),
@@ -267,7 +265,6 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
       // then parse the JSON.
       if (response.body.isEmpty) return false;
       review = Review.fromJson(json.decode(response.body));
-      print("UserUID: ${review.userUID}, recipe: ${widget.recipeId}");
       loadedData = true;
       _controllerComment.text = review.comment;
       chosenRating = review.rating;

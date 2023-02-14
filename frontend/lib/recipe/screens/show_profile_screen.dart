@@ -22,7 +22,7 @@ class _ShowProfileScreenState extends State<ShowProfileScreen> {
   Future<UserInformation> getProfileData() async {
     final response = await http.get(
         Uri.parse('http://10.0.2.2:8080/user/get_info?user_uid=${widget.uid}'));
-    print("Loaded data from endpoint.");
+    print("Loaded profile data from endpoint.");
     if (response.statusCode == 200) {
       userInfo = UserInformation.fromJson(json.decode(response.body));
       return userInfo;

@@ -43,18 +43,13 @@ class _SearchDishNameState extends State<SearchDishName> {
     String parameters = buildParameters();
     final response = await http
         .get(Uri.parse('http://10.0.2.2:8080/search_by_name?$parameters'));
-    //print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,r
-      // then parse the JSON.
       List<RecipePreview> recipes;
       recipes = (json.decode(response.body) as List)
           .map((i) => RecipePreview.fromJson(i))
           .toList();
       return recipes;
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
       throw Exception('Failed to load data');
     }
   }
@@ -79,8 +74,7 @@ class _SearchDishNameState extends State<SearchDishName> {
       }
     }
     if (chosenOptionCarbohydrates != 0) {
-      parameters +=
-          "&minCarbs=${carbohydratesValues[chosenOptionCarbohydrates - 1]}";
+      parameters += "&minCarbs=${carbohydratesValues[chosenOptionCarbohydrates - 1]}";
       if (chosenOptionCarbohydrates != 3) {
         parameters +=
             "&maxCarbs=${carbohydratesValues[chosenOptionCarbohydrates]}";
@@ -93,34 +87,15 @@ class _SearchDishNameState extends State<SearchDishName> {
       }
     }
     if (intolerancesProvider.selectedItems.isNotEmpty) {
-      print("Added intolenrances");
       String intolerances = intolerancesProvider.selectedItems.toString();
-      intolerances = intolerances.replaceAll(' ', '');
-      parameters +=
-          "&intolerances=${intolerances.substring(1, intolerances.length - 1)}";
+      intolerances = intolerances.substring(1, intolerances.length - 1);
+      parameters += "&intolerances=$intolerances";
     }
     return parameters;
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    // Start listening to changes.
-    textEditingController.addListener(_textFieldListener);
-  }
-
-  @override
-  void dispose() {
-    textEditingController.dispose();
-    super.dispose();
-  }
-
-  void _textFieldListener() {}
-
-  @override
   Widget build(BuildContext context) {
-    //print(buildParameters());
     List<Widget> listOfWidgets = [
       SearchWidget(),
       TimeWidget(),
