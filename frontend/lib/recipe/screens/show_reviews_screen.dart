@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/recipe/models/review.dart';
 import 'package:frontend/recipe/screens/add_review_screen.dart';
 import 'package:frontend/recipe/widgets/recipe_review_container.dart';
@@ -17,6 +19,7 @@ class ShowReviewsPage extends StatefulWidget {
 }
 
 class _ShowReviewsPageState extends State<ShowReviewsPage> {
+  User? user = Auth().currentUser;
   Future<List<Review>> getReviewData() async {
     final response = await http.get(Uri.parse(
         'http://10.0.2.2:8080/review/get?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}'));
@@ -41,6 +44,7 @@ class _ShowReviewsPageState extends State<ShowReviewsPage> {
         ),
         title: const Text("Reviews"),
         actions: [
+          if (user != null)
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -69,15 +73,14 @@ class _ShowReviewsPageState extends State<ShowReviewsPage> {
             } else if (snapshot.hasData) {
               List<Review> reviewList = snapshot.data!;
               return ListView.builder(
-                primary: false,
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                padding: const EdgeInsets.all(8),
-                itemCount: reviewList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return RecipeReviewContainer(reviewList[index]);
-                }
-              );
+                  primary: false,
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(8),
+                  itemCount: reviewList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return RecipeReviewContainer(reviewList[index]);
+                  });
             } else {
               return const Center(
                   child: CircularProgressIndicator(color: Colors.white));

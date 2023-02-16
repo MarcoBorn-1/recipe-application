@@ -71,25 +71,27 @@ class _RecipeScreenState extends State<RecipeScreen> {
             RecipeStepsWidget(recipe.steps),
             RecipeReviewsWidget(recipe.amountOfReviews, recipe.reviews,
                 recipe.id, recipe.isExternal),
+            if (user != null)
             Padding(
               padding: const EdgeInsets.only(
                   top: 0.0, left: 16, right: 16, bottom: 24),
               child: GestureDetector(
-                  onTap: () async {
-                    var value = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddReviewScreen(
-                          widget.recipeId, widget.isExternal)
+                onTap: () async {
+                  var value = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddReviewScreen(
+                        widget.recipeId, widget.isExternal
                       )
-                    );
-                    if (value) {
-                      setState(() {
-                        loadedData = false;
-                      });
-                    }
-                  },
-                  child: const CustomButton("Add review", true, 24)),
+                    )
+                  );
+                  if (value) {
+                    setState(() {
+                      loadedData = false;
+                    });
+                  }
+                },
+                child: const CustomButton("Add review", true, 24)),
             ),
           ];
           return Scaffold(
@@ -137,6 +139,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                         if (snapshot.hasError) {
                           return Container();
                         } else if (snapshot.hasData) {
+                          if (user == null) return const Text("");
                           isFavorite = snapshot.data ?? false;
                           return GestureDetector(
                             onTap: () {
@@ -157,7 +160,9 @@ class _RecipeScreenState extends State<RecipeScreen> {
                         } else {
                           return const Padding(
                             padding: EdgeInsets.only(right: 20),
-                            child: CircularProgressIndicator(color: Colors.white)
+                            child: CircularProgressIndicator(
+                              color: Colors.white
+                            )
                           );
                         }
                       }),
@@ -172,8 +177,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
               ));
         } else {
           return const Center(
-            child: CircularProgressIndicator(color: Colors.white)
-          );
+              child: CircularProgressIndicator(color: Colors.white));
         }
       },
     );
