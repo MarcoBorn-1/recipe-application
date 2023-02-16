@@ -67,12 +67,13 @@ class _SearchByIngredientsScreenState extends State<SearchByIngredientsScreen> {
             child: ListTile(
               tileColor: const Color.fromARGB(126, 126, 126, 126),
               title: Center(
-                  child: Text(
-                ingredientList[index].name.titleCase,
-                softWrap: true,
-                overflow: TextOverflow.fade,
-                style: const TextStyle(color: Colors.white),
-              )),
+                child: Text(
+                  ingredientList[index].name.titleCase,
+                  softWrap: true,
+                  overflow: TextOverflow.fade,
+                  style: const TextStyle(color: Colors.white),
+                )
+              ),
               trailing: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -95,36 +96,6 @@ class _SearchByIngredientsScreenState extends State<SearchByIngredientsScreen> {
       fontSize: 16,
       );
     }
-
-    List<Widget> listOfWidgets = [
-      const TitleText("Ingredients"),
-        ingredientWidget,
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GestureDetector(
-            onTap: () async {
-              var ingredient = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SearchIngredientScreen(
-                    mode: IngredientSearch.search,
-                    excludedIngredientList: ingredientList,
-                  )
-                )
-              );
-              if (ingredient != null) {
-                setState(() {
-                  ingredientList.add(ingredient);
-                });
-              }
-            },
-            child: const CustomButton("Add ingredients", true, 24)),
-        ),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CustomButton("Add from pantry", true, 24),
-        ),
-    ];
 
     return Scaffold(
         appBar: AppBar(
@@ -159,11 +130,38 @@ class _SearchByIngredientsScreenState extends State<SearchByIngredientsScreen> {
           onTap: () {
             FocusScope.of(context).requestFocus(FocusNode());
           },
-          child: ListView.builder(
-            itemCount: listOfWidgets.length,
-            itemBuilder: (BuildContext context, int index) {
-              return listOfWidgets[index];
-            },
+          child: ListView(
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: TitleText("Ingredients", fontSize: 32,),
+              ),
+              Center(child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: ingredientWidget,
+              )),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+                child: GestureDetector(
+                  onTap: () async {
+                    var ingredient = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchIngredientScreen(
+                          mode: IngredientSearch.search,
+                          excludedIngredientList: ingredientList,
+                        )
+                      )
+                    );
+                    if (ingredient != null) {
+                      setState(() {
+                        ingredientList.add(ingredient);
+                      });
+                    }
+                  },
+                  child: const CustomButton("Add ingredients", true, 24)),
+              ),
+            ],
           ),
         ));
   }

@@ -35,6 +35,7 @@ public class RecipeService {
     final UserService userService;
     final FavoriteService favoriteService;
     final ReviewService reviewService;
+    final PantryService pantryService;
     public String createRecipe(Recipe recipe) throws ExecutionException, InterruptedException {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDateTime now = LocalDateTime.now();
@@ -214,6 +215,16 @@ public class RecipeService {
         }
 
         return recipeList;
+    }
+
+    public List<RecipePreview> searchRecipesByPantry(String userUID) throws ExecutionException, InterruptedException, IOException {
+        List<IngredientPreview> pantry = pantryService.getIngredientsFromPantry(userUID);
+        List<String> ingredientList = new ArrayList<>();
+        for (IngredientPreview ingredient: pantry) {
+            ingredientList.add(ingredient.getName());
+        }
+
+        return searchRecipesByIngredient(ingredientList);
     }
 
     public List<RecipePreview> getRecipesByUserUID(String userUID) throws ExecutionException, InterruptedException {

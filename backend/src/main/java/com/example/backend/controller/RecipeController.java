@@ -66,6 +66,11 @@ public class RecipeController {
         return recipeService.searchRecipesByName(parameters);
     }
 
+    @GetMapping("/search/pantry")
+    public List<RecipePreview> searchRecipesByPantry(@RequestParam String userUID) throws IOException, ExecutionException, InterruptedException {
+        return recipeService.searchRecipesByPantry(userUID);
+    }
+
     @GetMapping("/get_favorite")
     public List<RecipePreview> getFavoritesByUserUID(@RequestParam String user_uid)
             throws ExecutionException, InterruptedException, IOException {

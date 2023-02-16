@@ -1,4 +1,5 @@
 enum SearchMode {
   name,
-  ingredient
+  ingredient,
+  pantry
 }
