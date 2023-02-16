@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/widgets/icon_option_widget.dart';
+import 'package:frontend/search/screens/search_by_ingredients_screen.dart';
 import 'package:frontend/search/screens/search_dish_name_screen.dart';
 
 class SearchOptionScreen extends StatelessWidget {
@@ -55,7 +56,14 @@ class SearchOptionScreen extends StatelessWidget {
                 )
               ),
               GestureDetector(
-                onTap: () => {},
+                onTap: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SearchByIngredientsScreen()
+                    )
+                  )
+                },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: IconOptionWidget(

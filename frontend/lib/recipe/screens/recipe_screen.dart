@@ -77,10 +77,12 @@ class _RecipeScreenState extends State<RecipeScreen> {
               child: GestureDetector(
                   onTap: () async {
                     var value = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddReviewScreen(
-                                widget.recipeId, widget.isExternal)));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddReviewScreen(
+                          widget.recipeId, widget.isExternal)
+                      )
+                    );
                     if (value) {
                       setState(() {
                         loadedData = false;
@@ -153,7 +155,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
                             ),
                           );
                         } else {
-                          return loadingWidget;
+                          return const Padding(
+                            padding: EdgeInsets.only(right: 20),
+                            child: CircularProgressIndicator(color: Colors.white)
+                          );
                         }
                       }),
                 ],
@@ -167,7 +172,8 @@ class _RecipeScreenState extends State<RecipeScreen> {
               ));
         } else {
           return const Center(
-              child: CircularProgressIndicator(color: Colors.white));
+            child: CircularProgressIndicator(color: Colors.white)
+          );
         }
       },
     );

@@ -24,7 +24,6 @@ public class SearchParameters {
     Integer minFat;
     Integer maxFat;
     List<String> intolerances;
-    List<String> ingredients;
     Integer amount;
 
     public String createSearchURL() {
@@ -39,8 +38,9 @@ public class SearchParameters {
         if (maxCarbs != null) urlBuilder.append("maxCarbs=").append(maxCarbs).append("&");
         if (minFat != null) urlBuilder.append("minFat=").append(minFat).append("&");
         if (maxFat != null) urlBuilder.append("maxFat=").append(maxFat).append("&");
-        if (intolerances != null && !intolerances.isEmpty()) urlBuilder.append("intolerances=").append(intolerances.toString(), 1, intolerances.size() - 1).append("&");
-        if (ingredients != null && !ingredients.isEmpty()) urlBuilder.append("includeIngredients=").append(ingredients.toString(), 1, intolerances.size() - 1).append("&");
+        if (intolerances != null && !intolerances.isEmpty()) {
+            urlBuilder.append("intolerances=").append(intolerances.toString(), 1, intolerances.toString().length() - 1).append("&");
+        }
         if (amount != null) urlBuilder.append("number=").append(amount).append("&");
         urlBuilder.append("query=").append(query).append("&");
         urlBuilder.append("addRecipeNutrition=").append(true).append("&");
@@ -92,16 +92,6 @@ public class SearchParameters {
         else {
             if (minFat != null) filters.append("fats >= ").append(minFat);
             if (maxFat != null) filters.append("fats <= ").append(maxFat);
-        }
-
-        if (ingredients != null && !ingredients.isEmpty()) {
-            if (!filters.isEmpty()) filters.append(" AND ");
-            filters.append("(");
-            for (int i = 0; i < ingredients.size(); i++) {
-                if (i != 0) filters.append(" OR ");
-                filters.append("ingredients:").append(ingredients.get(i));
-            }
-            filters.append(")");
         }
 
         if (!filters.isEmpty()) searchQuery.setFilters(filters.toString());

@@ -1,6 +1,5 @@
 package com.example.backend.controller;
 
-import com.example.backend.entity.InternalRecipeDTO;
 import com.example.backend.entity.Recipe;
 import com.example.backend.entity.RecipePreview;
 import com.example.backend.entity.SearchParameters;
@@ -9,10 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @AllArgsConstructor
@@ -46,7 +42,12 @@ public class RecipeController {
         return recipeService.getRecipesByUserUID(user_uid);
     }
 
-    @GetMapping("/search_by_name")
+    @GetMapping("/search/ingredient")
+    public List<RecipePreview> searchRecipesByIngredient(@RequestParam List<String> ingredients) throws IOException, ExecutionException, InterruptedException {
+        return recipeService.searchRecipesByIngredient(ingredients);
+    }
+
+    @GetMapping("/search/name")
     public List<RecipePreview> searchRecipesByName(@RequestParam String query,
                                                    @RequestParam(required = false) Integer maxReadyTime,
                                                    @RequestParam(required = false) Integer minCalories,
@@ -61,7 +62,7 @@ public class RecipeController {
                                                    @RequestParam(required = false) Integer amount) throws IOException {
         SearchParameters parameters = new SearchParameters(
                 query, maxReadyTime, minCalories, maxCalories, minProteins, maxProteins, minCarbohydrates, maxCarbohydrates,
-                minFats, maxFats, intolerances, null, amount);
+                minFats, maxFats, intolerances, amount);
         return recipeService.searchRecipesByName(parameters);
     }
 

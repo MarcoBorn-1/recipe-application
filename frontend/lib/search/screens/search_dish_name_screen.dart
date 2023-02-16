@@ -9,6 +9,7 @@ import 'package:frontend/common/widgets/icon_title_button.dart';
 import 'package:frontend/common/widgets/title_text.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/providers/intolerance_provider.dart';
+import 'package:frontend/search/models/search_mode_enum.dart';
 import 'package:frontend/search/screens/search_results_screen.dart';
 import 'package:frontend/search/widgets/search_intolerances_dialog.dart';
 import 'package:http/http.dart' as http;
@@ -42,7 +43,7 @@ class _SearchDishNameState extends State<SearchDishName> {
     if (loadedData == true) return loadedRecipes;
     String parameters = buildParameters();
     final response = await http
-        .get(Uri.parse('http://10.0.2.2:8080/search_by_name?$parameters'));
+        .get(Uri.parse('http://10.0.2.2:8080/search?$parameters'));
     if (response.statusCode == 200) {
       List<RecipePreview> recipes;
       recipes = (json.decode(response.body) as List)
@@ -552,6 +553,7 @@ class _SearchDishNameState extends State<SearchDishName> {
                 MaterialPageRoute(
                     builder: (context) => SearchResultScreen(
                           parameters: buildParameters(),
+                          searchMode: SearchMode.name,
                         )));
           },
           enabled: true,
@@ -582,6 +584,7 @@ class _SearchDishNameState extends State<SearchDishName> {
                       MaterialPageRoute(
                           builder: (context) => SearchResultScreen(
                                 parameters: buildParameters(),
+                                searchMode: SearchMode.name,
                               )));
                 },
                 child: const Icon(CupertinoIcons.search, color: Colors.black)),

@@ -22,12 +22,10 @@ class SearchIngredientScreen extends StatefulWidget {
 }
 
 class _SearchIngredientState extends State<SearchIngredientScreen> {
+  late Future<List<IngredientPreview>> dataFuture;
   User? user = Auth().currentUser;
-  bool loadedData = false;
   final TextEditingController textController = TextEditingController();
-  List<IngredientPreview> loadedIngredients = [];
   String loadedQuery = "";
-
   // MODES
   // pantry
   //    - filtered out ingredients already present in pantry (in Spring)
@@ -55,21 +53,25 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
 
     return filteredList;
   }
+  @override
+  void initState() {
+    super.initState();
+    dataFuture = (widget.mode == IngredientSearch.pantry)
+        ? loadPantryData()
+        : loadIngredientData();
+  }
 
   Future<List<IngredientPreview>> loadIngredientData() async {
-    if (loadedData == true) {
-      return loadedIngredients;
-    }
+    loadedQuery = textController.text;
     final response = await http.get(Uri.parse(
         'http://10.0.2.2:8080/ingredient/search?query=${textController.text}'));
     print("Loaded ingredient search results data from endpoint.");
-    loadedQuery = textController.text;
     if (response.statusCode == 200) {
       List<IngredientPreview> ingredients;
       ingredients = (json.decode(response.body) as List)
           .map((i) => IngredientPreview.fromJson(i))
           .toList();
-      ingredients = filterIngredients(ingredients); // TODO: could be done better
+      ingredients = filterIngredients(ingredients);
       return ingredients;
     } else {
       throw Exception('Failed to load data');
@@ -77,9 +79,6 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
   }
 
   Future<List<IngredientPreview>> loadPantryData() async {
-    if (loadedData == true) {
-      return loadedIngredients;
-    }
     final response = await http.get(Uri.parse(
         'http://10.0.2.2:8080/pantry/search?query=${textController.text}&user_uid=${user!.uid}'));
     print("Loaded pantry search results data from endpoint.");
@@ -89,7 +88,6 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
       ingredients = (json.decode(response.body) as List)
           .map((i) => IngredientPreview.fromJson(i))
           .toList();
-
       return ingredients;
     } else {
       throw Exception('Failed to load data');
@@ -120,12 +118,10 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
 
     void addToRecipeOnClick(IngredientPreview ingredient) async {
       var tmp = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AddIngredient(
-              ingredientPreview: ingredient)
-        )
-      );
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  AddIngredient(ingredientPreview: ingredient)));
       if (tmp != null) {
         if (!mounted) return;
         Navigator.pop(context, tmp);
@@ -133,8 +129,9 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
     }
 
     void searchOnClick(IngredientPreview ingredient) async {
-
+      Navigator.pop(context, ingredient);
     }
+
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -155,10 +152,11 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
                 padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
                 child: TextField(
                   onSubmitted: (value) {
-                    if (loadedQuery != textController.text) {
+                    if (textController.text != loadedQuery) {
                       setState(() {
-                        loadedIngredients = [];
-                        loadedData = false;
+                        dataFuture = (widget.mode == IngredientSearch.pantry)
+                            ? loadPantryData()
+                            : loadIngredientData();
                       });
                     }
                   },
@@ -168,7 +166,7 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
                   style: const TextStyle(fontSize: 20),
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration(
-                    hintText: ' ',
+                    hintText: '',
                     hintStyle: const TextStyle(
                         fontSize: 24, fontStyle: FontStyle.italic),
                     border: OutlineInputBorder(
@@ -182,25 +180,24 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
                     contentPadding: const EdgeInsets.only(left: 20),
                     fillColor: Colors.white,
                     prefixIcon: GestureDetector(
-                        onTap: () {
-                          if (loadedQuery != textController.text) {
-                            setState(() {
-                              loadedIngredients = [];
-                              loadedData = false;
-                            });
-                          }
-                        },
-                        child: const Icon(CupertinoIcons.search,
-                            color: Colors.black)),
+                      onTap: () {
+                        if (loadedQuery != textController.text) {
+                          setState(() {
+                            dataFuture = (widget.mode == IngredientSearch.pantry)
+                              ? loadPantryData()
+                              : loadIngredientData();
+                          });
+                        }
+                      },
+                      child: const Icon(CupertinoIcons.search,
+                          color: Colors.black)),
                   ),
                 )),
             Expanded(
                 child: Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: FutureBuilder<List<IngredientPreview>>(
-                future: (widget.mode == IngredientSearch.pantry)
-                    ? loadPantryData()
-                    : loadIngredientData(),
+                future: dataFuture,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(
@@ -209,8 +206,8 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
                       style: const TextStyle(color: Colors.white),
                     ));
                   } else if (snapshot.hasData) {
+                    List<IngredientPreview> loadedIngredients;
                     loadedIngredients = snapshot.data!;
-                    loadedData = true;
                     return ListView.builder(
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
@@ -219,7 +216,8 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
                         itemBuilder: (BuildContext context, int index) {
                           return GestureDetector(
                             onTap: () async {
-                              IngredientPreview ingredient = loadedIngredients[index];
+                              IngredientPreview ingredient =
+                                  loadedIngredients[index];
                               switch (widget.mode) {
                                 case IngredientSearch.pantry:
                                   pantryOnClick(ingredient);

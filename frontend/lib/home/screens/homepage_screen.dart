@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       return loadedRecipes;
     }
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/search_by_name?query=${textController.text}&amount=20'));
+        'http://10.0.2.2:8080/recipe/search/name?query=${textController.text}&amount=20'));
     print("Loaded main screen data from endpoint.");
     loadedQuery = textController.text;
     if (response.statusCode == 200) {
@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
       recipes = (json.decode(response.body) as List)
           .map((i) => RecipePreview.fromJson(i))
           .toList();
-      
+
       return recipes;
     } else {
       throw Exception('Failed to load data');

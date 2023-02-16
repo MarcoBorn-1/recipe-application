@@ -3,7 +3,6 @@ package com.example.backend.service;
 import com.algolia.search.DefaultSearchClient;
 import com.algolia.search.SearchClient;
 import com.algolia.search.SearchIndex;
-import com.algolia.search.models.indexing.Query;
 import com.algolia.search.models.indexing.SearchResult;
 import com.example.backend.entity.*;
 import com.google.api.core.ApiFuture;
@@ -16,6 +15,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -103,12 +103,7 @@ public class RecipeService {
         JSONArray jsonArray = jsonObject.getJSONArray("results");
 
         List<RecipePreview> list = new ArrayList<>();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            ExternalRecipeDTO externalRecipeDTO = new ExternalRecipeDTO(jsonArray.getJSONObject(i));
-            Recipe recipe = new Recipe(externalRecipeDTO);
-            RecipePreview recipePreview = new RecipePreview(recipe);
-            list.add(recipePreview);
-        }
+        getRecipesFromJSONArray(list, jsonArray);
 
         return list;
     }
@@ -147,6 +142,55 @@ public class RecipeService {
         return "Deleted recipe " + recipe.getId();
     }
 
+    public List<RecipePreview> searchRecipesByIngredient(List<String> ingredients) throws IOException, ExecutionException, InterruptedException {
+        List<RecipePreview> recipeList = new ArrayList<>();
+        if (ingredients.isEmpty()) return recipeList;
+
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("https://api.spoonacular.com/recipes/findByIngredients");
+        urlBuilder.append("?ingredients=").append(ingredients.toString().substring(1, ingredients.toString().length() - 1).replaceAll(", ", ","));
+        urlBuilder.append("&number=").append(4);
+        urlBuilder.append("&apiKey=").append(SPOONACULAR_API_KEY);
+
+        URL url = new URL(urlBuilder.toString());
+        String json = IOUtils.toString(url, StandardCharsets.UTF_8);
+        JSONArray jsonArray = new JSONArray(json);
+        if (jsonArray.isEmpty()) return recipeList;
+        ArrayList<Integer> recipeIdList = new ArrayList<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            recipeIdList.add(jsonObject.getInt("id"));
+        }
+
+        recipeList.addAll(getListOfExternalRecipes(recipeIdList));
+
+        // Internal recipes
+
+        StringBuilder filter = new StringBuilder();
+        if (!ingredients.isEmpty()) {
+            filter.append("(");
+            for (int i = 0; i < ingredients.size(); i++) {
+                if (i != 0) filter.append(" OR ");
+                filter.append("ingredients:").append('"').append(ingredients.get(i)).append('"');
+            }
+            filter.append(")");
+        }
+        com.algolia.search.models.indexing.Query query = new com.algolia.search.models.indexing.Query("");
+        query.setFilters(filter.toString());
+
+        SearchResult<InternalRecipeDTO> result = index.search(query);
+        List<InternalRecipeDTO> recipeDTOList = result.getHits();
+
+        for (InternalRecipeDTO recipeDTO : recipeDTOList) {
+            Recipe recipe = new Recipe(recipeDTO);
+            RecipePreview recipePreview = new RecipePreview(recipe);
+            recipeList.add(recipePreview);
+        }
+
+        return recipeList;
+    }
+
     public List<RecipePreview> searchRecipesByName(SearchParameters parameters) throws IOException {
         List<RecipePreview> recipeList = new ArrayList<>();
 
@@ -156,18 +200,12 @@ public class RecipeService {
         String json = IOUtils.toString(url, StandardCharsets.UTF_8);
         JSONObject jsonObject = new JSONObject(json);
         JSONArray jsonArray = jsonObject.getJSONArray("results");
-        for (int i = 0; i < jsonArray.length(); i++) {
-            ExternalRecipeDTO externalRecipeDTO = new ExternalRecipeDTO(jsonArray.getJSONObject(i));
-            Recipe recipe = new Recipe(externalRecipeDTO);
-            RecipePreview recipePreview = new RecipePreview(recipe);
-            recipeList.add(recipePreview);
-        }
+        getRecipesFromJSONArray(recipeList, jsonArray);
 
         // Internal recipe search
 
         SearchResult<InternalRecipeDTO> result = index.search(parameters.createQuery());
         List<InternalRecipeDTO> recipeDTOList = result.getHits();
-        System.out.println(recipeDTOList.size());
 
         for (InternalRecipeDTO recipeDTO : recipeDTOList) {
             Recipe recipe = new Recipe(recipeDTO);
@@ -193,7 +231,6 @@ public class RecipeService {
         ArrayList<RecipePreview> recipeList = new ArrayList<>();
         Favorites favorites = favoriteService.getFavoriteRecipeIds(user_uid);
         if (favorites == null) return recipeList;
-        System.out.println(favorites.getItems_external().toString());
         recipeList.addAll(getListOfInternalRecipes(favorites.getItems_internal()));
         recipeList.addAll(getListOfExternalRecipes(favorites.getItems_external()));
         return recipeList;
@@ -237,5 +274,14 @@ public class RecipeService {
         }
 
         return recipeList;
+    }
+
+    private void getRecipesFromJSONArray(List<RecipePreview> recipeList, JSONArray jsonArray) {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            ExternalRecipeDTO externalRecipeDTO = new ExternalRecipeDTO(jsonArray.getJSONObject(i));
+            Recipe recipe = new Recipe(externalRecipeDTO);
+            RecipePreview recipePreview = new RecipePreview(recipe);
+            recipeList.add(recipePreview);
+        }
     }
 }
