@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
@@ -8,19 +9,37 @@ import 'package:frontend/search/screens/search_by_ingredients_screen.dart';
 import 'package:frontend/search/screens/search_dish_name_screen.dart';
 import 'package:frontend/search/screens/search_results_screen.dart';
 
-class SearchOptionScreen extends StatelessWidget {
-  SearchOptionScreen({super.key});
+class SearchOptionScreen extends StatefulWidget {
+  const SearchOptionScreen({super.key});
 
-  final User? user = Auth().currentUser;
+  @override
+  State<StatefulWidget> createState() => _SearchOptionScreenState();
+}
+
+class _SearchOptionScreenState extends State<SearchOptionScreen> {
   final List<String> titleList = ["Dish Name", "Ingredients", "Pantry"];
   final List<String> descList = [
     "Search for a recipe using it’s name (f.e. Spaghetti), or parameters like nutrient content.",
     "Search for recipes using ingredients.",
     "Search for recipes you can do with your pantry content"
   ];
+  User? user = Auth().currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    FirebaseAuth.instance.authStateChanges().listen((User? currentUser) {
+      if (user != currentUser) {
+        setState(() {
+          user = currentUser;
+        });
+      }
+    });
+    
     return Scaffold(
       appBar: AppBar(
         leading: const Icon(CupertinoIcons.search, color: Colors.white),
@@ -75,23 +94,24 @@ class SearchOptionScreen extends StatelessWidget {
                     ),
                   )),
               if (user != null)
-              GestureDetector(
-                  onTap: () => {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SearchResultScreen(
-                                      searchMode: SearchMode.pantry,
-                                    )))
-                      },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: IconOptionWidget(
-                      title: titleList[2],
-                      description: descList[2],
-                      icon: Icons.kitchen_outlined,
-                    ),
-                  )),
+                GestureDetector(
+                    onTap: () => {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SearchResultScreen(
+                                        searchMode: SearchMode.pantry,
+                                      )))
+                        },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: IconOptionWidget(
+                        title: titleList[2],
+                        description: descList[2],
+                        icon: Icons.kitchen_outlined,
+                      ),
+                    )),
             ]),
       ),
     );
