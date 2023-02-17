@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/ingredient_search_enum.dart';
+import 'package:frontend/common/providers/intolerance_provider.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/title_text.dart';
 import 'package:frontend/common/widgets/input_field.dart';
@@ -15,7 +16,9 @@ import 'package:frontend/profile/add_recipe/widgets/ingredient_list_widget.dart'
 import 'package:frontend/profile/pantry/screens/search_ingredient_screen.dart';
 import 'package:frontend/common/models/ingredient.dart';
 import 'package:frontend/recipe/widgets/recipe_steps_widget.dart';
+import 'package:frontend/common/widgets/intolerances_dialog.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -43,6 +46,14 @@ class _AddRecipeState extends State<AddRecipeScreen> {
   final TextEditingController _servingsController = TextEditingController();
 
   final TextEditingController _instructionsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final intolerancesProvider =
+        Provider.of<IntolerancesProvider>(context, listen: false);
+    intolerancesProvider.clear();
+  }
 
   void selectFile() async {
     final result = await FilePicker.platform.pickFiles(type: FileType.image);
@@ -87,6 +98,13 @@ class _AddRecipeState extends State<AddRecipeScreen> {
       imageURL = await uploadFile();
     }
 
+    List<String> intolerances = [];
+    if (mounted) {
+      final intolerancesProvider =
+          Provider.of<IntolerancesProvider>(context, listen: false);
+      intolerances = intolerancesProvider.selectedItems;
+    }
+
     RecipeDTO recipeDTO = RecipeDTO(
         title: _titleController.text,
         readyInMinutes: double.tryParse(_readyInMinutesController.text) ?? 0,
@@ -98,7 +116,12 @@ class _AddRecipeState extends State<AddRecipeScreen> {
         fats: double.tryParse(_fatsController.text) ?? 0,
         steps: steps,
         ingredients: ingredients,
-        author: user!.uid);
+        author: user!.uid,
+        intolerances: intolerances);
+
+    print("Hello");
+    print(intolerances);
+
     Map<String, dynamic> json = recipeDTO.toJson();
     final response = await http.post(
       Uri.parse('http://10.0.2.2:8080/recipe/create'),
@@ -226,8 +249,20 @@ class _AddRecipeState extends State<AddRecipeScreen> {
             });
           },
           child: const Padding(
-            padding: EdgeInsets.only(bottom: 16.0),
+            padding: EdgeInsets.only(bottom: 4.0),
             child: CustomButton("Add instructions", true, 24),
+          )),
+      GestureDetector(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return const IntolerancesDialog();
+                });
+          },
+          child: const Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: CustomButton("Add intolerances", false, 24),
           )),
     ];
     return Scaffold(

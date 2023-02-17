@@ -11,7 +11,7 @@ import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/providers/intolerance_provider.dart';
 import 'package:frontend/search/models/search_mode_enum.dart';
 import 'package:frontend/search/screens/search_results_screen.dart';
-import 'package:frontend/search/widgets/search_intolerances_dialog.dart';
+import 'package:frontend/common/widgets/intolerances_dialog.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 

@@ -1,8 +1,8 @@
 import 'package:frontend/common/models/ingredient.dart';
 
 class RecipeDTO {
-  RecipeDTO(
-      {required this.author, 
+  RecipeDTO( 
+      {required this.author,
       required this.title,
       required this.readyInMinutes,
       required this.imageURL,
@@ -12,6 +12,7 @@ class RecipeDTO {
       required this.carbohydrates,
       required this.fats,
       required this.steps,
+      required this.intolerances,
       required this.ingredients});
 
   final String author;
@@ -25,7 +26,7 @@ class RecipeDTO {
   final double fats;
   final List<String> steps;
   final List<Ingredient> ingredients;
-  
+  final List<String> intolerances;
 
   Map<String, dynamic> toJson() => {
         'title': title,
@@ -37,7 +38,8 @@ class RecipeDTO {
         'carbohydrates': carbohydrates,
         'fats': fats,
         'steps': steps,
+        'intolerances': intolerances,
         'ingredients': ingredients.map((i) => i.toJson()).toList(),
-        'author': author
+        'author': author,
       };
 }

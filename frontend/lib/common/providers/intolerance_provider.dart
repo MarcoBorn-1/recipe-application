@@ -33,4 +33,8 @@ class IntolerancesProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void clear() {
+    _selectedItems.clear();
+  }
 }

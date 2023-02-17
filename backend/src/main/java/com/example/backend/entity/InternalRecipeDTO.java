@@ -26,6 +26,7 @@ public class InternalRecipeDTO {
         author = recipe.getAuthor();
         dateAdded = recipe.getDateAdded();
         steps = recipe.getSteps();
+        intolerances = recipe.getIntolerances();
         ingredients = new ArrayList<>();
 
         ArrayList<Ingredient> ingredientArrayList = recipe.getIngredients();
@@ -54,6 +55,7 @@ public class InternalRecipeDTO {
     private Double carbohydrates;
     private Double fats;
     private ArrayList<String> steps;
+    private ArrayList<String> intolerances;
 
     private double readyInMinutes;
     private String imageURL;

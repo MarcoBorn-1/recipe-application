@@ -62,6 +62,7 @@ public class Recipe {
 
     private ArrayList<Ingredient> ingredients = new ArrayList<>();
     private ArrayList<String> steps;
+    private ArrayList<String> intolerances;
 
     private Double readyInMinutes;
 
