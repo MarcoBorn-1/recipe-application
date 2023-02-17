@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import 'package:frontend/common/widgets/icon_option_widget.dart';
+import 'package:frontend/profile/settings/screens/change_password_screen.dart';
 import 'package:frontend/profile/settings/screens/change_profile_picture_screen.dart';
 import 'package:frontend/profile/settings/screens/change_username_screen.dart';
 
@@ -18,18 +20,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
         context,
         MaterialPageRoute(
             builder: (context) => const ChangeProfilePictureScreen()));
-    if (isChanged == null) return;
-    if (isChanged) changesMade = true;
+    if (isChanged == null && isChanged) {
+      if (mounted) {
+        showSnackBar(
+            context, "Successfully changed profile picture!", SnackBarType.success);
+      }
+      changesMade = true;
+    }
+    
   }
 
   void changeUsername() async {
     var isChanged = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => const ChangeUsernameScreen()));
     if (isChanged == null) return;
-    if (isChanged) changesMade = true;
+    if (isChanged) {
+      if (mounted) {
+        showSnackBar(
+            context, "Successfully changed username!", SnackBarType.success);
+      }
+      changesMade = true;
+    }
   }
 
-  void changePassword() {}
+  void changePassword() async {
+    var isChanged = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
+    if (isChanged != null && isChanged == true) {
+      if (mounted) {
+        showSnackBar(
+            context, "Successfully changed password!", SnackBarType.success);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               GestureDetector(
-                onTap: () => changePassword(),
+                onTap: () async => changePassword(),
                 child: const IconOptionWidget(
                   title: "Password",
                   description: "You can change your password here",

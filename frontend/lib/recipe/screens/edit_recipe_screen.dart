@@ -229,7 +229,7 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
                     title: "Prep time (min)",
                     controller: _readyInMinutesController,
                     isSigned: true,
-                    type: "INTEGER"),
+                    type: InputType.integer),
               )),
           Expanded(
               flex: 10,
@@ -237,7 +237,7 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
                   title: "Servings",
                   controller: _servingsController,
                   isSigned: true,
-                  type: "INTEGER")),
+                  type: InputType.integer)),
         ],
       ),
       const TitleText("Nutrients"),
@@ -245,22 +245,22 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
           title: "Calories",
           controller: _caloriesController,
           isSigned: true,
-          type: "DECIMAL"),
+          type: InputType.decimal),
       InputField(
           title: "Proteins",
           controller: _proteinsController,
           isSigned: true,
-          type: "DECIMAL"),
+          type: InputType.decimal),
       InputField(
           title: "Carbohydrates",
           controller: _carbohydratesController,
           isSigned: true,
-          type: "DECIMAL"),
+          type: InputType.decimal),
       InputField(
           title: "Fats",
           controller: _fatsController,
           isSigned: true,
-          type: "DECIMAL"),
+          type: InputType.decimal),
       IngredientListWidget(ingredientList: ingredients),
       GestureDetector(
           onTap: () async {

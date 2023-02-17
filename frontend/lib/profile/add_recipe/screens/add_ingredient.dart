@@ -66,7 +66,7 @@ class _AddIngredientState extends State<AddIngredient> {
                 title: "Amount",
                 controller: _amountController,
                 isSigned: true,
-                type: "DECIMAL",
+                type: InputType.decimal,
               ),
             ),
             Padding(
