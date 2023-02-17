@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ProfileHeader extends StatelessWidget {
+class ProfileHeader extends StatefulWidget {
   const ProfileHeader(
       {this.onSettingsTap,
       this.onLogoutTap,
@@ -14,10 +14,15 @@ class ProfileHeader extends StatelessWidget {
   final String imageURL;
   final bool showIcons;
 
+  @override
+  State<StatefulWidget> createState() => _ProfileHeaderState();
+}
+
+class _ProfileHeaderState extends State<ProfileHeader> {
   Widget _settings() {
-    if (showIcons) {
+    if (widget.showIcons) {
       return GestureDetector(
-        onTap: onSettingsTap,
+        onTap: widget.onSettingsTap,
         child: const Padding(
           padding: EdgeInsets.only(top: 8.0),
           child: Icon(
@@ -33,9 +38,9 @@ class ProfileHeader extends StatelessWidget {
   }
 
   Widget _logout() {
-    if (showIcons) {
+    if (widget.showIcons) {
       return GestureDetector(
-          onTap: onLogoutTap,
+          onTap: widget.onLogoutTap,
           child: const Padding(
             padding: EdgeInsets.only(top: 8.0),
             child: Icon(Icons.logout, color: Colors.white, size: 30),
@@ -61,21 +66,18 @@ class ProfileHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 1,
-                child: _settings()
-              ),
+              Expanded(flex: 1, child: _settings()),
               Expanded(
                 flex: 6,
                 child:
                     Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                   CircleAvatar(
                       radius: 48,
-                      backgroundImage: (imageURL == "")
+                      backgroundImage: (widget.imageURL == "")
                           ? Image.asset("assets/images/profile_picture.jpg")
                               .image
                           : Image.network(
-                              imageURL,
+                              widget.imageURL,
                               loadingBuilder:
                                   (context, child, loadingProgress) {
                                 return const CircularProgressIndicator(
@@ -89,20 +91,15 @@ class ProfileHeader extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
-                      username,
+                      widget.username,
                       style: const TextStyle(fontSize: 24, color: Colors.white),
                     ),
                   )
                 ]),
               ),
-              Expanded(
-                flex: 1,
-                child: _logout()
-              ),
+              Expanded(flex: 1, child: _logout()),
             ],
           )),
     );
   }
-
-  void fun() {}
 }

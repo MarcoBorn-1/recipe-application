@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:frontend/common/widgets/custom_button.dart';
 import '../../../common/models/auth.dart';
 
 class LoginPage extends StatefulWidget {
@@ -92,10 +93,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _submitButton() {
-    return ElevatedButton(
-      onPressed:
-          isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
-      child: Text(isLogin ? 'Login' : 'Register'),
+    return GestureDetector(
+      onTap: () async {
+        isLogin ? signInWithEmailAndPassword() : createUserWithEmailAndPassword();
+      },
+      child: CustomButton(isLogin ? 'Login' : 'Register', true, 24),
     );
   }
 
@@ -138,7 +140,9 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 _entryField('E-mail', _controllerEmail),
-                (isLogin) ? const Text("") :_entryField('Username', _controllerDisplayName),
+                (isLogin)
+                    ? const Text("")
+                    : _entryField('Username', _controllerDisplayName),
                 _passwordTextField('Password', _controllerPassword),
                 _errorMessage(),
                 _submitButton(),
