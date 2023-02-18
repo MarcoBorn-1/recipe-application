@@ -7,6 +7,8 @@ import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import 'package:frontend/common/widgets/recipe_container.dart';
 import 'package:frontend/profile/add_recipe/screens/add_recipe_screen.dart';
+import 'package:frontend/recipe/models/edit_recipe_status_enum.dart';
+import 'package:frontend/recipe/screens/recipe_screen.dart';
 import 'package:http/http.dart' as http;
 
 class MyRecipesScreen extends StatefulWidget {
@@ -17,8 +19,9 @@ class MyRecipesScreen extends StatefulWidget {
 }
 
 class _MyRecipesScreenState extends State<MyRecipesScreen> {
-  late List<RecipePreview> recipeList;
+  late Future<List<RecipePreview>> recipeDataFuture;
   User? user = Auth().currentUser;
+
   Future<List<RecipePreview>> getRecipeData() async {
     final response = await http.get(Uri.parse(
         'http://10.0.2.2:8080/recipe/get_by_user_uid?user_uid=${user!.uid}'));
@@ -27,11 +30,16 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
       recipes = (json.decode(response.body) as List)
           .map((i) => RecipePreview.fromJson(i))
           .toList();
-      recipeList = recipes;
       return recipes;
     } else {
       throw Exception('Failed to load data');
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    recipeDataFuture = getRecipeData();
   }
 
   @override
@@ -52,7 +60,7 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
                       builder: (context) => const AddRecipeScreen()));
               if (val != null && val) {
                 setState(() {
-                  recipeList = [];
+                  recipeDataFuture = getRecipeData();
                 });
                 if (mounted) {
                   showSnackBar(context, "Successfully added a recipe!",
@@ -73,25 +81,48 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
       backgroundColor: const Color(0xFF242424),
       body: SafeArea(
         child: FutureBuilder<List<RecipePreview>>(
-          future: getRecipeData(),
+          future: recipeDataFuture,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(child: Text(snapshot.error.toString()));
             } else if (snapshot.hasData) {
-              recipeList = snapshot.data!;
+              List<RecipePreview> recipeList = snapshot.data!;
               return ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(8),
                   itemCount: recipeList.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return RecipeContainer(
-                        recipeList[index].id,
-                        recipeList[index].title,
-                        recipeList[index].readyInMinutes,
-                        recipeList[index].calories,
-                        recipeList[index].imageURL,
-                        recipeList[index].isExternal);
+                    return GestureDetector(
+                      onTap: () async {
+                        var tmp = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RecipeScreen(
+                                      recipeImg: recipeList[index].imageURL,
+                                      title: recipeList[index].title,
+                                      recipeId: recipeList[index].id,
+                                      isExternal: recipeList[index].isExternal,
+                                    )));
+                        print(tmp);
+                        if (tmp != null &&
+                            (tmp == EditRecipeStatus.delete ||
+                                tmp == EditRecipeStatus.edit)) {
+                          await Future.delayed(const Duration(seconds: 1));
+                          setState(() {
+                            recipeDataFuture = getRecipeData();
+                          });
+                          
+                        }
+                      },
+                      child: RecipeContainer(
+                          recipeList[index].id,
+                          recipeList[index].title,
+                          recipeList[index].readyInMinutes,
+                          recipeList[index].calories,
+                          recipeList[index].imageURL,
+                          recipeList[index].isExternal),
+                    );
                   });
             } else {
               return const Center(

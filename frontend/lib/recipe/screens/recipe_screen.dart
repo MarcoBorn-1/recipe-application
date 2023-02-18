@@ -34,27 +34,31 @@ class RecipeScreen extends StatefulWidget {
 }
 
 class _RecipeScreenState extends State<RecipeScreen> {
-  bool loadedData = false;
-  late Recipe recipe;
+  late Future<Recipe> recipeDataFuture;
+  late Future<bool> favoriteDataFuture;
   User? user = Auth().currentUser;
-  late bool isFavorite;
-  final double ratingAvg = 4;
-  final int timeToPrepareMin = 30;
+  EditRecipeStatus status = EditRecipeStatus.noEdit;
 
   Widget loadingWidget = const Padding(
       padding: EdgeInsets.only(right: 20),
       child: CircularProgressIndicator(color: Colors.white));
 
   @override
+  void initState() {
+    super.initState();
+    recipeDataFuture = loadData();
+    favoriteDataFuture = isRecipeFavorite();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<Recipe>(
-      future: loadData(),
+      future: recipeDataFuture,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(child: Text(snapshot.error.toString()));
         } else if (snapshot.hasData) {
-          recipe = snapshot.data!;
-          loadedData = true;
+          Recipe recipe = snapshot.data!;
           List<Widget> widgetList = [
             RecipeHeaderWidget(
                 recipe.title,
@@ -85,7 +89,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                                   widget.recipeId, widget.isExternal)));
                       if (value) {
                         setState(() {
-                          loadedData = false;
+                          recipeDataFuture = loadData();
                         });
                       }
                     },
@@ -96,7 +100,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
               appBar: AppBar(
                 leading: GestureDetector(
                     onTap: () {
-                      Navigator.pop(context);
+                      Navigator.pop(context, status);
                     },
                     child: const Icon(Icons.arrow_back, color: Colors.white)),
                 title: Text(widget.title),
@@ -115,11 +119,19 @@ class _RecipeScreenState extends State<RecipeScreen> {
                             case EditRecipeStatus.noEdit:
                               break;
                             case EditRecipeStatus.delete:
-                              if (mounted) Navigator.pop(context, true);
+                              status = EditRecipeStatus.delete;
+                              if (mounted) {
+                                showSnackBar(
+                                    context,
+                                    "You've successfully deleted the recipe!",
+                                    SnackBarType.error);
+                                Navigator.pop(context, status);
+                              }
                               break;
                             case EditRecipeStatus.edit:
+                              status = EditRecipeStatus.edit;
                               setState(() {
-                                loadedData = false;
+                                recipeDataFuture = loadData();
                               });
                               if (mounted) {
                                 showSnackBar(
@@ -138,17 +150,18 @@ class _RecipeScreenState extends State<RecipeScreen> {
                       ),
                     ),
                   FutureBuilder<bool>(
-                      future: isRecipeFavorite(),
+                      future: favoriteDataFuture,
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           return Container();
                         } else if (snapshot.hasData) {
                           if (user == null) return const Text("");
-                          isFavorite = snapshot.data ?? false;
+                          bool isFavorite = snapshot.data ?? false;
                           return GestureDetector(
-                            onTap: () {
+                            onTap: () async {
+                              await changeFavoriteStatus(isFavorite);
                               setState(() {
-                                changeFavoriteStatus();
+                                favoriteDataFuture = isRecipeFavorite();
                               });
                             },
                             child: Padding(
@@ -185,25 +198,22 @@ class _RecipeScreenState extends State<RecipeScreen> {
     );
   }
 
-  Future<void> changeFavoriteStatus() async {
+  Future<void> changeFavoriteStatus(bool isFavorite) async {
     if (isFavorite) {
       await http.delete(Uri.parse(
           'http://10.0.2.2:8080/favorite/remove?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
       if (mounted) {
         showSnackBar(
-          context, "Removed recipe from favorites", SnackBarType.error);
+            context, "Removed recipe from favorites", SnackBarType.error);
       }
     } else {
       await http.post(Uri.parse(
           'http://10.0.2.2:8080/favorite/add?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
       if (mounted) {
         showSnackBar(
-          context, "Added recipe to favorites", SnackBarType.success);
+            context, "Added recipe to favorites", SnackBarType.success);
       }
     }
-    setState(() {
-      isFavorite = !isFavorite;
-    });
   }
 
   Future<bool> isRecipeFavorite() async {
@@ -219,9 +229,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
   }
 
   Future<Recipe> loadData() async {
-    if (loadedData == true) {
-      return recipe;
-    }
     http.Response response;
     if (widget.isExternal) {
       response = await http.get(Uri.parse(
@@ -232,9 +239,8 @@ class _RecipeScreenState extends State<RecipeScreen> {
     }
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
-      recipe = Recipe.fromJson(json.decode(response.body));
+      Recipe recipe = Recipe.fromJson(json.decode(response.body));
       print("ID: ${recipe.id}, isExternal: ${recipe.isExternal}");
-      loadedData = true;
       return recipe;
     } else {
       // If the server did not return a 200 OK response,

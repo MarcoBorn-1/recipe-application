@@ -22,14 +22,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late Future<UserInformation> dataFuture;
-  String imageURL = "";
-  String username = "";
 
   Future<void> signOut() async {
     await Auth().signOut();
     if (mounted) {
-      showSnackBar(
-        context, "Successfully logged out!", SnackBarType.success);
+      showSnackBar(context, "Successfully logged out!", SnackBarType.success);
     }
   }
 
@@ -82,65 +79,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
           MaterialPageRoute(builder: (context) => const FavoriteScreen()));
     }
 
-    return FutureBuilder<UserInformation>(
-      future: getUserInformation(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(child: Text(snapshot.error.toString()));
-        }
-        if (snapshot.hasData) {
-          username = snapshot.data?.username ?? "";
-          imageURL = snapshot.data?.imageURL ?? "";
-          return Scaffold(
-            appBar: AppBar(
-              leading: const Icon(Icons.person, color: Colors.white),
-              title: const Text("Profile"),
-            ),
-            backgroundColor: const Color(0xFF242424),
-            body: SafeArea(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    ProfileHeader(
-                      onSettingsTap: openSettings,
-                      onLogoutTap: signOut,
-                      username: username,
-                      imageURL: imageURL,
-                      showIcons: true,
-                    ),
-                    GestureDetector(
-                      onTap: () => openFavorites(),
-                      child: const IconOptionWidget(
-                        title: "Favorites",
-                        description: "Access recipes you marked as favorite",
-                        icon: Icons.favorite_border,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => openMyRecipes(),
-                      child: const IconOptionWidget(
-                          title: "My recipes",
-                          description:
-                              "Add, edit, remove and look through recipes you added",
-                          icon: Icons.menu_book_outlined),
-                    ),
-                    GestureDetector(
-                      onTap: () => openPantry(),
-                      child: const IconOptionWidget(
-                        title: "Pantry",
-                        description:
-                            "Manage your pantry, allowing you to search for recipes easier!",
-                        icon: Icons.kitchen_outlined,
-                      ),
-                    ),
-                  ]),
-            ),
-          );
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+    return Scaffold(
+        appBar: AppBar(
+          leading: const Icon(Icons.person, color: Colors.white),
+          title: const Text("Profile"),
+        ),
+        backgroundColor: const Color(0xFF242424),
+        body: FutureBuilder<UserInformation>(
+            future: dataFuture,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text(snapshot.error.toString()));
+              }
+              if (snapshot.hasData) {
+                String username = snapshot.data?.username ?? "";
+                String imageURL = snapshot.data?.imageURL ?? "";
+                return SafeArea(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ProfileHeader(
+                          onSettingsTap: openSettings,
+                          onLogoutTap: signOut,
+                          username: username,
+                          imageURL: imageURL,
+                          showIcons: true,
+                        ),
+                        GestureDetector(
+                          onTap: () => openFavorites(),
+                          child: const IconOptionWidget(
+                            title: "Favorites",
+                            description:
+                                "Access recipes you marked as favorite",
+                            icon: Icons.favorite_border,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => openMyRecipes(),
+                          child: const IconOptionWidget(
+                              title: "My recipes",
+                              description:
+                                  "Add, edit, remove and look through recipes you added",
+                              icon: Icons.menu_book_outlined),
+                        ),
+                        GestureDetector(
+                          onTap: () => openPantry(),
+                          child: const IconOptionWidget(
+                            title: "Pantry",
+                            description:
+                                "Manage your pantry, allowing you to search for recipes easier!",
+                            icon: Icons.kitchen_outlined,
+                          ),
+                        ),
+                      ]),
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator(color: Colors.white,));
+              }
+            }));
   }
 }

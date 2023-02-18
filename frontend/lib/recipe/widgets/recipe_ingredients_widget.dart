@@ -28,13 +28,26 @@ class RecipeIngredientsWidget extends StatelessWidget {
         rows.add(Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              element.name.titleCase,
-              style: const TextStyle(color: Colors.white, fontSize: 18),
+            Expanded(
+              flex: 6,
+              child: Text(
+                element.name.titleCase,
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+              ),
             ),
-            Text(
-              element.amount.toStringAsFixed(2) + temp,
-              style: const TextStyle(color: Colors.white, fontSize: 18),
+            Expanded(
+              flex: 4,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Flexible(
+                    child: Text(
+                      element.amount.toStringAsFixed(2) + temp,
+                      style: const TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
             )
           ],
         ));

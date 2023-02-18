@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/widgets/recipe_container.dart';
+import 'package:frontend/recipe/models/edit_recipe_status_enum.dart';
+import 'package:frontend/recipe/screens/recipe_screen.dart';
 import 'package:frontend/search/models/search_mode_enum.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,20 +22,20 @@ class SearchResultScreen extends StatefulWidget {
 }
 
 class _SearchResultScreenState extends State<SearchResultScreen> {
-  late Future<List<RecipePreview>> dataFuture;
+  late Future<List<RecipePreview>> recipeDataFuture;
 
   @override
   void initState() {
     super.initState();
     switch (widget.searchMode) {
       case SearchMode.name:
-        dataFuture = loadRecipesByName();
+        recipeDataFuture = loadRecipesByName();
         break;
       case SearchMode.ingredient:
-        dataFuture = loadRecipesByIngredients();
+        recipeDataFuture = loadRecipesByIngredients();
         break;
       case SearchMode.pantry:
-        dataFuture = loadRecipesUsingPantry();
+        recipeDataFuture = loadRecipesUsingPantry();
         break;
     }
   }
@@ -110,25 +112,55 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
       backgroundColor: const Color(0xFF242424),
       body: GestureDetector(
         child: FutureBuilder<List<RecipePreview>>(
-          future: dataFuture,
+          future: recipeDataFuture,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(child: Text(snapshot.error.toString()));
             } else if (snapshot.hasData) {
-              List<RecipePreview> loadedRecipes = snapshot.data!;
+              List<RecipePreview> recipeList = snapshot.data!;
               return ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(8),
-                  itemCount: loadedRecipes.length,
+                  itemCount: recipeList.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return RecipeContainer(
-                        loadedRecipes[index].id,
-                        loadedRecipes[index].title,
-                        loadedRecipes[index].readyInMinutes,
-                        loadedRecipes[index].calories,
-                        loadedRecipes[index].imageURL,
-                        loadedRecipes[index].isExternal);
+                    return GestureDetector(
+                      onTap: () async {
+                        var tmp = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RecipeScreen(
+                                      recipeImg: recipeList[index].imageURL,
+                                      title: recipeList[index].title,
+                                      recipeId: recipeList[index].id,
+                                      isExternal:
+                                          recipeList[index].isExternal,
+                                    )));
+                        if (tmp != null && (tmp == EditRecipeStatus.delete || tmp == EditRecipeStatus.edit)) {
+                          await Future.delayed(const Duration(seconds: 1));
+                          setState(() {
+                            switch (widget.searchMode) {
+                              case SearchMode.name:
+                                recipeDataFuture = loadRecipesByName();
+                                break;
+                              case SearchMode.ingredient:
+                                recipeDataFuture = loadRecipesByIngredients();
+                                break;
+                              case SearchMode.pantry:
+                                recipeDataFuture = loadRecipesUsingPantry();
+                                break;
+                            }
+                          });
+                        }
+                      },
+                      child: RecipeContainer(
+                          recipeList[index].id,
+                          recipeList[index].title,
+                          recipeList[index].readyInMinutes,
+                          recipeList[index].calories,
+                          recipeList[index].imageURL,
+                          recipeList[index].isExternal),
+                    );
                   });
             } else {
               return const Center(

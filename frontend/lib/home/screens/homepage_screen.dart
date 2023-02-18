@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/widgets/recipe_container.dart';
+import 'package:frontend/recipe/models/edit_recipe_status_enum.dart';
+import 'package:frontend/recipe/screens/recipe_screen.dart';
 import 'package:http/http.dart' as http;
 
 import '../../common/models/auth.dart';
@@ -17,21 +19,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  User? user = Auth().currentUser;
-  bool loadedData = false;
+  late Future<List<RecipePreview>> recipeDataFuture;
   final TextEditingController textController = TextEditingController();
-  List<RecipePreview> loadedRecipes = [];
   String loadedQuery = "";
+  User? user = Auth().currentUser;
 
   @override
   void initState() {
     super.initState();
+    recipeDataFuture = loadData();
   }
 
   Future<List<RecipePreview>> loadData() async {
-    if (loadedData == true) {
-      return loadedRecipes;
-    }
     final response = await http.get(Uri.parse(
         'http://10.0.2.2:8080/recipe/search/name?query=${textController.text}&amount=20'));
     print("Loaded main screen data from endpoint.");
@@ -63,10 +62,9 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
                 child: TextField(
                   onSubmitted: (value) {
-                    if (loadedQuery != textController.text) {
+                    if (loadedQuery != value) {
                       setState(() {
-                        loadedRecipes = [];
-                        loadedData = false;
+                        recipeDataFuture = loadData();
                       });
                     }
                   },
@@ -93,8 +91,7 @@ class _HomePageState extends State<HomePage> {
                         onTap: () {
                           if (loadedQuery != textController.text) {
                             setState(() {
-                              loadedRecipes = [];
-                              loadedData = false;
+                              recipeDataFuture = loadData();
                             });
                           }
                         },
@@ -106,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                 child: Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: FutureBuilder<List<RecipePreview>>(
-                future: loadData(),
+                future: recipeDataFuture,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(
@@ -115,21 +112,43 @@ class _HomePageState extends State<HomePage> {
                       style: const TextStyle(color: Colors.white),
                     ));
                   } else if (snapshot.hasData) {
-                    loadedRecipes = snapshot.data!;
-                    loadedData = true;
+                    List<RecipePreview> recipeList = snapshot.data!;
                     return ListView.builder(
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         padding: const EdgeInsets.all(8),
-                        itemCount: loadedRecipes.length,
+                        itemCount: recipeList.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return RecipeContainer(
-                              loadedRecipes[index].id,
-                              loadedRecipes[index].title,
-                              loadedRecipes[index].readyInMinutes,
-                              loadedRecipes[index].calories,
-                              loadedRecipes[index].imageURL,
-                              loadedRecipes[index].isExternal);
+                          return GestureDetector(
+                            onTap: () async {
+                              var tmp = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RecipeScreen(
+                                            recipeImg:
+                                                recipeList[index].imageURL,
+                                            title: recipeList[index].title,
+                                            recipeId: recipeList[index].id,
+                                            isExternal:
+                                                recipeList[index].isExternal,
+                                          )));
+                              if (tmp != null &&
+                                  (tmp == EditRecipeStatus.delete ||
+                                      tmp == EditRecipeStatus.edit)) {
+                                await Future.delayed(const Duration(seconds: 1));
+                                setState(() {
+                                  recipeDataFuture = loadData();
+                                });
+                              }
+                            },
+                            child: RecipeContainer(
+                                recipeList[index].id,
+                                recipeList[index].title,
+                                recipeList[index].readyInMinutes,
+                                recipeList[index].calories,
+                                recipeList[index].imageURL,
+                                recipeList[index].isExternal),
+                          );
                         });
                   } else {
                     return const Center(
