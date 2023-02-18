@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
+import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import 'package:frontend/recipe/models/edit_recipe_status_enum.dart';
 import 'package:frontend/recipe/models/recipe.dart';
 import 'package:frontend/recipe/screens/add_review_screen.dart';
@@ -72,27 +73,24 @@ class _RecipeScreenState extends State<RecipeScreen> {
             RecipeReviewsWidget(recipe.amountOfReviews, recipe.reviews,
                 recipe.id, recipe.isExternal),
             if (user != null)
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 0.0, left: 16, right: 16, bottom: 24),
-              child: GestureDetector(
-                onTap: () async {
-                  var value = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddReviewScreen(
-                        widget.recipeId, widget.isExternal
-                      )
-                    )
-                  );
-                  if (value) {
-                    setState(() {
-                      loadedData = false;
-                    });
-                  }
-                },
-                child: const CustomButton("Add review", true, 24)),
-            ),
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 0.0, left: 16, right: 16, bottom: 24),
+                child: GestureDetector(
+                    onTap: () async {
+                      var value = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddReviewScreen(
+                                  widget.recipeId, widget.isExternal)));
+                      if (value) {
+                        setState(() {
+                          loadedData = false;
+                        });
+                      }
+                    },
+                    child: const CustomButton("Add review", true, 24)),
+              ),
           ];
           return Scaffold(
               appBar: AppBar(
@@ -123,6 +121,12 @@ class _RecipeScreenState extends State<RecipeScreen> {
                               setState(() {
                                 loadedData = false;
                               });
+                              if (mounted) {
+                                showSnackBar(
+                                    context,
+                                    "You've successfully edited the recipe!",
+                                    SnackBarType.success);
+                              }
                               break;
                           }
                           // TODO: add toast confirming the deletion/edit of recipe
@@ -159,11 +163,9 @@ class _RecipeScreenState extends State<RecipeScreen> {
                           );
                         } else {
                           return const Padding(
-                            padding: EdgeInsets.only(right: 20),
-                            child: CircularProgressIndicator(
-                              color: Colors.white
-                            )
-                          );
+                              padding: EdgeInsets.only(right: 20),
+                              child: CircularProgressIndicator(
+                                  color: Colors.white));
                         }
                       }),
                 ],
@@ -187,9 +189,17 @@ class _RecipeScreenState extends State<RecipeScreen> {
     if (isFavorite) {
       await http.delete(Uri.parse(
           'http://10.0.2.2:8080/favorite/remove?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
+      if (mounted) {
+        showSnackBar(
+          context, "Removed recipe from favorites", SnackBarType.error);
+      }
     } else {
       await http.post(Uri.parse(
           'http://10.0.2.2:8080/favorite/add?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
+      if (mounted) {
+        showSnackBar(
+          context, "Added recipe to favorites", SnackBarType.success);
+      }
     }
     setState(() {
       isFavorite = !isFavorite;

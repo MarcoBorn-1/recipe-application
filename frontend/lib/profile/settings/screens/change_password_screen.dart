@@ -22,7 +22,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     void changePassword() async {
-      // TODO: add text verification
       final User? user = Auth().currentUser;
       if (user == null) return;
       if (_newPassword.text != _newPasswordConfirm.text) {
@@ -33,14 +32,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       user.reauthenticateWithCredential(cred).then((value) {
         user.updatePassword(_newPassword.text).then((_) {
           print("Successfully changed password");
-          Navigator.pop(context, true);
+          isChanged = true;
+          Navigator.pop(context, isChanged);
         }).catchError((error) {
           print("Password can't be changed" + error.toString());
           errorMessage = error.toString();
+          return;
         });
       }).catchError((err) {
-        print("Failed to auth" + err.toString());
+        print("Failed to authenticate" + err.toString());
         errorMessage = err.toString();
+        return;
       });
     }
 

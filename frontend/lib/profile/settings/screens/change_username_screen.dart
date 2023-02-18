@@ -19,8 +19,6 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-
     User? user = Auth().currentUser;
     String username = user!.displayName ?? "";
     if (isChanged) {
@@ -37,10 +35,9 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
           .update({"username": _usernameController.text});
 
       isChanged = true;
-      setState(() {
-        username = user.displayName ?? "";
-      });
+      if (mounted) Navigator.pop(context, isChanged);
     }
+
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(

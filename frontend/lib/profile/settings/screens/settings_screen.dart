@@ -20,14 +20,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         context,
         MaterialPageRoute(
             builder: (context) => const ChangeProfilePictureScreen()));
-    if (isChanged == null && isChanged) {
+    if (isChanged != null && isChanged) {
       if (mounted) {
         showSnackBar(
             context, "Successfully changed profile picture!", SnackBarType.success);
       }
       changesMade = true;
     }
-    
   }
 
   void changeUsername() async {

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
+import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import 'package:frontend/common/widgets/recipe_container.dart';
 import 'package:frontend/profile/add_recipe/screens/add_recipe_screen.dart';
 import 'package:http/http.dart' as http;
@@ -53,6 +54,10 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
                 setState(() {
                   recipeList = [];
                 });
+                if (mounted) {
+                  showSnackBar(context, "Successfully added a recipe!",
+                      SnackBarType.success);
+                }
               }
             },
             child: const Padding(

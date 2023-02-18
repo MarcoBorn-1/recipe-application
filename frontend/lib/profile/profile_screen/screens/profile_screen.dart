@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:frontend/common/models/auth.dart';
+import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import 'package:frontend/profile/favorites/screens/favorite_screen.dart';
 import 'package:frontend/profile/my_recipes/screens/my_recipes_screen.dart';
 import 'package:frontend/profile/pantry/screens/pantry_screen.dart';
@@ -26,6 +27,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> signOut() async {
     await Auth().signOut();
+    if (mounted) {
+      showSnackBar(
+        context, "Successfully logged out!", SnackBarType.success);
+    }
   }
 
   @override

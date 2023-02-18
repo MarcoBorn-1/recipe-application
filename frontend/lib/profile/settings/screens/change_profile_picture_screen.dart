@@ -40,12 +40,15 @@ class _ChangeProfilePictureScreenState
 
     final snapshot = await upload!.whenComplete(() => {});
     final urlDownload = await snapshot.ref.getDownloadURL();
-    user!.updatePhotoURL(urlDownload);
+    await user!.updatePhotoURL(urlDownload);
 
-    // TODO: move somewhere (Auth/Spring)
     final db = FirebaseFirestore.instance;
-    db.collection("users").doc(user!.uid).update({"imageURL": urlDownload});
+    await db
+        .collection("users")
+        .doc(user!.uid)
+        .update({"imageURL": urlDownload});
     isChanged = true;
+    if (mounted) Navigator.pop(context, isChanged);
   }
 
   @override

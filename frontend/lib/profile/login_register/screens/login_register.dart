@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
+import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import '../../../common/models/auth.dart';
 
 class LoginPage extends StatefulWidget {
@@ -24,6 +25,10 @@ class _LoginPageState extends State<LoginPage> {
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
+      if (mounted) {
+        showSnackBar(
+          context, "Successfully logged in!", SnackBarType.success);
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -38,6 +43,10 @@ class _LoginPageState extends State<LoginPage> {
         password: _controllerPassword.text,
         displayName: _controllerDisplayName.text,
       );
+      if (mounted) {
+        showSnackBar(
+          context, "Successfully registered account!", SnackBarType.success);
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
