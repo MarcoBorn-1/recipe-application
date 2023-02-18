@@ -43,8 +43,8 @@ public class RecipeController {
     }
 
     @GetMapping("/search/ingredient")
-    public List<RecipePreview> searchRecipesByIngredient(@RequestParam List<String> ingredients) throws IOException, ExecutionException, InterruptedException {
-        return recipeService.searchRecipesByIngredient(ingredients);
+    public List<RecipePreview> searchRecipesByIngredient(@RequestParam List<String> ingredients, @RequestParam List<Integer> ingredientIds) throws IOException, ExecutionException, InterruptedException {
+        return recipeService.searchRecipesByIngredient(ingredients, ingredientIds);
     }
 
     @GetMapping("/search/name")

@@ -143,55 +143,6 @@ public class RecipeService {
         return "Deleted recipe " + recipe.getId();
     }
 
-    public List<RecipePreview> searchRecipesByIngredient(List<String> ingredients) throws IOException, ExecutionException, InterruptedException {
-        List<RecipePreview> recipeList = new ArrayList<>();
-        if (ingredients.isEmpty()) return recipeList;
-
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append("https://api.spoonacular.com/recipes/findByIngredients");
-        urlBuilder.append("?ingredients=").append(ingredients.toString().substring(1, ingredients.toString().length() - 1).replaceAll(", ", ","));
-        urlBuilder.append("&number=").append(4);
-        urlBuilder.append("&apiKey=").append(SPOONACULAR_API_KEY);
-
-        URL url = new URL(urlBuilder.toString());
-        String json = IOUtils.toString(url, StandardCharsets.UTF_8);
-        JSONArray jsonArray = new JSONArray(json);
-        if (jsonArray.isEmpty()) return recipeList;
-        ArrayList<Integer> recipeIdList = new ArrayList<>();
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            recipeIdList.add(jsonObject.getInt("id"));
-        }
-
-        recipeList.addAll(getListOfExternalRecipes(recipeIdList));
-
-        // Internal recipes
-
-        StringBuilder filter = new StringBuilder();
-        if (!ingredients.isEmpty()) {
-            filter.append("(");
-            for (int i = 0; i < ingredients.size(); i++) {
-                if (i != 0) filter.append(" OR ");
-                filter.append("ingredients:").append('"').append(ingredients.get(i)).append('"');
-            }
-            filter.append(")");
-        }
-        com.algolia.search.models.indexing.Query query = new com.algolia.search.models.indexing.Query("");
-        query.setFilters(filter.toString());
-
-        SearchResult<InternalRecipeDTO> result = index.search(query);
-        List<InternalRecipeDTO> recipeDTOList = result.getHits();
-
-        for (InternalRecipeDTO recipeDTO : recipeDTOList) {
-            Recipe recipe = new Recipe(recipeDTO);
-            RecipePreview recipePreview = new RecipePreview(recipe);
-            recipeList.add(recipePreview);
-        }
-
-        return recipeList;
-    }
-
     public List<RecipePreview> searchRecipesByName(SearchParameters parameters) throws IOException {
         List<RecipePreview> recipeList = new ArrayList<>();
 
@@ -217,14 +168,65 @@ public class RecipeService {
         return recipeList;
     }
 
+    public List<RecipePreview> searchRecipesByIngredient(List<String> ingredients, List<Integer> ingredientIds) throws IOException, ExecutionException, InterruptedException {
+        List<RecipePreview> recipeList = new ArrayList<>();
+        if (ingredients.isEmpty()) return recipeList;
+
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("https://api.spoonacular.com/recipes/findByIngredients");
+        urlBuilder.append("?ingredients=").append(ingredients.toString().substring(1, ingredients.toString().length() - 1).replaceAll(", ", ","));
+        urlBuilder.append("&number=").append(4);
+        urlBuilder.append("&apiKey=").append(SPOONACULAR_API_KEY);
+
+        URL url = new URL(urlBuilder.toString());
+        String json = IOUtils.toString(url, StandardCharsets.UTF_8);
+        JSONArray jsonArray = new JSONArray(json);
+        if (jsonArray.isEmpty()) return recipeList;
+        ArrayList<Integer> recipeIdList = new ArrayList<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            recipeIdList.add(jsonObject.getInt("id"));
+        }
+
+        recipeList.addAll(getListOfExternalRecipes(recipeIdList));
+
+        // Internal recipes
+
+        StringBuilder filter = new StringBuilder();
+        if (!ingredientIds.isEmpty()) {
+            filter.append("(");
+            for (int i = 0; i < ingredientIds.size(); i++) {
+                if (i != 0) filter.append(" OR ");
+                filter.append("ingredients:").append(ingredientIds.get(i));
+            }
+            filter.append(")");
+        }
+        com.algolia.search.models.indexing.Query query = new com.algolia.search.models.indexing.Query();
+        query.setFilters(filter.toString());
+
+        SearchResult<InternalRecipeDTO> result = index.search(query);
+        List<InternalRecipeDTO> recipeDTOList = result.getHits();
+
+        for (InternalRecipeDTO recipeDTO : recipeDTOList) {
+            Recipe recipe = new Recipe(recipeDTO);
+            RecipePreview recipePreview = new RecipePreview(recipe);
+            recipeList.add(recipePreview);
+        }
+
+        return recipeList;
+    }
+
     public List<RecipePreview> searchRecipesByPantry(String userUID) throws ExecutionException, InterruptedException, IOException {
         List<IngredientPreview> pantry = pantryService.getIngredientsFromPantry(userUID);
         List<String> ingredientList = new ArrayList<>();
+        List<Integer> ingredientIdList = new ArrayList<>();
         for (IngredientPreview ingredient: pantry) {
             ingredientList.add(ingredient.getName());
+            ingredientIdList.add(ingredient.getId());
         }
 
-        return searchRecipesByIngredient(ingredientList);
+        return searchRecipesByIngredient(ingredientList, ingredientIdList);
     }
 
     public List<RecipePreview> getRecipesByUserUID(String userUID) throws ExecutionException, InterruptedException {

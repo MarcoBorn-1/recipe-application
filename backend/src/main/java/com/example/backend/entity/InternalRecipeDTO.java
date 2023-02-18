@@ -33,7 +33,7 @@ public class InternalRecipeDTO {
 
         Map<String, Map<String, Object>> converted_ingredient_map = new HashMap<>();
         for (Ingredient ingredient: ingredientArrayList) {
-            ingredients.add(ingredient.getName());
+            ingredients.add(ingredient.getId());
 
             Map<String, Object> ingredientInfo = new HashMap<>();
             ingredientInfo.put("id", ingredient.getId());
@@ -48,7 +48,7 @@ public class InternalRecipeDTO {
 
     private int id;
     private String title;
-    private ArrayList<String> ingredients;
+    private ArrayList<Integer> ingredients;
     private Map<String, Map<String, Object>> ingredients_map;
     private Double calories;
     private Double proteins;

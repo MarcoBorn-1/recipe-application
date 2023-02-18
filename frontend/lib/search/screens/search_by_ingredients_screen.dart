@@ -42,12 +42,17 @@ class _SearchByIngredientsScreenState extends State<SearchByIngredientsScreen> {
 
     if (ingredientList.isNotEmpty) {
       List<String> ingredientNameList = [];
+      List<int> ingredientIdList = [];
+
       for (IngredientPreview preview in ingredientList) {
         ingredientNameList.add(preview.name);
+        ingredientIdList.add(preview.id);
       }
       String ingredients = ingredientNameList.toString();
+      String ingredientIds = ingredientIdList.toString();
       ingredients = ingredients.substring(1, ingredients.length - 1);
-      parameters += "ingredients=$ingredients";
+      ingredientIds = ingredientIds.substring(1, ingredientIds.length - 1);
+      parameters += "ingredients=$ingredients&ingredientIds=$ingredientIds";
     }
     return parameters;
   }
@@ -67,13 +72,12 @@ class _SearchByIngredientsScreenState extends State<SearchByIngredientsScreen> {
             child: ListTile(
               tileColor: const Color.fromARGB(126, 126, 126, 126),
               title: Center(
-                child: Text(
-                  ingredientList[index].name.titleCase,
-                  softWrap: true,
-                  overflow: TextOverflow.fade,
-                  style: const TextStyle(color: Colors.white),
-                )
-              ),
+                  child: Text(
+                ingredientList[index].name.titleCase,
+                softWrap: true,
+                overflow: TextOverflow.fade,
+                style: const TextStyle(color: Colors.white),
+              )),
               trailing: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -89,38 +93,38 @@ class _SearchByIngredientsScreenState extends State<SearchByIngredientsScreen> {
           );
         }),
       );
-    }
-    else {
+    } else {
       ingredientWidget = const TitleText(
-      "No ingredients added yet...",
-      fontSize: 16,
+        "No ingredients added yet...",
+        fontSize: 16,
       );
     }
 
     return Scaffold(
         appBar: AppBar(
           leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Icon(Icons.egg_alt_outlined, color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.egg_alt_outlined, color: Colors.white)),
           title: Text(appBarTitle),
           actions: [
             GestureDetector(
               onTap: () {
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchResultScreen(
-                      parameters: buildParameters(),
-                      searchMode: SearchMode.ingredient,
-                    )
-                  )
-                );
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SearchResultScreen(
+                              parameters: buildParameters(),
+                              searchMode: SearchMode.ingredient,
+                            )));
               },
               child: const Padding(
                 padding: EdgeInsets.only(right: 8.0),
-                child: Icon(Icons.search, color: Colors.white,),
+                child: Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
               ),
             )
           ],
@@ -134,32 +138,35 @@ class _SearchByIngredientsScreenState extends State<SearchByIngredientsScreen> {
             children: [
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
-                child: TitleText("Ingredients", fontSize: 32,),
+                child: TitleText(
+                  "Ingredients",
+                  fontSize: 32,
+                ),
               ),
-              Center(child: Padding(
+              Center(
+                  child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: ingredientWidget,
               )),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
                 child: GestureDetector(
-                  onTap: () async {
-                    var ingredient = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchIngredientScreen(
-                          mode: IngredientSearch.search,
-                          excludedIngredientList: ingredientList,
-                        )
-                      )
-                    );
-                    if (ingredient != null) {
-                      setState(() {
-                        ingredientList.add(ingredient);
-                      });
-                    }
-                  },
-                  child: const CustomButton("Add ingredients", true, 24)),
+                    onTap: () async {
+                      var ingredient = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SearchIngredientScreen(
+                                    mode: IngredientSearch.search,
+                                    excludedIngredientList: ingredientList,
+                                  )));
+                      if (ingredient != null) {
+                        setState(() {
+                          ingredientList.add(ingredient);
+                        });
+                      }
+                    },
+                    child: const CustomButton("Add ingredients", true, 24)),
               ),
             ],
           ),
