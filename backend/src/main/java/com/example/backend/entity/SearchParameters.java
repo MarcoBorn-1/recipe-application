@@ -94,6 +94,19 @@ public class SearchParameters {
             if (maxFat != null) filters.append("fats <= ").append(maxFat);
         }
 
+        if (intolerances != null && !intolerances.isEmpty())
+        {
+            if (!filters.isEmpty()) filters.append(" AND ");
+            filters.append("(");
+            for (int i = 0; i < intolerances.size(); i++) {
+                if (i != 0) filters.append(" OR ");
+                filters.append("NOT intolerances:").append('"').append(intolerances.get(i)).append('"');
+            }
+            filters.append(")");
+        }
+
+        System.out.println(filters);
+
         if (!filters.isEmpty()) searchQuery.setFilters(filters.toString());
 
         return searchQuery;
