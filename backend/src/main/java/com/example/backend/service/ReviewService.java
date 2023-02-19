@@ -19,9 +19,10 @@ public class ReviewService {
     private UserService userService;
     public String createReview(Review review) throws ExecutionException, InterruptedException {
         String review_type = (review.getIsExternal()) ? "external_reviews" : "internal_reviews";
-        System.out.println(review.getComment() + review.getRating());
         Firestore dbFirestore = FirestoreClient.getFirestore();
         WriteResult collectionsApiFuture = dbFirestore.collection("reviews").document(review_type).collection(String.valueOf(review.getRecipeID())).document(review.getUserUID()).set(review.convertToDTO()).get();
+
+
         return collectionsApiFuture.getUpdateTime().toString();
     }
 

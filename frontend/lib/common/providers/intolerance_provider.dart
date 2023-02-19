@@ -16,7 +16,7 @@ class IntolerancesProvider extends ChangeNotifier {
     "Tree Nut",
     "Wheat"
   ];
-  List<String> _selectedItems = [];
+  final List<String> _selectedItems = [];
   List<String> get selectedItems => _selectedItems;
   bool containsItem(String value) => _selectedItems.contains(value);
 

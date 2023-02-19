@@ -78,7 +78,7 @@ class _MyBottomNavigatorState extends State<MyBottomNavigator> {
   List<Widget> _buildScreens() {
       return [
         const HomePage(),
-        SearchOptionScreen(),
+        const SearchOptionScreen(),
         const WidgetTree(),
       ];
   }

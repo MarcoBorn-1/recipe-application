@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/common/models/auth.dart';
@@ -35,12 +34,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           isChanged = true;
           Navigator.pop(context, isChanged);
         }).catchError((error) {
-          print("Password can't be changed" + error.toString());
+          print("Password can't be changed: $error");
           errorMessage = error.toString();
           return;
         });
       }).catchError((err) {
-        print("Failed to authenticate" + err.toString());
+        print("Failed to authenticate: $err");
         errorMessage = err.toString();
         return;
       });

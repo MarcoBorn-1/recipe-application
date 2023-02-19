@@ -262,7 +262,6 @@ public class RecipeService {
             if (i != recipeIdList.size() - 1) urlBuilder.append(",");
         }
 
-        System.out.println(urlBuilder);
         URL url = new URL(urlBuilder.toString());
         String json = IOUtils.toString(url, StandardCharsets.UTF_8);
         JSONArray jsonArray = new JSONArray(json);

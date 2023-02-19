@@ -34,7 +34,6 @@ public class PantryService {
         Firestore db = FirestoreClient.getFirestore();
         DocumentReference pantryRef = db.collection("pantry").document(user_uid);
         if (!pantryRef.get().get().exists()) {
-            System.out.println("test");
             Map<String, Object> pantry = new HashMap<>();
             pantry.put("ingredients", new ArrayList<>());
             pantryRef.set(pantry);
