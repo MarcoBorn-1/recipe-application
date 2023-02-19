@@ -3,6 +3,8 @@ package com.example.backend.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class User {
@@ -10,4 +12,5 @@ public class User {
     private String imageURL;
     private String uid;
     private String username;
+    private List<String> deviceTokens;
 }

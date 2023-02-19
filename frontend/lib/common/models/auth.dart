@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Auth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -11,8 +12,17 @@ class Auth {
 
   Future<void> signInWithEmailAndPassword(
       {required String email, required String password}) async {
-    await _firebaseAuth.signInWithEmailAndPassword(
-        email: email, password: password);
+    UserCredential userCredential = await _firebaseAuth
+        .signInWithEmailAndPassword(email: email, password: password);
+    User user = userCredential.user!;
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+
+    if (fcmToken != null) {
+      db
+          .collection("users")
+          .doc(user.uid)
+          .update({"deviceTokens": FieldValue.arrayUnion([fcmToken])});
+    }
   }
 
   Future<void> createUserWithEmailAndPassword(
@@ -23,15 +33,18 @@ class Auth {
         .createUserWithEmailAndPassword(email: email, password: password);
     User user = userCredential.user!;
     await user.updateDisplayName(displayName);
+    final fcmToken = await FirebaseMessaging.instance.getToken();
 
     final data = {
       "uid": user.uid,
       "username": displayName,
       "email": user.email,
-      "imageURL": ''
+      "imageURL": '',
+      "deviceTokens": [fcmToken ?? ""]
     };
 
     db.collection("users").doc(user.uid).set(data);
+    await Future.delayed(const Duration(seconds: 1));
   }
 
   Future<void> signOut() async {
