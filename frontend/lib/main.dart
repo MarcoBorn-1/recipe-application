@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/common/models/auth.dart';
+import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import 'package:frontend/profile/login_register/widgets/widget_tree.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +16,7 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await FirebaseMessaging.instance.getToken();
   SystemChrome.setPreferredOrientations(
     [
       DeviceOrientation.portraitUp,
@@ -41,16 +46,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: IntolerancesProvider())
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: const MaterialColor(0xFF221722, color),
-        ),
-        home: const MyBottomNavigator(),
-    ));
+        providers: [
+          ChangeNotifierProvider.value(value: IntolerancesProvider())
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primarySwatch: const MaterialColor(0xFF221722, color),
+          ),
+          home: const MyBottomNavigator(),
+        ));
   }
 }
 
@@ -74,68 +79,92 @@ class _MyBottomNavigatorState extends State<MyBottomNavigator> {
     800: Color.fromRGBO(34, 23, 34, .9),
     900: Color.fromRGBO(34, 23, 34, 1),
   };
-  
+
   List<Widget> _buildScreens() {
-      return [
-        const HomePage(),
-        const SearchOptionScreen(),
-        const WidgetTree(),
-      ];
+    return [
+      const HomePage(),
+      const SearchOptionScreen(),
+      const WidgetTree(),
+    ];
   }
+
   List<PersistentBottomNavBarItem> _navBarsItems() {
-        return [
-            PersistentBottomNavBarItem(
-                icon: const Icon(CupertinoIcons.home),
-                title: ("Home"),
-                activeColorPrimary: CupertinoColors.activeBlue,
-                inactiveColorPrimary: CupertinoColors.systemGrey,
-            ),
-            PersistentBottomNavBarItem(
-                icon: const Icon(CupertinoIcons.search),
-                title: ("Search"),
-                activeColorPrimary: CupertinoColors.activeBlue,
-                inactiveColorPrimary: CupertinoColors.systemGrey,
-            ),
-            PersistentBottomNavBarItem(
-              icon: const Icon(CupertinoIcons.person),
-              title: "Profile",
-              activeColorPrimary: CupertinoColors.activeBlue,
-              inactiveColorPrimary: CupertinoColors.systemGrey,
-            )
-        ];
-    }
-    
+    return [
+      PersistentBottomNavBarItem(
+        icon: const Icon(CupertinoIcons.home),
+        title: ("Home"),
+        activeColorPrimary: CupertinoColors.activeBlue,
+        inactiveColorPrimary: CupertinoColors.systemGrey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(CupertinoIcons.search),
+        title: ("Search"),
+        activeColorPrimary: CupertinoColors.activeBlue,
+        inactiveColorPrimary: CupertinoColors.systemGrey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(CupertinoIcons.person),
+        title: "Profile",
+        activeColorPrimary: CupertinoColors.activeBlue,
+        inactiveColorPrimary: CupertinoColors.systemGrey,
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
-   PersistentTabController controller = PersistentTabController(initialIndex: 0);
+    User? user = Auth().currentUser;
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.notification != null) {
+        String desc = message.notification?.body ?? "";
+        if (desc != "" && message.data['receiving_user'] == user?.uid) {
+          showSnackBar(context, desc, SnackBarType.info);
+        }
+
+        if (message.notification!.title != null) {
+          print(message.notification!.title);
+        }
+        if (message.notification!.body != null) {
+          print(message.notification!.body);
+        }
+      }
+    });
+    PersistentTabController controller =
+        PersistentTabController(initialIndex: 0);
     return PersistentTabView(
-        context,
-        controller: controller,
-        screens: _buildScreens(),
-        items: _navBarsItems(),
-        confineInSafeArea: true,
-        backgroundColor: const MaterialColor(0xFF221722, color), // Default is Colors.white.
-        handleAndroidBackButtonPress: true, // Default is true.
-        resizeToAvoidBottomInset: true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
-        stateManagement: true, // Default is true.
-        hideNavigationBarWhenKeyboardShows: true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-        decoration: NavBarDecoration(
-          borderRadius: BorderRadius.circular(10.0),
-          colorBehindNavBar: const MaterialColor(0xFF221722, color),
-        ),
-        popAllScreensOnTapOfSelectedTab: true,
-        popAllScreensOnTapAnyTabs: true,
-        popActionScreens: PopActionScreensType.all,
-        itemAnimationProperties: const ItemAnimationProperties( // Navigation Bar's items animation properties.
-          duration: Duration(milliseconds: 200),
-          curve: Curves.ease,
-        ),
-        screenTransitionAnimation: const ScreenTransitionAnimation( // Screen transition animation on change of selected tab.
-          animateTabTransition: true,
-          curve: Curves.ease,
-          duration: Duration(milliseconds: 200),
-        ),
-        navBarStyle: NavBarStyle.style3, // Choose the nav bar style with this property.
+      context,
+      controller: controller,
+      screens: _buildScreens(),
+      items: _navBarsItems(),
+      confineInSafeArea: true,
+      backgroundColor:
+          const MaterialColor(0xFF221722, color), // Default is Colors.white.
+      handleAndroidBackButtonPress: true, // Default is true.
+      resizeToAvoidBottomInset:
+          true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
+      stateManagement: true, // Default is true.
+      hideNavigationBarWhenKeyboardShows:
+          true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
+      decoration: NavBarDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        colorBehindNavBar: const MaterialColor(0xFF221722, color),
+      ),
+      popAllScreensOnTapOfSelectedTab: true,
+      popAllScreensOnTapAnyTabs: true,
+      popActionScreens: PopActionScreensType.all,
+      itemAnimationProperties: const ItemAnimationProperties(
+        // Navigation Bar's items animation properties.
+        duration: Duration(milliseconds: 200),
+        curve: Curves.ease,
+      ),
+      screenTransitionAnimation: const ScreenTransitionAnimation(
+        // Screen transition animation on change of selected tab.
+        animateTabTransition: true,
+        curve: Curves.ease,
+        duration: Duration(milliseconds: 200),
+      ),
+      navBarStyle:
+          NavBarStyle.style3, // Choose the nav bar style with this property.
     );
   }
 }

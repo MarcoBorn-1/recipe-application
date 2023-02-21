@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class UserService {
-    public UserPreview getUserInformation(String userUID) throws ExecutionException, InterruptedException {
+    public User getUser(String userUID) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         DocumentReference recipeDocumentReference = dbFirestore.collection("users").document(userUID);
         ApiFuture<DocumentSnapshot> future = recipeDocumentReference.get();
@@ -22,7 +22,11 @@ public class UserService {
             return null;
 
         }
-        User user = document.toObject(User.class);
+        return document.toObject(User.class);
+    }
+
+    public UserPreview getUserInformation(String userUID) throws ExecutionException, InterruptedException {
+        User user = getUser(userUID);
         if (user == null) return null;
         return new UserPreview(user);
     }

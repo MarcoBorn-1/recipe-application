@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.entity.Review;
 import com.example.backend.entity.ReviewPreview;
 import com.example.backend.service.ReviewService;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class ReviewController {
     public ReviewService reviewService;
 
     @PostMapping("/create")
-    public String createReview(@RequestBody Review review) throws InterruptedException, ExecutionException {
+    public String createReview(@RequestBody Review review) throws InterruptedException, ExecutionException, FirebaseMessagingException {
         return reviewService.createReview(review);
     }
 
@@ -30,8 +31,8 @@ public class ReviewController {
         return reviewService.getReviewByUserUID(recipeID, isExternal, userUID);
     }
 
-    public String updateReview(@RequestBody Review review, @RequestParam Integer recipeID, @RequestParam boolean isExternal) {
-        return reviewService.updateReview(review, recipeID, isExternal);
+    public String updateReview(@RequestBody Review review) throws FirebaseMessagingException, ExecutionException, InterruptedException {
+        return reviewService.updateReview(review);
     }
 
     @DeleteMapping("/delete")

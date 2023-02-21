@@ -12,5 +12,5 @@ public class User {
     private String imageURL;
     private String uid;
     private String username;
-    private List<String> deviceTokens;
+    private String deviceToken;
 }

@@ -21,7 +21,7 @@ class Auth {
       db
           .collection("users")
           .doc(user.uid)
-          .update({"deviceTokens": FieldValue.arrayUnion([fcmToken])});
+          .update({"deviceToken": fcmToken});
     }
   }
 
@@ -40,7 +40,7 @@ class Auth {
       "username": displayName,
       "email": user.email,
       "imageURL": '',
-      "deviceTokens": [fcmToken ?? ""]
+      "deviceToken": fcmToken
     };
 
     db.collection("users").doc(user.uid).set(data);

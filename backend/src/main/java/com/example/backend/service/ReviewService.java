@@ -4,11 +4,17 @@ import com.example.backend.entity.*;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @AllArgsConstructor
@@ -17,12 +23,31 @@ public class ReviewService {
 
     final int REVIEWS_IN_RECIPE = 3;
     private UserService userService;
-    public String createReview(Review review) throws ExecutionException, InterruptedException {
+    public String createReview(Review review) throws ExecutionException, InterruptedException, FirebaseMessagingException {
         String review_type = (review.getIsExternal()) ? "external_reviews" : "internal_reviews";
         Firestore dbFirestore = FirestoreClient.getFirestore();
         WriteResult collectionsApiFuture = dbFirestore.collection("reviews").document(review_type).collection(String.valueOf(review.getRecipeID())).document(review.getUserUID()).set(review.convertToDTO()).get();
 
+        if (!review.getIsExternal()) {
+            // Go to recipe, get author
+            DocumentReference recipeDocumentReference = dbFirestore.collection("recipes").document(String.valueOf(review.getRecipeID()));
+            ApiFuture<DocumentSnapshot> future = recipeDocumentReference.get();
+            DocumentSnapshot document = future.get();
+            if (!document.exists()) {
+                return null;
 
+            }
+            InternalRecipeDTO internalRecipeDTO = document.toObject(InternalRecipeDTO.class);
+            if (internalRecipeDTO == null) return "";
+            // Go to users, get user class
+            User user = userService.getUser(internalRecipeDTO.getAuthor());
+            // Retrieve token
+            String token = user.getDeviceToken();
+            if (token.isEmpty()) return "";
+            Message message = Message.builder().setToken(token).putData("receiving_user", internalRecipeDTO.getAuthor()).setNotification(Notification.builder().setTitle("New review").setBody("Your recipe got a new review!").build()).build();
+            FirebaseMessaging fcm = FirebaseMessaging.getInstance();
+            fcm.send(message);
+        }
         return collectionsApiFuture.getUpdateTime().toString();
     }
 
@@ -75,8 +100,35 @@ public class ReviewService {
         return review;
     }
 
-    public String updateReview(Review review, Integer recipeID, boolean isExternal) {
-        return "";
+    public String updateReview(Review review) throws FirebaseMessagingException, ExecutionException, InterruptedException {
+        String review_type = (review.getIsExternal()) ? "external_reviews" : "internal_reviews";
+        Map<String, Object> updatedReview = new HashMap<>();
+        updatedReview.put("comment", review.getComment());
+        updatedReview.put("rating", review.getRating());
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        WriteResult collectionsApiFuture = dbFirestore.collection("reviews").document(review_type).collection(String.valueOf(review.getRecipeID())).document(review.getUserUID()).set(updatedReview).get();
+
+        if (!review.getIsExternal()) {
+            // Go to recipe, get author
+            DocumentReference recipeDocumentReference = dbFirestore.collection("recipes").document(String.valueOf(review.getRecipeID()));
+            ApiFuture<DocumentSnapshot> future = recipeDocumentReference.get();
+            DocumentSnapshot document = future.get();
+            if (!document.exists()) {
+                return null;
+
+            }
+            InternalRecipeDTO internalRecipeDTO = document.toObject(InternalRecipeDTO.class);
+            if (internalRecipeDTO == null) return "";
+            // Go to users, get user class
+            User user = userService.getUser(internalRecipeDTO.getAuthor());
+            // Retrieve token
+            String token = user.getDeviceToken();
+            if (token.isEmpty()) return "";
+            Message message = Message.builder().setToken(token).putData("receiving_user", internalRecipeDTO.getAuthor()).setNotification(Notification.builder().setTitle("New review").setBody("Your recipe got a new review!").build()).build();
+            FirebaseMessaging fcm = FirebaseMessaging.getInstance();
+            fcm.send(message);
+        }
+        return collectionsApiFuture.getUpdateTime().toString();
     }
 
     public void removeReview(Review review) {
