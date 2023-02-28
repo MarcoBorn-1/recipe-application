@@ -6,6 +6,7 @@ import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/recipe/models/review.dart';
 import 'package:frontend/recipe/screens/add_review_screen.dart';
 import 'package:frontend/recipe/widgets/recipe_review_container.dart';
+import 'package:frontend/recipe/widgets/review_widget_tree.dart';
 import 'package:http/http.dart' as http;
 
 class ShowReviewsPage extends StatefulWidget {
@@ -51,7 +52,7 @@ class _ShowReviewsPageState extends State<ShowReviewsPage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          AddReviewScreen(widget.recipeId, widget.isExternal)));
+                          ReviewWidgetTree(widget.recipeId, widget.isExternal)));
             },
             child: const Padding(
               padding: EdgeInsets.only(right: 8.0),

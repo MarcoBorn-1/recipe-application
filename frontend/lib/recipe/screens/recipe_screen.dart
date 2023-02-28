@@ -14,6 +14,7 @@ import 'package:frontend/recipe/widgets/recipe_ingredients_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_nutrients_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_reviews_widget.dart';
 import 'package:frontend/recipe/widgets/recipe_steps_widget.dart';
+import 'package:frontend/recipe/widgets/review_widget_tree.dart';
 import 'package:http/http.dart' as http;
 
 class RecipeScreen extends StatefulWidget {
@@ -85,7 +86,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                       var value = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => AddReviewScreen(
+                              builder: (context) => ReviewWidgetTree(
                                   widget.recipeId, widget.isExternal)));
                       if (value) {
                         setState(() {
@@ -141,7 +142,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
                               }
                               break;
                           }
-                          // TODO: add toast confirming the deletion/edit of recipe
                         }
                       },
                       child: const Padding(

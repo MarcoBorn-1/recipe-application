@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
+import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import 'package:frontend/common/widgets/title_text.dart';
 import 'package:frontend/recipe/models/review.dart';
 import 'package:frontend/recipe/models/review_DTO.dart';
@@ -20,13 +21,13 @@ class AddReviewScreen extends StatefulWidget {
 }
 
 class _AddReviewScreenState extends State<AddReviewScreen> {
+  late Future<Review?> dataFuture;
   String errorMessage = "";
   User? user = Auth().currentUser;
   double chosenRating = -1;
   final TextEditingController _controllerComment = TextEditingController();
   bool loadedData = false;
   late Review review;
-  bool editRecipe = false;
   bool changedReview = false;
 
   Widget _entryField(
@@ -55,6 +56,12 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    dataFuture = loadData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -67,89 +74,28 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
       ),
       backgroundColor: const Color(0xFF242424),
       body: SafeArea(
-        child: FutureBuilder<bool>(
-          future: loadData(),
+        child: FutureBuilder<Review?>(
+          future: dataFuture,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(child: Text(snapshot.error.toString()));
-            } else if (snapshot.hasData) {
-              if (!snapshot.data! || editRecipe == true) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 20.0),
-                        child: TitleText(
-                          "Rating",
-                          fontSize: 32,
-                        ),
-                      ),
-                      RatingBar.builder(
-                        itemSize: 50,
-                        ignoreGestures: false,
-                        initialRating: chosenRating,
-                        direction: Axis.horizontal,
-                        itemCount: 5,
-                        itemBuilder: (context, _) => const Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
-                        onRatingUpdate: (rating) {
-                          chosenRating = rating;
-                        },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 50.0, vertical: 20),
-                        child: _entryField("Comment", _controllerComment),
-                      ),
-                      Text(
-                        errorMessage,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                        child: GestureDetector(
-                          onTap: () async {
-                            bool added = await addReview();
-                            if (!added) {
-                              setState(() {
-                                errorMessage = "Fill out all fields!";
-                              });
-                            } else {
-                              setState(() {
-                              editRecipe = false;
-                              loadedData = false;
-                            });
-                              errorMessage = "";
-                              changedReview = true;
-                            }
-                          },
-                          child: const CustomButton("Add review", true, 24),
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              } else {
-                return Center(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+            } else if (snapshot.data == null) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Padding(
-                      padding: EdgeInsets.only(bottom: 30.0),
+                      padding: EdgeInsets.only(top: 20.0),
                       child: TitleText(
-                        "You have already reviewed this recipe!",
-                        fontSize: 16,
+                        "Rating",
+                        fontSize: 32,
                       ),
                     ),
-                    const TitleText("Your review:"),
                     RatingBar.builder(
-                      itemSize: 25,
-                      ignoreGestures: true,
-                      initialRating: review.rating,
+                      itemSize: 50,
+                      ignoreGestures: false,
+                      initialRating: chosenRating,
                       direction: Axis.horizontal,
                       itemCount: 5,
                       itemBuilder: (context, _) => const Icon(
@@ -160,39 +106,39 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                         chosenRating = rating;
                       },
                     ),
-                    TitleText(review.comment, fontSize: 12),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 20, horizontal: 40.0),
-                      child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              editRecipe = true;
-                              errorMessage = "";
-                            });
-                          },
-                          child: const CustomButton("Edit review", true, 24)),
+                          horizontal: 50.0, vertical: 20),
+                      child: _entryField("Comment", _controllerComment),
+                    ),
+                    Text(
+                      errorMessage,
+                      style: const TextStyle(color: Colors.red),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 20, horizontal: 40.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 50.0),
                       child: GestureDetector(
-                          onTap: () {
-                            removeReview();
+                        onTap: () async {
+                          bool added = await addReview();
+                          if (!added) {
                             setState(() {
-                              errorMessage = "";
+                              errorMessage = "Fill out all fields!";
                             });
-                          },
-                          child: const CustomButton(
-                            "Remove review",
-                            false,
-                            24,
-                            isWarning: true,
-                          )),
-                    ),
+                          } else {
+                            if (mounted) {
+                              showSnackBar(context, "Successfully added review!",
+                                SnackBarType.success);
+                              Navigator.pop(context, true);
+                            }
+                            
+                          }
+                        },
+                        child: const CustomButton("Add review", true, 24),
+                      ),
+                    )
                   ],
-                ));
-              }
+                ),
+              );
             } else {
               return const Center(
                   child: CircularProgressIndicator(color: Colors.white));
@@ -218,14 +164,6 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
-
-    Review newReview = Review(
-        rating: chosenRating,
-        userUID: review.userUID,
-        username: review.username,
-        comment: _controllerComment.text,
-        userImageURL: review.userImageURL);
-    review = newReview;
     return true;
   }
 
@@ -249,10 +187,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
     });
   }
 
-  Future<bool> loadData() async {
-    if (loadedData == true) {
-      return true;
-    }
+  Future<Review?> loadData() async {
     if (user == null) {
       print("User is not logged in!");
       throw Exception('User is not logged in');
@@ -261,14 +196,12 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
         'http://10.0.2.2:8080/review/get_by_user_uid?recipeID=${widget.recipeId}&isExternal=${widget.isExternal}&userUID=${user!.uid}'));
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,r
-      // then parse the JSON.
-      if (response.body.isEmpty) return false;
       review = Review.fromJson(json.decode(response.body));
-      loadedData = true;
       _controllerComment.text = review.comment;
       chosenRating = review.rating;
-      return true;
+      return review;
+    } else if (response.statusCode == 204) {
+      return null;
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
