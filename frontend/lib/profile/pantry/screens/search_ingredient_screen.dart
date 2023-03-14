@@ -1,8 +1,11 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/ingredient_preview.dart';
 import 'package:frontend/common/models/ingredient_search_enum.dart';
@@ -64,7 +67,7 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
   Future<List<IngredientPreview>> loadIngredientData() async {
     loadedQuery = textController.text;
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/ingredient/search?query=${textController.text}'));
+        '${API_URL}/ingredient/search?query=${textController.text}'));
     print("Loaded ingredient search results data from endpoint.");
     if (response.statusCode == 200) {
       List<IngredientPreview> ingredients;
@@ -80,7 +83,7 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
 
   Future<List<IngredientPreview>> loadPantryData() async {
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/pantry/search?query=${textController.text}&user_uid=${user!.uid}'));
+        '${API_URL}/pantry/search?query=${textController.text}&user_uid=${user!.uid}'));
     print("Loaded pantry search results data from endpoint.");
     loadedQuery = textController.text;
     if (response.statusCode == 200) {
@@ -96,7 +99,7 @@ class _SearchIngredientState extends State<SearchIngredientScreen> {
 
   void addIngredient(int ingredientId) async {
     await http.post(Uri.parse(
-        'http://10.0.2.2:8080/pantry/add?ingredient_id=$ingredientId&user_uid=${user!.uid}'));
+        '${API_URL}/pantry/add?ingredient_id=$ingredientId&user_uid=${user!.uid}'));
   }
 
   @override

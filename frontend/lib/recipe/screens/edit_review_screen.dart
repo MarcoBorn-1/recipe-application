@@ -1,8 +1,11 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/custom_snack_bar.dart';
@@ -40,7 +43,7 @@ class _EditReviewScreenState extends State<EditReviewScreen> {
         recipeID: widget.recipeId,
         isExternal: widget.isExternal);
     await http.post(
-      Uri.parse('http://10.0.2.2:8080/review/create'),
+      Uri.parse('${API_URL}/review/create'),
       body: json.encode(reviewDTO),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -57,7 +60,7 @@ class _EditReviewScreenState extends State<EditReviewScreen> {
         recipeID: widget.recipeId,
         isExternal: widget.isExternal);
     await http.delete(
-      Uri.parse('http://10.0.2.2:8080/review/delete'),
+      Uri.parse('${API_URL}/review/delete'),
       body: json.encode(reviewDTO),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

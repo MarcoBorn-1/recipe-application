@@ -1,9 +1,10 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps
 
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/icon_title_button.dart';
 import 'package:frontend/common/widgets/title_text.dart';
@@ -43,7 +44,7 @@ class _SearchDishNameState extends State<SearchDishName> {
     if (loadedData == true) return loadedRecipes;
     String parameters = buildParameters();
     final response = await http
-        .get(Uri.parse('http://10.0.2.2:8080/search?$parameters'));
+        .get(Uri.parse('${API_URL}/search?$parameters'));
     if (response.statusCode == 200) {
       List<RecipePreview> recipes;
       recipes = (json.decode(response.body) as List)

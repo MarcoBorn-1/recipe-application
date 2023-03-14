@@ -1,7 +1,10 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/custom_snack_bar.dart';
@@ -201,14 +204,14 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Future<void> changeFavoriteStatus(bool isFavorite) async {
     if (isFavorite) {
       await http.delete(Uri.parse(
-          'http://10.0.2.2:8080/favorite/remove?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
+          '${API_URL}/favorite/remove?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
       if (mounted) {
         showSnackBar(
             context, "Removed recipe from favorites", SnackBarType.error);
       }
     } else {
       await http.post(Uri.parse(
-          'http://10.0.2.2:8080/favorite/add?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
+          '${API_URL}/favorite/add?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
       if (mounted) {
         showSnackBar(
             context, "Added recipe to favorites", SnackBarType.success);
@@ -219,7 +222,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
   Future<bool> isRecipeFavorite() async {
     if (user == null) return false;
     var response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/favorite/is_favorite?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
+        '${API_URL}/favorite/is_favorite?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}&user_uid=${user!.uid}'));
     if (response.statusCode == 200) {
       String result = response.body;
       return (result == "true") ? true : false;
@@ -232,10 +235,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
     http.Response response;
     if (widget.isExternal) {
       response = await http.get(Uri.parse(
-          'http://10.0.2.2:8080/recipe/get_external?id=${widget.recipeId}'));
+          '${API_URL}/recipe/get_external?id=${widget.recipeId}'));
     } else {
       response = await http.get(Uri.parse(
-          'http://10.0.2.2:8080/recipe/get_internal?id=${widget.recipeId}'));
+          '${API_URL}/recipe/get_internal?id=${widget.recipeId}'));
     }
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {

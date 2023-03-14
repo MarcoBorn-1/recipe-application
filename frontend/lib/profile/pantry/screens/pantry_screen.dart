@@ -1,7 +1,10 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/ingredient_preview.dart';
 import 'package:frontend/common/models/ingredient_search_enum.dart';
@@ -29,7 +32,7 @@ class _PantryScreenState extends State<PantryScreen> {
       return ingredientList;
     }
     final response = await http.get(
-        Uri.parse('http://10.0.2.2:8080/pantry/get?user_uid=${user!.uid}'));
+        Uri.parse('${API_URL}/pantry/get?user_uid=${user!.uid}'));
     if (response.statusCode == 200) {
       print("Loaded in pantry");
       List<IngredientPreview> ingredients;
@@ -45,7 +48,7 @@ class _PantryScreenState extends State<PantryScreen> {
 
   void removeIngredient(int ingredientId) async {
     await http.delete(Uri.parse(
-        'http://10.0.2.2:8080/pantry/remove?ingredient_id=$ingredientId&user_uid=${user!.uid}'));
+        '${API_URL}/pantry/remove?ingredient_id=$ingredientId&user_uid=${user!.uid}'));
   }
 
   Widget removeIngredientDialog(IngredientPreview ingredient) {

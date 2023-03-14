@@ -1,7 +1,10 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/widgets/recipe_container.dart';
@@ -22,8 +25,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   User? user = Auth().currentUser;
 
   Future<List<RecipePreview>> getRecipeData() async {
-    final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/get_favorite?user_uid=${user!.uid}'));
+    final response = await http
+        .get(Uri.parse('${API_URL}/recipe/get_favorite?user_uid=${user!.uid}'));
     if (response.statusCode == 200) {
       List<RecipePreview> recipes;
       recipes = (json.decode(response.body) as List)
@@ -78,7 +81,9 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                       recipeId: recipeList[index].id,
                                       isExternal: recipeList[index].isExternal,
                                     )));
-                        if (tmp != null && (tmp == EditRecipeStatus.delete || tmp == EditRecipeStatus.edit)) {
+                        if (tmp != null &&
+                            (tmp == EditRecipeStatus.delete ||
+                                tmp == EditRecipeStatus.edit)) {
                           await Future.delayed(const Duration(seconds: 1));
                           setState(() {
                             recipeDataFuture = getRecipeData();

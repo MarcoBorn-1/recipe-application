@@ -1,6 +1,9 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/widgets/recipe_container.dart';
 import 'package:frontend/profile/profile_screen/widgets/profile_header_widget.dart';
@@ -24,7 +27,7 @@ class _ShowProfileScreenState extends State<ShowProfileScreen> {
 
   Future<UserInformation> getProfileData() async {
     final response = await http.get(
-        Uri.parse('http://10.0.2.2:8080/user/get_info?user_uid=${widget.uid}'));
+        Uri.parse('${API_URL}/user/get_info?user_uid=${widget.uid}'));
     print("Loaded profile data from endpoint.");
     if (response.statusCode == 200) {
       UserInformation userInfo = UserInformation.fromJson(json.decode(response.body));
@@ -36,7 +39,7 @@ class _ShowProfileScreenState extends State<ShowProfileScreen> {
 
   Future<List<RecipePreview>> getRecipeData() async {
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/get_by_user_uid?user_uid=${widget.uid}'));
+        '${API_URL}/recipe/get_by_user_uid?user_uid=${widget.uid}'));
     if (response.statusCode == 200) {
       List<RecipePreview> recipes;
       recipes = (json.decode(response.body) as List)

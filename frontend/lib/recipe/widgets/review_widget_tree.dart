@@ -1,6 +1,9 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/profile/profile_screen/screens/profile_screen.dart';
 import 'package:frontend/profile/login_register/screens/login_register.dart';
@@ -37,7 +40,7 @@ class _ReviewWidgetTreeState extends State<ReviewWidgetTree> {
       throw Exception('User is not logged in');
     }
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/review/get_by_user_uid?recipeID=${widget.recipeId}&isExternal=${widget.isExternal}&userUID=${user!.uid}'));
+        '${API_URL}/review/get_by_user_uid?recipeID=${widget.recipeId}&isExternal=${widget.isExternal}&userUID=${user!.uid}'));
     print("Loaded data from endpoint.");
     if (response.statusCode == 200) {
       Review review = Review.fromJson(json.decode(response.body));

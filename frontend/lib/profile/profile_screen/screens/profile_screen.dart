@@ -1,7 +1,10 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import 'package:frontend/profile/favorites/screens/favorite_screen.dart';
@@ -42,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user == null) throw Exception("User is not logged in");
     await user.reload();
     final response = await http.get(
-        Uri.parse('http://10.0.2.2:8080/user/get_info?user_uid=${user.uid}'));
+        Uri.parse('${API_URL}/user/get_info?user_uid=${user.uid}'));
     if (response.statusCode == 200) {
       UserInformation userInformation;
       userInformation = UserInformation.fromJson(json.decode(response.body));

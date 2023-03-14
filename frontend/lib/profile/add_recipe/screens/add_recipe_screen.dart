@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -5,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/ingredient_search_enum.dart';
 import 'package:frontend/common/providers/intolerance_provider.dart';
@@ -124,7 +127,7 @@ class _AddRecipeState extends State<AddRecipeScreen> {
 
     Map<String, dynamic> json = recipeDTO.toJson();
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8080/recipe/create'),
+      Uri.parse('${API_URL}/recipe/create'),
       body: jsonEncode(json),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

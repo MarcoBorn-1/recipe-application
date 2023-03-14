@@ -1,8 +1,11 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/widgets/recipe_container.dart';
 import 'package:frontend/recipe/models/edit_recipe_status_enum.dart';
@@ -32,7 +35,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<RecipePreview>> loadData() async {
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/search/name?query=${textController.text}&amount=20'));
+        '${API_URL}/recipe/search/name?query=${textController.text}&amount=20'));
     print("Loaded main screen data from endpoint.");
     loadedQuery = textController.text;
     if (response.statusCode == 200) {
@@ -135,7 +138,8 @@ class _HomePageState extends State<HomePage> {
                               if (tmp != null &&
                                   (tmp == EditRecipeStatus.delete ||
                                       tmp == EditRecipeStatus.edit)) {
-                                await Future.delayed(const Duration(seconds: 1));
+                                await Future.delayed(
+                                    const Duration(seconds: 1));
                                 setState(() {
                                   recipeDataFuture = loadData();
                                 });

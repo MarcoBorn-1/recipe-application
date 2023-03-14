@@ -1,8 +1,11 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/common/models/recipe_preview.dart';
 import 'package:frontend/common/widgets/recipe_container.dart';
@@ -42,7 +45,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
 
   Future<List<RecipePreview>> loadRecipesByName() async {
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/search/name?${widget.parameters}'));
+        '${API_URL}/recipe/search/name?${widget.parameters}'));
     print("Loaded search data from endpoint.");
     if (response.statusCode == 200) {
       List<RecipePreview> recipes;
@@ -68,7 +71,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
 
   Future<List<RecipePreview>> loadRecipesByIngredients() async {
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/search/ingredient?${widget.parameters}'));
+        '${API_URL}/recipe/search/ingredient?${widget.parameters}'));
     print("Loaded search data from endpoint.");
     if (response.statusCode == 200) {
       List<RecipePreview> recipes;
@@ -84,7 +87,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
   Future<List<RecipePreview>> loadRecipesUsingPantry() async {
     User? user = Auth().currentUser;
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/recipe/search/pantry?userUID=${user!.uid}'));
+        '${API_URL}/recipe/search/pantry?userUID=${user!.uid}'));
     print("Loaded search data from endpoint.");
     if (response.statusCode == 200) {
       List<RecipePreview> recipes;

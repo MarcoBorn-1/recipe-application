@@ -1,7 +1,10 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/common/constants/constants.dart';
 import 'package:frontend/common/models/auth.dart';
 import 'package:frontend/recipe/models/review.dart';
 import 'package:frontend/recipe/screens/add_review_screen.dart';
@@ -23,7 +26,7 @@ class _ShowReviewsPageState extends State<ShowReviewsPage> {
   User? user = Auth().currentUser;
   Future<List<Review>> getReviewData() async {
     final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/review/get?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}'));
+        '${API_URL}/review/get?recipe_id=${widget.recipeId}&isExternal=${widget.isExternal}'));
     if (response.statusCode == 200) {
       List<Review> reviews;
       reviews = (json.decode(response.body) as List)
