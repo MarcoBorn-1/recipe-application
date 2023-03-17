@@ -33,6 +33,7 @@ class RecipeIngredientsWidget extends StatelessWidget {
               child: Text(
                 element.name.titleCase,
                 style: const TextStyle(color: Colors.white, fontSize: 18),
+                textAlign: TextAlign.start,
               ),
             ),
             Expanded(
@@ -44,6 +45,7 @@ class RecipeIngredientsWidget extends StatelessWidget {
                     child: Text(
                       element.amount.toStringAsFixed(2) + temp,
                       style: const TextStyle(color: Colors.white, fontSize: 18),
+                      textAlign: TextAlign.end
                     ),
                   ),
                 ],
