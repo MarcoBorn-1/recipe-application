@@ -61,6 +61,7 @@ class _EditRecipeScreenState extends State<EditRecipeScreen> {
     if (result == null) return;
 
     setState(() {
+      useOldImage = false;
       pickedImage = result.files.first;
     });
   }
