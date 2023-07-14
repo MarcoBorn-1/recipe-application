@@ -11,7 +11,6 @@ import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/custom_snack_bar.dart';
 import 'package:frontend/common/widgets/input_field.dart';
 import 'package:frontend/common/widgets/title_text.dart';
-import 'package:frontend/recipe/models/review.dart';
 import 'package:frontend/recipe/models/review_DTO.dart';
 import 'package:http/http.dart' as http;
 
@@ -83,7 +82,7 @@ class _EditReviewScreenState extends State<EditReviewScreen> {
                 Navigator.pop(context, false);
               },
               child: const Icon(Icons.arrow_back, color: Colors.white)),
-          title: const Text("Add review"),
+          title: const Text("Edit review"),
         ),
         backgroundColor: const Color(0xFF242424),
         body: SafeArea(
@@ -148,7 +147,7 @@ class _EditReviewScreenState extends State<EditReviewScreen> {
                   padding: const EdgeInsets.symmetric(
                       vertical: 20, horizontal: 30.0),
                   child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         removeReview();
                         showSnackBar(context, "Successfully removed review!",
                             SnackBarType.success);

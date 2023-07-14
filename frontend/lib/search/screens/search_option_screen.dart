@@ -16,7 +16,7 @@ class SearchOptionScreen extends StatefulWidget {
 }
 
 class _SearchOptionScreenState extends State<SearchOptionScreen> {
-  final List<String> titleList = ["Dish Name", "Ingredients", "Pantry"];
+  final List<String> titleList = ["Parameters", "Ingredients", "Pantry"];
   final List<String> descList = [
     "Search for a recipe using it’s name (f.e. Spaghetti), or parameters like nutrient content.",
     "Search for recipes using ingredients.",

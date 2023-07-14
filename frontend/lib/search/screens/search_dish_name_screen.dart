@@ -27,7 +27,7 @@ class _SearchDishNameState extends State<SearchDishName> {
   final TextEditingController textEditingController = TextEditingController();
   bool loadedData = false;
   List<RecipePreview> loadedRecipes = [];
-  String appBarTitle = "Search using dish name";
+  String appBarTitle = "Search using parameters";
   List<int> timeValues = [15, 30, 60];
   List<int> caloriesValues = [0, 200, 400];
   List<int> proteinsValues = [0, 20, 40];
