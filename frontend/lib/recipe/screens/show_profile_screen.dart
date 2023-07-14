@@ -70,73 +70,75 @@ class _ShowProfileScreenState extends State<ShowProfileScreen> {
         title: const Text("View Profile"),
       ),
       backgroundColor: const Color(0xFF242424),
-      body: Column(
-        children: [
-          FutureBuilder<UserInformation>(
-            future: userDataFuture,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Center(child: Text("${snapshot.error}"));
-              } else if (snapshot.hasData) {
-                UserInformation userInfo = snapshot.data!;
-                return ProfileHeader(
-                    username: userInfo.username,
-                    imageURL: userInfo.imageURL,
-                    showIcons: false);
-              } else {
-                return const Center(
-                    child: CircularProgressIndicator());
-              }
-            },
-          ),
-          FutureBuilder<List<RecipePreview>>(
-            future: recipeDataFuture,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Center(child: Text(snapshot.error.toString()));
-              } else if (snapshot.hasData) {
-                List<RecipePreview> recipeList = snapshot.data!;
-                return ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(8),
-                    itemCount: recipeList.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () async {
-                          var tmp = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RecipeScreen(
-                                        recipeImg: recipeList[index].imageURL,
-                                        title: recipeList[index].title,
-                                        recipeId: recipeList[index].id,
-                                        isExternal:
-                                            recipeList[index].isExternal,
-                                      )));
-                          if (tmp != null && (tmp == EditRecipeStatus.delete || tmp == EditRecipeStatus.edit)) {
-                            await Future.delayed(const Duration(seconds: 1));
-                            setState(() {
-                              recipeDataFuture = getRecipeData();
-                            });
-                          }
-                        },
-                        child: RecipeContainer(
-                            recipeList[index].id,
-                            recipeList[index].title,
-                            recipeList[index].readyInMinutes,
-                            recipeList[index].calories,
-                            recipeList[index].imageURL,
-                            recipeList[index].isExternal),
-                      );
-                    });
-              } else {
-                return const Center(
-                    child: CircularProgressIndicator());
-              }
-            },
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            FutureBuilder<UserInformation>(
+              future: userDataFuture,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text("${snapshot.error}"));
+                } else if (snapshot.hasData) {
+                  UserInformation userInfo = snapshot.data!;
+                  return ProfileHeader(
+                      username: userInfo.username,
+                      imageURL: userInfo.imageURL,
+                      showIcons: false);
+                } else {
+                  return const Center(
+                      child: CircularProgressIndicator());
+                }
+              },
+            ),
+            FutureBuilder<List<RecipePreview>>(
+              future: recipeDataFuture,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text(snapshot.error.toString()));
+                } else if (snapshot.hasData) {
+                  List<RecipePreview> recipeList = snapshot.data!;
+                  return ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(8),
+                      itemCount: recipeList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () async {
+                            var tmp = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RecipeScreen(
+                                          recipeImg: recipeList[index].imageURL,
+                                          title: recipeList[index].title,
+                                          recipeId: recipeList[index].id,
+                                          isExternal:
+                                              recipeList[index].isExternal,
+                                        )));
+                            if (tmp != null && (tmp == EditRecipeStatus.delete || tmp == EditRecipeStatus.edit)) {
+                              await Future.delayed(const Duration(seconds: 1));
+                              setState(() {
+                                recipeDataFuture = getRecipeData();
+                              });
+                            }
+                          },
+                          child: RecipeContainer(
+                              recipeList[index].id,
+                              recipeList[index].title,
+                              recipeList[index].readyInMinutes,
+                              recipeList[index].calories,
+                              recipeList[index].imageURL,
+                              recipeList[index].isExternal),
+                        );
+                      });
+                } else {
+                  return const Center(
+                      child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
