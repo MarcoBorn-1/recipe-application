@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:frontend/common/widgets/custom_button.dart';
 import 'package:frontend/common/widgets/custom_snack_bar.dart';
+import 'package:frontend/common/widgets/title_text.dart';
 import '../../../common/models/auth.dart';
 
 class LoginPage extends StatefulWidget {
@@ -147,7 +148,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
+              children: [
+                TitleText(isLogin ? "Login" : "Register"),
                 _entryField('E-mail', _controllerEmail),
                 (isLogin)
                     ? const Text("")
