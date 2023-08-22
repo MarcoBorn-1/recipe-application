@@ -28,11 +28,6 @@
             <scope>test</scope>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-security</artifactId>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -42,37 +37,38 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
-            <version>9.1.1</version>
+            <version>9.2.0</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <version>2.13.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20230618</version>
+            <version>20230227</version>
         </dependency>
+
 
         <dependency>
             <groupId>com.algolia</groupId>
             <artifactId>algoliasearch-core</artifactId>
-            <version>3.16.5</version>
+            <version>3.16.6</version>
         </dependency>
         <dependency>
             <groupId>com.algolia</groupId>
             <artifactId>algoliasearch-apache</artifactId>
-            <version>3.16.5</version>
+            <version>3.16.6</version>
         </dependency>
 
     </dependencies>
